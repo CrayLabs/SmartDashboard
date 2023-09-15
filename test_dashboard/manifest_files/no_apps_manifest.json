@@ -11,8 +11,8 @@
     "runs": [
         {
             "timestep": 1,
-            "applications": [],
-            "orchestrators": [
+            "model": [],
+            "orchestrator": [
                 {
                     "name": "orchestrator_0",
                     "launcher": "local",
@@ -28,7 +28,7 @@
                     "db_hosts": ["string"]
                 }
             ],
-            "ensembles": [
+            "ensemble": [
                 {
                     "name": "ensemble_1",
                     "perm_strat": "string0",
@@ -109,8 +109,8 @@
         },
         {
             "timestep": "int",
-            "applications": [],
-            "orchestrators": [
+            "model": [],
+            "orchestrator": [
                 {
                     "name": "orchestrator_2",
                     "launcher": "local",
@@ -126,7 +126,7 @@
                     "db_hosts": ["host1", "host2", "host3"]
                 }
             ],
-            "ensembles": [
+            "ensemble": [
                 {
                     "name": "ensemble_2",
                     "perm_strat": "all-perm",

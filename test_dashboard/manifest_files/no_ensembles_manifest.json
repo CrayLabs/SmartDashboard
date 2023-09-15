@@ -11,7 +11,7 @@
     "runs": [
         {
             "timestep": 1,
-            "applications": [
+            "model": [
                 {
                     "name": "app1",
                     "path": "app/1/path",
@@ -145,7 +145,7 @@
                     "step_id": 111
                 }
             ],
-            "orchestrators": [
+            "orchestrator": [
                 {
                     "name": "orchestrator_0",
                     "launcher": "local",
@@ -161,11 +161,11 @@
                     "db_hosts": ["string"]
                 }
             ],
-            "ensembles": []
+            "ensemble": []
         },
         {
             "timestep": "int",
-            "applications": [
+            "model": [
                 {
                     "name": "app3",
                     "path": "app/3/path",
@@ -286,7 +286,7 @@
                     "step_id": 111
                 }
             ],
-            "orchestrators": [
+            "orchestrator": [
                 {
                     "name": "orchestrator_2",
                     "launcher": "local",
@@ -302,7 +302,7 @@
                     "db_hosts": ["host1", "host2", "host3"]
                 }
             ],
-            "ensembles": []
+            "ensemble": []
         }
     ]
 }

@@ -26,13 +26,13 @@ class ManifestReader:
             self.experiment = self.data.get("experiment", {})
             self.runs = self.data.get("runs", [])
             self.applications = [
-                app for run in self.runs for app in run.get("applications", [])
+                app for run in self.runs for app in run.get("model", [])
             ]
             self.orchestrators = [
-                orch for run in self.runs for orch in run.get("orchestrators", [])
+                orch for run in self.runs for orch in run.get("orchestrator", [])
             ]
             self.ensembles = [
-                ensemble for run in self.runs for ensemble in run.get("ensembles", [])
+                ensemble for run in self.runs for ensemble in run.get("ensemble", [])
             ]
 
     def get_entity(

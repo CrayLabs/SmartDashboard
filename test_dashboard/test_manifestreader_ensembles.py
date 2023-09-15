@@ -44,6 +44,8 @@ ensemble1 = {
             ],
             "job_id": "111",
             "step_id": 111,
+            "out_path": "test_dashboard/log_files/model_0.out",
+            "err_path": "test_dashboard/log_files/model_0.err"
         }
     ],
 }
@@ -91,6 +93,8 @@ ensemble3 = {
             ],
             "job_id": "111",
             "step_id": 111,
+            "out_path": "test_dashboard/log_files/model_0.out",
+            "err_path": "test_dashboard/log_files/model_0.err"
         },
         {
             "name": "ensemble_3_member_2",
@@ -129,6 +133,8 @@ ensemble3 = {
             ],
             "job_id": "111",
             "step_id": 111,
+            "out_path": "test_dashboard/log_files/model_1.out",
+            "err_path": "test_dashboard/log_files/model_1.err"
         },
     ],
 }

@@ -6,12 +6,14 @@
     "experiment": {
         "name": "my-experiment",
         "path": "experiment/path",
-        "launcher": "local"
+        "launcher": "local",
+        "out_path": "test_dashboard/log_files/model_0.out",
+        "err_path": "test_dashboard/log_files/model_0.err"
     },
     "runs": [
         {
             "timestep": 1,
-            "applications": [
+            "model": [
                 {
                     "name": "app1",
                     "path": "app/1/path",
@@ -76,7 +78,9 @@
                         }
                     ],
                     "job_id": "111",
-                    "step_id": 111
+                    "step_id": 111,
+                    "out_path": "test_dashboard/log_files/model_0.out",
+                    "err_path": "test_dashboard/log_files/model_0.err"
                 },
                 {
                     "name": "app2",
@@ -142,10 +146,12 @@
                         }
                     ],
                     "job_id": "111",
-                    "step_id": 111
+                    "step_id": 111,
+                    "out_path": "test_dashboard/log_files/model_1.out",
+                    "err_path": "test_dashboard/log_files/model_1.err"
                 }
             ],
-            "orchestrators": [
+            "orchestrator": [
                 {
                     "name": "orchestrator_0",
                     "launcher": "local",
@@ -161,7 +167,7 @@
                     "db_hosts": ["string"]
                 }
             ],
-            "ensembles": [
+            "ensemble": [
                 {
                     "name": "ensemble_1",
                     "perm_strat": "string0",
@@ -236,7 +242,9 @@
                                 }
                             ],
                             "job_id": "111",
-                            "step_id": 111
+                            "step_id": 111,
+                            "out_path": "test_dashboard/log_files/model_0.out",
+                            "err_path": "test_dashboard/log_files/model_0.err"
                         }
                     ]
                 }
@@ -244,7 +252,7 @@
         },
         {
             "timestep": "int",
-            "applications": [
+            "model": [
                 {
                     "name": "app3",
                     "path": "app/3/path",
@@ -296,7 +304,9 @@
                         }
                     ],
                     "job_id": "111",
-                    "step_id": 111
+                    "step_id": 111,
+                    "out_path": "test_dashboard/log_files/model_0.out",
+                    "err_path": "test_dashboard/log_files/model_0.err"
                 },
                 {
                     "name": "app4",
@@ -362,10 +372,12 @@
                         }
                     ],
                     "job_id": "111",
-                    "step_id": 111
+                    "step_id": 111,
+                    "out_path": "test_dashboard/log_files/model_1.out",
+                    "err_path": "test_dashboard/log_files/model_1.err"
                 }
             ],
-            "orchestrators": [
+            "orchestrator": [
                 {
                     "name": "orchestrator_2",
                     "launcher": "local",
@@ -381,7 +393,7 @@
                     "db_hosts": ["host1", "host2", "host3"]
                 }
             ],
-            "ensembles": [
+            "ensemble": [
                 {
                     "name": "ensemble_2",
                     "perm_strat": "all-perm",
@@ -430,7 +442,9 @@
                             "db_scripts": [],
                             "db_models": [],
                             "job_id": "111",
-                            "step_id": 111
+                            "step_id": 111,
+                            "out_path": "test_dashboard/log_files/model_1.out",
+                            "err_path": "test_dashboard/log_files/model_1.err"
                         }
                     ]
                 },
@@ -508,7 +522,9 @@
                                 }
                             ],
                             "job_id": "111",
-                            "step_id": 111
+                            "step_id": 111,
+                            "out_path": "test_dashboard/log_files/model_0.out",
+                            "err_path": "test_dashboard/log_files/model_0.err"
                         },
                         {
                             "name": "ensemble_3_member_2",
@@ -573,7 +589,9 @@
                                 }
                             ],
                             "job_id": "111",
-                            "step_id": 111
+                            "step_id": 111,
+                            "out_path": "test_dashboard/log_files/model_1.out",
+                            "err_path": "test_dashboard/log_files/model_1.err"
                         }
                     ]
                 }

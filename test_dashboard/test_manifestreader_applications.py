@@ -38,6 +38,8 @@ application1 = {
     ],
     "job_id": "111",
     "step_id": 111,
+    "out_path": "test_dashboard/log_files/model_0.out",
+    "err_path": "test_dashboard/log_files/model_0.err"
 }
 
 application3 = {
@@ -74,6 +76,8 @@ application3 = {
     ],
     "job_id": "111",
     "step_id": 111,
+    "out_path": "test_dashboard/log_files/model_0.out",
+    "err_path": "test_dashboard/log_files/model_0.err"
 }
 
 parameterize_creator = pytest.mark.parametrize(
