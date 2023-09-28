@@ -17,18 +17,20 @@ from utils.helpers import (
     get_loaded_entities,
     get_ensemble_members,
     get_member,
+    get_entities_with_name,
 )
 
 set_streamlit_page_config()
 local_css("assets/style.scss")
 
 # get real path and manifest.json
-manifest_data = ManifestReader("tests/test_utils/manifest_files/manifesttest.json")
+manifest = ManifestReader.from_file("tests/test_utils/manifest_files/no_apps_manifest.json")
 
-if manifest_data.data is None or manifest_data.experiment == {}:
+
+if manifest.experiment == {}:
     st.header("Experiment Not Found")
 else:
-    st.header("Experiment Overview: " + get_value("name", manifest_data.experiment))
+    st.header("Experiment Overview: " + get_value("name", manifest.experiment))
 
 st.write("")
 
@@ -43,8 +45,8 @@ with experiment:
     col1, col2 = st.columns([4, 4])
     with col1:
         st.write("Status: :green[Running]")
-        st.write("Path: " + get_value("path", manifest_data.experiment))
-        st.write("Launcher: " + get_value("launcher", manifest_data.experiment))
+        st.write("Path: " + get_value("path", manifest.experiment))
+        st.write("Launcher: " + get_value("launcher", manifest.experiment))
 
     st.write("")
     with st.expander(label="Logs"):
@@ -64,11 +66,11 @@ with application:
     with col1:
         selected_app_name: t.Optional[str] = st.selectbox(
             "Select an application:",
-            [app["name"] for app in manifest_data.applications],
+            [app["name"] for app in manifest.applications],
         )
     if selected_app_name is not None:
-        SELECTED_APPLICATION = manifest_data.get_entity(
-            selected_app_name, manifest_data.applications
+        SELECTED_APPLICATION = get_entities_with_name(
+            selected_app_name, manifest.applications
         )
     else:
         SELECTED_APPLICATION = None
@@ -174,13 +176,11 @@ with orchestrators:
     with col1:
         selected_orc_name: t.Optional[str] = st.selectbox(
             "Select an orchestrator:",
-            [orc["name"] for orc in manifest_data.orchestrators],
+            [orc["name"] for orc in manifest.orchestrators],
         )
 
     if selected_orc_name is not None:
-        SELECTED_ORC = manifest_data.get_entity(
-            selected_orc_name, manifest_data.orchestrators
-        )
+        SELECTED_ORC = get_entities_with_name(selected_orc_name, manifest.orchestrators)
     else:
         SELECTED_ORC = None
 
@@ -226,12 +226,12 @@ with ensembles:
     with col1:
         selected_ensemble_name: t.Optional[str] = st.selectbox(
             "Select an ensemble:",
-            [ensemble["name"] for ensemble in manifest_data.ensembles],
+            [ensemble["name"] for ensemble in manifest.ensembles],
         )
 
     if selected_ensemble_name is not None:
-        SELECTED_ENSEMBLE = manifest_data.get_entity(
-            selected_ensemble_name, manifest_data.ensembles
+        SELECTED_ENSEMBLE = get_entities_with_name(
+            selected_ensemble_name, manifest.ensembles
         )
     else:
         SELECTED_ENSEMBLE = None

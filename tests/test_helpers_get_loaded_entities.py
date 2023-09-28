@@ -1,13 +1,13 @@
 import pytest
-import tests.test_utils.test_entities as e
+from .test_utils.test_entities import *
 from utils.helpers import get_loaded_entities
 
 
-parameterize_creator = pytest.mark.parametrize(
+@pytest.mark.parametrize(
     "entity, expected_value",
     [
         pytest.param(
-            e.application_1.get("colocated_db"),
+            application_1.get("colocated_db"),
             [
                 {
                     "Name": "model1",
@@ -36,7 +36,7 @@ parameterize_creator = pytest.mark.parametrize(
             ],
         ),
         pytest.param(
-            e.application_2.get("colocated_db"),
+            application_2.get("colocated_db"),
             [
                 {
                     "Name": "model1",
@@ -65,14 +65,14 @@ parameterize_creator = pytest.mark.parametrize(
             ],
         ),
         pytest.param(
-            e.orchestrator_1, {"Name": [], "Type": [], "Backend": [], "Device": []}
+            orchestrator_1, {"Name": [], "Type": [], "Backend": [], "Device": []}
         ),
         pytest.param(
-            e.no_db_scripts_or_models,
+            no_db_scripts_or_models,
             {"Name": [], "Type": [], "Backend": [], "Device": []},
         ),
         pytest.param(
-            e.application_3.get("colocated_db"),
+            application_3.get("colocated_db"),
             [
                 {
                     "Name": "model1",
@@ -89,7 +89,7 @@ parameterize_creator = pytest.mark.parametrize(
             ],
         ),
         pytest.param(
-            e.application_4.get("colocated_db"),
+            application_4.get("colocated_db"),
             [
                 {
                     "Name": "script1",
@@ -108,9 +108,6 @@ parameterize_creator = pytest.mark.parametrize(
         pytest.param(None, {"Name": [], "Type": [], "Backend": [], "Device": []}),
     ],
 )
-
-
-@parameterize_creator
 def test_get_loaded_entities(entity, expected_value):
     val = get_loaded_entities(entity)
     assert val == expected_value

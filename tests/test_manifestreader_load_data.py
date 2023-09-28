@@ -1,7 +1,8 @@
 import pytest
-from ..utils.FileReader import ManifestReader
+from utils.FileReader import ManifestReader
 
-parameterize_creator = pytest.mark.parametrize(
+
+@pytest.mark.parametrize(
     "json_file, runs_length, app_length, orc_length, ens_length",
     [
         pytest.param("tests/test_utils/manifest_files/manifesttest.json", 2, 4, 3, 3),
@@ -20,11 +21,9 @@ parameterize_creator = pytest.mark.parametrize(
         pytest.param("file_doesnt_exist", 0, 0, 0, 0),
     ],
 )
-
-
-@parameterize_creator
 def test_load_data(json_file, runs_length, app_length, orc_length, ens_length):
-    dash_data = ManifestReader(json_file)
+    dash_data = ManifestReader.from_file(json_file)
+    print(dash_data)
     assert len(dash_data.runs) == runs_length
     assert len(dash_data.applications) == app_length
     assert len(dash_data.orchestrators) == orc_length

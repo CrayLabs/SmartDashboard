@@ -1,20 +1,17 @@
 import pytest
-import tests.test_utils.test_entities as e
+from .test_utils.test_entities import *
 from utils.helpers import get_interface
 
 
-parameterize_creator = pytest.mark.parametrize(
+@pytest.mark.parametrize(
     "entity, expected_value",
     [
-        pytest.param(e.orchestrator_1, "lo, lo2"),
-        pytest.param(e.orchestrator_2, "lo"),
-        pytest.param(e.orchestrator_3, "lo"),
-        pytest.param(e.application_1, ""),
+        pytest.param(orchestrator_1, "lo, lo2"),
+        pytest.param(orchestrator_2, "lo"),
+        pytest.param(orchestrator_3, "lo"),
+        pytest.param(application_1, ""),
     ],
 )
-
-
-@parameterize_creator
 def test_get_interface(entity, expected_value):
     val = get_interface(entity)
     assert val == expected_value

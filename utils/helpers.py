@@ -199,3 +199,31 @@ def get_loaded_entities(
         return loaded_data
 
     return {"Name": [], "Type": [], "Backend": [], "Device": []}
+
+
+def get_entities_with_name(
+    entity_name: str, entity_list: Optional[Dict[str, Any]]
+) -> Optional[Dict[str, Any]]:
+    """
+    Gets an entity from a list of entities when you only
+    know its name. There is a chance that there will be
+    multiple entities with the same name, so for now
+    just grab the first entity.
+
+    Args:
+        entity_name (str): The name of the entity to search for. This is
+        gotten from a dropdown in the dashboard.
+        entity_list (List[Dict[str, Any]]): The list of entites
+        to search through.
+
+    Returns:
+        Optional[Dict[str, Any]]: If found, returns the entity.
+        Otherwise returns None.
+    """
+
+    entities = [e for e in entity_list if entity_name == e["name"]]
+
+    try:
+        return entities[0]
+    except IndexError:
+        return None
