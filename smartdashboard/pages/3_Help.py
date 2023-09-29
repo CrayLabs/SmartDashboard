@@ -1,8 +1,12 @@
+import os
+import pathlib
 import streamlit as st
-from utils.pageSetup import local_css, set_streamlit_page_config
+
+from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 
 set_streamlit_page_config()
-local_css("assets/style.scss")
+curr_path = pathlib.Path(os.path.abspath(__file__)).parent.parent.parent
+local_css(curr_path / "assets/style.scss")
 
 st.header("Welcome to the SmartSim Dashboard Help Page")
 st.write("")

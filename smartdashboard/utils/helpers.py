@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Any, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 
 def get_value(key: str, entity: Optional[Dict[str, Any]]) -> str:
@@ -29,7 +29,7 @@ def get_interface(entity: Optional[Dict[str, Any]]) -> str:
     string if entity is None for dashboard displaying purposes.
     """
     if entity:
-        value = entity.get("interface", "")
+        value: str = entity.get("interface", "")
         if isinstance(value, List):
             return ", ".join(value)
         return value
@@ -79,6 +79,7 @@ def get_port(orc: Optional[Dict[str, Any]]) -> str:
 
         if len(shard_ports) == 1:
             return shard_ports.pop()
+
         raise Exception("Shards within an Orchestrator should have the same port.")
 
     return ""
@@ -217,7 +218,6 @@ def get_entities_with_name(
         Optional[Dict[str, Any]]: If found, returns the entity.
         Otherwise returns None.
     """
-
     entities = [e for e in entity_list if entity_name == e["name"]]
 
     if entities:
