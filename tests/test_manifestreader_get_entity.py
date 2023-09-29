@@ -1,5 +1,5 @@
 import pytest
-from ..utils.FileReader import ManifestReader
+from ..utils.FileReader import Manifest
 from utils.helpers import get_entities_with_name
 from .test_utils.test_entities import *
 
@@ -31,7 +31,7 @@ from .test_utils.test_entities import *
     ],
 )
 def test_get_entity_apps(json_file, app_name, application):
-    dash_data = ManifestReader.from_file(json_file)
+    dash_data = Manifest.from_file(json_file)
     app = get_entities_with_name(app_name, dash_data.applications)
     assert app == application
 
@@ -68,7 +68,7 @@ def test_get_entity_apps(json_file, app_name, application):
     ],
 )
 def test_get_entity_orchestrator(json_file, orc_name, orchestrator):
-    dash_data = ManifestReader.from_file(json_file)
+    dash_data = Manifest.from_file(json_file)
     orc = get_entities_with_name(orc_name, dash_data.orchestrators)
     assert orc == orchestrator
 
@@ -100,6 +100,6 @@ def test_get_entity_orchestrator(json_file, orc_name, orchestrator):
     ],
 )
 def test_get_entity_ensemble(json_file, ensemble_name, ensemble):
-    dash_data = ManifestReader.from_file(json_file)
+    dash_data = Manifest.from_file(json_file)
     ens = get_entities_with_name(ensemble_name, dash_data.ensembles)
     assert ens == ensemble

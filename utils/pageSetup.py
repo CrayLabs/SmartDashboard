@@ -11,9 +11,10 @@ def local_css(file_name: str) -> None:
 
 
 # Loading Image using PIL
-SMARTSIM_LOGO: Image.Image = Image.open("assets/SmartSim.png")
+def get_logo() -> Image.Image:
+    return Image.open("assets/images/SmartSim.png")
 
 
 # Set page config
 def set_streamlit_page_config() -> None:
-    st.set_page_config(layout="wide", page_title="Dashboard", page_icon=SMARTSIM_LOGO)
+    st.set_page_config(layout="wide", page_title="Dashboard", page_icon=get_logo())

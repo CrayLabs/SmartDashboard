@@ -1,41 +1,54 @@
 import pytest
 from .test_utils.test_entities import *
-from utils.helpers import format_mixed_nested_dict
+from utils.helpers import flatten_nested_keyvalue_containers
 
 
 @pytest.mark.parametrize(
-    "dict_name, entity, expected_keys, expected_values",
+    "dict_name, entity, expected_list",
     [
         pytest.param(
             "batch_settings",
             application_1,
-            ["batch_cmd", "arg1", "arg2"],
-            ["command", "string1", "None"],
+            [("batch_cmd", "command"), ("arg1", "string1"), ("arg2", "None")],
         ),
         pytest.param(
             "run_settings",
             application_1,
-            ["exe", "run_command", "arg1", "arg2"],
-            ["echo", "srun", "string1", "None"],
+            [
+                ("exe", "echo"),
+                ("run_command", "srun"),
+                ("arg1", "string1"),
+                ("arg2", "None"),
+            ],
         ),
-        pytest.param("params", ensemble_1_member_1, ["string"], ["Any"]),
+        pytest.param("params", ensemble_1_member_1, [("string", "Any")]),
         pytest.param(
             "files",
             application_2,
-            ["Symlink", "Symlink", "Configure", "Copy", "Copy"],
-            ["file1", "file2", "file3", "file4", "file5"],
+            [
+                ("Symlink", "file1"),
+                ("Symlink", "file2"),
+                ("Configure", "file3"),
+                ("Copy", "file4"),
+                ("Copy", "file5"),
+            ],
         ),
         pytest.param(
             "settings",
             ensemble_1_member_1.get("colocated_db"),
-            ["protocol", "port", "interface", "db_cpus", "limit_app_cpus", "debug"],
-            ["TCP/IP", "1111", "lo", "1", "True", "False"],
+            [
+                ("protocol", "TCP/IP"),
+                ("port", "1111"),
+                ("interface", "lo"),
+                ("db_cpus", "1"),
+                ("limit_app_cpus", "True"),
+                ("debug", "False"),
+            ],
         ),
-        pytest.param("doesnt_exist", ensemble_1_member_1, [], []),
-        pytest.param("batch_settings", None, [], []),
+        pytest.param("doesnt_exist", ensemble_1_member_1, []),
+        pytest.param("batch_settings", None, []),
     ],
 )
-def test_format_mixed_nested_dict(dict_name, entity, expected_keys, expected_values):
-    k, v = format_mixed_nested_dict(dict_name, entity)
-    assert k == expected_keys
-    assert v == expected_values
+def test_flatten_nested_keyvalue_containers(dict_name, entity, expected_list):
+    key_value_list = flatten_nested_keyvalue_containers(dict_name, entity)
+    assert key_value_list == expected_list

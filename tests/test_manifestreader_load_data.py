@@ -1,5 +1,5 @@
 import pytest
-from utils.FileReader import ManifestReader
+from utils.FileReader import Manifest
 
 
 @pytest.mark.parametrize(
@@ -22,7 +22,7 @@ from utils.FileReader import ManifestReader
     ],
 )
 def test_load_data(json_file, runs_length, app_length, orc_length, ens_length):
-    dash_data = ManifestReader.from_file(json_file)
+    dash_data = Manifest.from_file(json_file)
     print(dash_data)
     assert len(dash_data.runs) == runs_length
     assert len(dash_data.applications) == app_length

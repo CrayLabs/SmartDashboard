@@ -79,8 +79,7 @@ def get_port(orc: Optional[Dict[str, Any]]) -> str:
 
         if len(shard_ports) == 1:
             return shard_ports.pop()
-        else:
-            raise Exception("Shards within an Orchestrator should have the same port.")
+        raise Exception("Shards within an Orchestrator should have the same port.")
 
     return ""
 
@@ -102,9 +101,9 @@ def get_db_hosts(orc: Optional[Dict[str, Any]]) -> List[str]:
     return hosts
 
 
-def format_mixed_nested_dict(
+def flatten_nested_keyvalue_containers(
     dict_name: str, entity: Optional[Dict[str, Any]]
-) -> Tuple[List[str], List[str]]:
+) -> List[Tuple[str, str]]:
     """
     Formats dicts in order to properly display them in the dashboard.
     The dictionaries can have a combination of types attached, so
@@ -115,12 +114,12 @@ def format_mixed_nested_dict(
     values = []
 
     if entity:
-        dict = entity.get(dict_name, {})
-        for key, value in dict.items():
+        target_dict = entity.get(dict_name, {})
+        for key, value in target_dict.items():
             if isinstance(value, List):
-                for v in value:
+                for val in value:
                     keys.append(key)
-                    values.append(str(v))
+                    values.append(str(val))
             elif isinstance(value, Dict):
                 for k, v in value.items():
                     keys.append(k)
@@ -129,12 +128,10 @@ def format_mixed_nested_dict(
                 keys.append(key)
                 values.append(str(value))
 
-    return keys, values
+    return list(zip(keys, values))
 
 
-def format_ensemble_params(
-    entity: Optional[Dict[str, Any]]
-) -> Tuple[List[str], List[str]]:
+def format_ensemble_params(entity: Optional[Dict[str, Any]]) -> List[Tuple[str, str]]:
     """
     Formats ensemble params in order to properly display them in the dashboard.
     """
@@ -148,7 +145,7 @@ def format_ensemble_params(
             keys.append(key)
             values.append(comma_separated_string)
 
-    return keys, values
+    return list(zip(keys, values))
 
 
 def get_loaded_entities(
@@ -223,7 +220,7 @@ def get_entities_with_name(
 
     entities = [e for e in entity_list if entity_name == e["name"]]
 
-    try:
+    if entities:
         return entities[0]
-    except IndexError:
-        return None
+
+    return None

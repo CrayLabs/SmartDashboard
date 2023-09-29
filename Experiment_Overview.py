@@ -5,12 +5,12 @@ from utils.pageSetup import (
     local_css,
     set_streamlit_page_config,
 )
-from utils.FileReader import ManifestReader
+from utils.FileReader import Manifest
 from utils.helpers import (
     get_db_hosts,
     get_port,
     format_ensemble_params,
-    format_mixed_nested_dict,
+    flatten_nested_keyvalue_containers,
     get_exe_args,
     get_value,
     get_interface,
@@ -24,7 +24,7 @@ set_streamlit_page_config()
 local_css("assets/style.scss")
 
 # get real path and manifest.json
-manifest = ManifestReader.from_file("tests/test_utils/manifest_files/no_apps_manifest.json")
+manifest = Manifest.from_file("tests/test_utils/manifest_files/manifesttest.json")
 
 
 if manifest.experiment == {}:
@@ -91,20 +91,18 @@ with application:
     st.write("")
     with st.expander(label="Batch and Run Settings"):
         col1, col2 = st.columns([4, 4])
-        batch_names, batch_values = format_mixed_nested_dict(
+        batch_settings_data = flatten_nested_keyvalue_containers(
             "batch_settings", SELECTED_APPLICATION
         )
         with col1:
-            batch = {"Name": batch_names, "Value": batch_values}
-            df = pd.DataFrame(batch)
+            df = pd.DataFrame(batch_settings_data, columns=["Name", "Value"])
             st.write("Batch")
             st.dataframe(df, hide_index=True, use_container_width=True)
         with col2:
-            run_names, run_values = format_mixed_nested_dict(
+            run_settings_data = flatten_nested_keyvalue_containers(
                 "run_settings", SELECTED_APPLICATION
             )
-            rs = {"Name": run_names, "Value": run_values}
-            df = pd.DataFrame(rs)
+            df = pd.DataFrame(run_settings_data, columns=["Name", "Value"])
             st.write("Run")
             st.dataframe(df, hide_index=True, use_container_width=True)
 
@@ -112,26 +110,17 @@ with application:
     with st.expander(label="Parameters and Generator Files"):
         col1, col2 = st.columns([4, 4])
         with col1:
-            (
-                param_names,
-                param_values,
-            ) = format_mixed_nested_dict("params", SELECTED_APPLICATION)
-            params = {
-                "Name": param_names,
-                "Value": param_values,
-            }
-            df = pd.DataFrame(params)
+            params_data = flatten_nested_keyvalue_containers(
+                "params", SELECTED_APPLICATION
+            )
+            df = pd.DataFrame(params_data, columns=["Name", "Value"])
             st.write("Parameters")
             st.dataframe(df, hide_index=True, use_container_width=True)
         with col2:
-            file_type, file_paths = format_mixed_nested_dict(
+            file_data = flatten_nested_keyvalue_containers(
                 "files", SELECTED_APPLICATION
             )
-            files = {
-                "File": file_paths,
-                "Type": file_type,
-            }
-            df = pd.DataFrame(files)
+            df = pd.DataFrame(file_data, columns=["File", "Type"])
             st.write("Files")
             st.dataframe(df, hide_index=True, use_container_width=True)
 
@@ -144,11 +133,10 @@ with application:
             )
             with col1:
                 st.write("Summary")
-                colo_keys, colo_vals = format_mixed_nested_dict(
+                colo_data = flatten_nested_keyvalue_containers(
                     "settings", app_colocated_db
                 )
-                colo_db = {"Name": colo_keys, "Value": colo_vals}
-                df = pd.DataFrame(colo_db)
+                df = pd.DataFrame(colo_data, columns=["Name", "Value"])
                 st.dataframe(df, hide_index=True, use_container_width=True)
 
             with col2:
@@ -242,27 +230,16 @@ with ensembles:
 
     st.write("")
     with st.expander(label="Batch Settings"):
-        batch_names, batch_values = format_mixed_nested_dict(
+        ens_batch_data = flatten_nested_keyvalue_containers(
             "batch_settings", SELECTED_ENSEMBLE
         )
-        batch = {
-            "Name": batch_names,
-            "Value": batch_values,
-        }
-        df = pd.DataFrame(batch)
+        df = pd.DataFrame(ens_batch_data, columns=["Name", "Value"])
         st.dataframe(df, hide_index=True, use_container_width=True)
 
     st.write("")
     with st.expander(label="Parameters"):
-        (
-            ens_param_names,
-            ens_param_values,
-        ) = format_ensemble_params(SELECTED_ENSEMBLE)
-        ens_params = {
-            "Name": ens_param_names,
-            "Value": ens_param_values,
-        }
-        df = pd.DataFrame(ens_params)
+        ens_param_data = format_ensemble_params(SELECTED_ENSEMBLE)
+        df = pd.DataFrame(ens_param_data, columns=["Name", "Value"])
         st.dataframe(df, hide_index=True, use_container_width=True)
 
     st.write("#")
@@ -275,7 +252,7 @@ with ensembles:
         members = get_ensemble_members(SELECTED_ENSEMBLE)
         selected_member_name: t.Optional[str] = st.selectbox(
             "Select a member:",
-            [member["name"] for member in members if member is not None],
+            [member["name"] for member in members],
         )
 
     if selected_member_name is not None:
@@ -297,26 +274,17 @@ with ensembles:
     with st.expander(label="Batch and Run Settings"):
         col1, col2 = st.columns([4, 4])
         with col1:
-            (
-                mem_batch_name,
-                mem_batch_value,
-            ) = format_mixed_nested_dict("batch_settings", SELECTED_MEMBER)
-            batch = {
-                "Name": mem_batch_name,
-                "Value": mem_batch_value,
-            }
-            df = pd.DataFrame(batch)
+            mem_batch_data = flatten_nested_keyvalue_containers(
+                "batch_settings", SELECTED_MEMBER
+            )
+            df = pd.DataFrame(mem_batch_data, columns=["Name", "Value"])
             st.write("Batch")
             st.dataframe(df, hide_index=True, use_container_width=True)
         with col2:
-            mem_rs_name, mem_rs_value = format_mixed_nested_dict(
+            mem_run_data = flatten_nested_keyvalue_containers(
                 "run_settings", SELECTED_MEMBER
             )
-            rs = {
-                "Name": mem_rs_name,
-                "Value": mem_rs_value,
-            }
-            df = pd.DataFrame(rs)
+            df = pd.DataFrame(mem_run_data, columns=["Name", "Value"])
             st.write("Run")
             st.dataframe(df, hide_index=True, use_container_width=True)
 
@@ -324,26 +292,15 @@ with ensembles:
     with st.expander(label="Parameters and Generator Files"):
         col1, col2 = st.columns([4, 4])
         with col1:
-            (
-                mem_param_name,
-                mem_param_value,
-            ) = format_mixed_nested_dict("params", SELECTED_MEMBER)
-            params = {
-                "Name": mem_param_name,
-                "Value": mem_param_value,
-            }
-            df = pd.DataFrame(params)
+            mem_param_data = flatten_nested_keyvalue_containers(
+                "params", SELECTED_MEMBER
+            )
+            df = pd.DataFrame(mem_param_data, columns=["Name", "Value"])
             st.write("Parameters")
             st.dataframe(df, hide_index=True, use_container_width=True)
         with col2:
-            mem_file_type, mem_files = format_mixed_nested_dict(
-                "files", SELECTED_MEMBER
-            )
-            files = {
-                "File": mem_files,
-                "Type": mem_file_type,
-            }
-            df = pd.DataFrame(files)
+            mem_file_data = flatten_nested_keyvalue_containers("files", SELECTED_MEMBER)
+            df = pd.DataFrame(mem_file_data, columns=["Type", "File"])
             st.write("Files")
             st.dataframe(df, hide_index=True, use_container_width=True)
 
@@ -356,12 +313,10 @@ with ensembles:
             )
             with col1:
                 st.write("Summary")
-                (
-                    mem_colo_keys,
-                    mem_colo_vals,
-                ) = format_mixed_nested_dict("settings", mem_colocated_db)
-                mem_colo_db = {"Name": mem_colo_keys, "Value": mem_colo_vals}
-                df = pd.DataFrame(mem_colo_db)
+                mem_colo_data = flatten_nested_keyvalue_containers(
+                    "settings", mem_colocated_db
+                )
+                df = pd.DataFrame(mem_colo_data, columns=["Name", "Value"])
                 st.dataframe(df, hide_index=True, use_container_width=True)
 
             with col2:
