@@ -1,7 +1,7 @@
 import os
 import pathlib
-import streamlit as st
 
+import streamlit as st
 from PIL import Image
 
 ## Page Setup ##
@@ -17,6 +17,7 @@ def local_css(file_name: str) -> None:
 def get_logo() -> Image.Image:
     curr_path = pathlib.Path(os.path.abspath(__file__)).parent.parent.parent
     return Image.open(curr_path / "assets/images/SmartSim.png")
+
 
 # Set page config
 def set_streamlit_page_config() -> None:
