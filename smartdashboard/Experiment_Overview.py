@@ -23,7 +23,7 @@ from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 
 set_streamlit_page_config()
 curr_path = pathlib.Path(os.path.abspath(__file__)).parent.parent
-local_css(curr_path / "assets/style.scss")
+local_css(str(curr_path / "assets/style.scss"))
 
 # get real path and manifest.json
 manifest = Manifest.from_file("tests/test_utils/manifest_files/manifesttest.json")
