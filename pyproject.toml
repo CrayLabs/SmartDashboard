@@ -55,7 +55,7 @@ log_cli_level = "debug"
 [tool.isort]
 # supress circular import warning
 profile = "black"
-skip = ["tests/test_configs/circular_config"]
+# skip = ["tests/test_configs/circular_config"]
 
 [tool.coverage.run]
 source = ["smartdashboard"]
@@ -94,15 +94,6 @@ show_error_codes = true
 
 [[tool.mypy.overrides]]
 # Ignore packages that are not used or not typed
-module = [
-  "coloredlogs",
-  "smartredis",
-  "smartredis.error",
-  "redis.cluster",
-  "keras",
-  "torch",
-  "smartsim.ml.torch.*",            # must solve/ignore inheritance issues
-  "watchdog",
-]
+module = []
 ignore_missing_imports = true
 ignore_errors = true
