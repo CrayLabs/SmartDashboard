@@ -120,33 +120,6 @@ from setuptools.command.build_py import build_py
 # __version__ in smartsim/__init__.py
 # smartsim_version = versions.write_version(setup_path)
 
-class BuildError(Exception):
-    pass
-
-# Hacky workaround for solving CI build "purelib" issue
-# see https://github.com/google/or-tools/issues/616
-class InstallPlatlib(install):
-    def finalize_options(self):
-        super().finalize_options()
-        if self.distribution.has_ext_modules():
-            self.install_lib = self.install_platlib
-
-# class SmartSimBuild(build_py):
-
-#     def run(self):
-#         database_builder = builder.DatabaseBuilder(build_env(),
-#                                              build_env.MALLOC,
-#                                              build_env.JOBS)
-#         if not database_builder.is_built:
-#             database_builder.build_from_git(versions.REDIS_URL,
-#                                          versions.REDIS)
-
-#             database_builder.cleanup()
-
-#         # run original build_py command
-#         super().run()
-
-
 # Tested with wheel v0.29.0
 class BinaryDistribution(Distribution):
     """Distribution which always forces a binary package with platform name
@@ -162,14 +135,6 @@ class BinaryDistribution(Distribution):
 deps = [
     "pandas>=2.1.1",
     "streamlit>=1.27.1",
-    # "psutil>=5.7.2",
-    # "coloredlogs>=10.0",
-    # "tabulate>=0.8.9",
-    # "redis>=4.5",
-    # "tqdm>=4.50.2",
-    # "filelock>=3.4.2",
-    # "protobuf~=3.20",
-    # "watchdog>=3.0.0",
 ]
 
 # Add SmartRedis at specific version
@@ -182,16 +147,11 @@ extras_require = {
         "pylint>=2.10.0",
         "pytest>=6.0.0",
         "pytest-cov>=2.10.1",
-        # "click==8.0.2",
     ],
     "mypy": [
         "mypy>=1.3.0",
         "pandas-stubs",
         "types-Pillow",
-        # "types-tabulate",
-        # "types-tqdm",
-        # "types-tensorflow",
-        # "types-setuptools",
     ],
 }
 
@@ -204,16 +164,12 @@ setup(
     package_data={"smartdashboard": [
         "bin/*",
     ]},
-    # cmdclass={
-    #     "build_py": SmartSimBuild,
-    #     "install": InstallPlatlib,
-    # },
     zip_safe=False,
     extras_require=extras_require,
     distclass=BinaryDistribution,
     entry_points={
         "console_scripts": [
-            "smart = smartsim._core._cli.__main__:main",
+            "smart-dash = smartdashboard._cli.__main__:main",
         ]
     }
 )

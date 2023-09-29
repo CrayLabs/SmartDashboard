@@ -1,9 +1,9 @@
-import typing as t
 
 import os
 import pandas as pd
 import pathlib
 import streamlit as st
+import typing as t
 
 from smartdashboard.utils.FileReader import Manifest
 from smartdashboard.utils.helpers import (
@@ -22,7 +22,6 @@ from smartdashboard.utils.helpers import (
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 
 set_streamlit_page_config()
-
 curr_path = pathlib.Path(os.path.abspath(__file__)).parent.parent
 local_css(curr_path / "assets/style.scss")
 
