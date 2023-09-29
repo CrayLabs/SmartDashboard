@@ -26,7 +26,7 @@ curr_path = pathlib.Path(os.path.abspath(__file__)).parent.parent
 local_css(str(curr_path / "assets/style.scss"))
 
 # get real path and manifest.json
-manifest = Manifest.from_file("tests/test_utils/manifest_files/manifesttest.json")
+manifest = Manifest.from_file(str(curr_path / "tests/test_utils/manifest_files/manifesttest.json"))
 
 if manifest.experiment == {}:
     st.header("Experiment Not Found")
