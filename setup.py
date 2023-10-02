@@ -27,12 +27,7 @@
 # Welcome to the SmartDashboard setup.py
 
 # This future is needed to print Python2 EOL message
-from __future__ import print_function
 import sys
-
-if sys.version_info < (3,):
-    print("Python 2 has reached end-of-life and is not supported by SmartDashboard")
-    sys.exit(-1)
 
 
 from setuptools import setup
