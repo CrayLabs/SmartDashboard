@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import typing as t
+from errors import MalformedManifestError
 from utils.pageSetup import (
     local_css,
     set_streamlit_page_config,
@@ -20,11 +21,16 @@ from utils.helpers import (
     get_entities_with_name,
 )
 
+
 set_streamlit_page_config()
-local_css("assets/style.scss")
+local_css("assets/style.css")
+
 
 # get real path and manifest.json
-manifest = Manifest.from_file("tests/test_utils/manifest_files/manifesttest.json")
+try:
+    manifest = Manifest.from_file("tests/test_utils/manifest_files/no_orchestrator_manifest.json")
+except FileNotFoundError:
+    manifest = Manifest.create_empty_manifest()
 
 
 if manifest.experiment == {}:
@@ -64,13 +70,17 @@ with application:
     st.subheader("Application Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
+        try:
+            rendered_apps = manifest.applications
+        except MalformedManifestError:
+            rendered_apps = []
         selected_app_name: t.Optional[str] = st.selectbox(
             "Select an application:",
-            [app["name"] for app in manifest.applications],
+            [app["name"] for app in rendered_apps],
         )
     if selected_app_name is not None:
         SELECTED_APPLICATION = get_entities_with_name(
-            selected_app_name, manifest.applications
+            selected_app_name, rendered_apps
         )
     else:
         SELECTED_APPLICATION = None
@@ -162,13 +172,17 @@ with orchestrators:
     st.subheader("Orchestrator Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
+        try:
+            rendered_orcs = manifest.orchestrators
+        except MalformedManifestError:
+            rendered_orcs = []
         selected_orc_name: t.Optional[str] = st.selectbox(
             "Select an orchestrator:",
-            [orc["name"] for orc in manifest.orchestrators],
+            [orc["name"] for orc in rendered_orcs],
         )
 
     if selected_orc_name is not None:
-        SELECTED_ORC = get_entities_with_name(selected_orc_name, manifest.orchestrators)
+        SELECTED_ORC = get_entities_with_name(selected_orc_name, rendered_orcs)
     else:
         SELECTED_ORC = None
 
@@ -212,14 +226,18 @@ with ensembles:
     st.subheader("Ensemble Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
+        try:
+            rendered_ensembles = manifest.ensembles
+        except MalformedManifestError:
+            rendered_orcs = []
         selected_ensemble_name: t.Optional[str] = st.selectbox(
             "Select an ensemble:",
-            [ensemble["name"] for ensemble in manifest.ensembles],
+            [ensemble["name"] for ensemble in rendered_ensembles],
         )
 
     if selected_ensemble_name is not None:
         SELECTED_ENSEMBLE = get_entities_with_name(
-            selected_ensemble_name, manifest.ensembles
+            selected_ensemble_name, rendered_ensembles
         )
     else:
         SELECTED_ENSEMBLE = None

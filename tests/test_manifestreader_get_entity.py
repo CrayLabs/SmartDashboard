@@ -27,11 +27,15 @@ from .test_utils.test_entities import *
             "app1",
             None,
         ),
-        pytest.param("file_doesnt_exist.json", "app4", None),
+        pytest.param("file_doesnt_exist.json", "app4", FileNotFoundError),
     ],
 )
 def test_get_entity_apps(json_file, app_name, application):
-    dash_data = Manifest.from_file(json_file)
+    try:
+        dash_data = Manifest.from_file(json_file)
+    except FileNotFoundError:
+        assert FileNotFoundError == application
+        return
     app = get_entities_with_name(app_name, dash_data.applications)
     assert app == application
 
@@ -59,7 +63,7 @@ def test_get_entity_apps(json_file, app_name, application):
             "orc_doesnt_exist",
             None,
         ),
-        pytest.param("file_doesnt_exist.json", "orchestrator_1", None),
+        pytest.param("file_doesnt_exist.json", "orchestrator_1", FileNotFoundError),
         pytest.param(
             "tests/test_utils/manifest_files/no_orchestrator_manifest.json",
             "orchestrator_1",
@@ -68,7 +72,11 @@ def test_get_entity_apps(json_file, app_name, application):
     ],
 )
 def test_get_entity_orchestrator(json_file, orc_name, orchestrator):
-    dash_data = Manifest.from_file(json_file)
+    try:
+        dash_data = Manifest.from_file(json_file)
+    except FileNotFoundError:
+        assert FileNotFoundError == orchestrator
+        return
     orc = get_entities_with_name(orc_name, dash_data.orchestrators)
     assert orc == orchestrator
 
@@ -86,7 +94,7 @@ def test_get_entity_orchestrator(json_file, orc_name, orchestrator):
             "ensemble_3",
             ensemble_3,
         ),
-        pytest.param("file_doesnt_exist.json", "ensemble4", None),
+        pytest.param("file_doesnt_exist.json", "ensemble4", FileNotFoundError),
         pytest.param(
             "tests/test_utils/manifest_files/manifesttest.json",
             "ensemble_doesnt_exist",
@@ -100,6 +108,10 @@ def test_get_entity_orchestrator(json_file, orc_name, orchestrator):
     ],
 )
 def test_get_entity_ensemble(json_file, ensemble_name, ensemble):
-    dash_data = Manifest.from_file(json_file)
+    try:
+        dash_data = Manifest.from_file(json_file)
+    except FileNotFoundError:
+        assert FileNotFoundError == ensemble
+        return
     ens = get_entities_with_name(ensemble_name, dash_data.ensembles)
     assert ens == ensemble

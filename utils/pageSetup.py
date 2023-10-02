@@ -12,7 +12,7 @@ def local_css(file_name: str) -> None:
 
 # Loading Image using PIL
 def get_logo() -> Image.Image:
-    return Image.open("assets/images/SmartSim.png")
+    return Image.open("static/SmartSim.png")
 
 
 # Set page config

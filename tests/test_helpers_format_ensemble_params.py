@@ -1,6 +1,6 @@
 import pytest
 from .test_utils.test_entities import *
-from utils.helpers import format_ensemble_params
+from ..utils.helpers import format_ensemble_params
 
 
 @pytest.mark.parametrize(

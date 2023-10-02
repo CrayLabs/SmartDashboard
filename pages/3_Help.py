@@ -2,7 +2,7 @@ import streamlit as st
 from utils.pageSetup import local_css, set_streamlit_page_config
 
 set_streamlit_page_config()
-local_css("assets/style.scss")
+local_css("assets/style.css")
 
 st.header("Welcome to the SmartSim Dashboard Help Page")
 st.write("")
