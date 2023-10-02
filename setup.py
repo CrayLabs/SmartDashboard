@@ -39,17 +39,6 @@ from setuptools import setup
 from setuptools.dist import Distribution
 
 
-# Tested with wheel v0.29.0
-class BinaryDistribution(Distribution):
-    """Distribution which always forces a binary package with platform name
-
-       We use this because we want to pre-package Redis for certain
-       platforms to use.
-    """
-    def has_ext_modules(_placeholder):
-        return True
-
-
 # Define needed dependencies for the installation
 deps = [
     "pandas>=2.1.1",
@@ -82,7 +71,6 @@ setup(
     ]},
     zip_safe=False,
     extras_require=extras_require,
-    distclass=BinaryDistribution,
     entry_points={
         "console_scripts": [
             "smart-dash = smartdashboard._cli.__main__:main",
