@@ -1,8 +1,10 @@
-import json
 import io
+import json
 import os
-from errors import MalformedManifestError
-from typing import Any, Union, Dict, List
+from typing import Any, Dict, List, Union
+
+from utils.errors import MalformedManifestError
+
 
 class Manifest:
     def __init__(self, manifest: dict[str, Any]) -> None:
@@ -39,7 +41,9 @@ class Manifest:
     @property
     def ensembles(self) -> List[Dict[str, Any]]:
         try:
-            ensembles = [ensemble for run in self.runs for ensemble in run.get("ensemble")]
+            ensembles = [
+                ensemble for run in self.runs for ensemble in run.get("ensemble")
+            ]
             if not isinstance(ensembles, list):
                 raise TypeError
             return ensembles

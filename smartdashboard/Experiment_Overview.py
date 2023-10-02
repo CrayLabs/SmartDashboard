@@ -1,37 +1,38 @@
+import os
+import pathlib
+import typing as t
+
 import pandas as pd
 import streamlit as st
-import typing as t
-from errors import MalformedManifestError
-from utils.pageSetup import (
-    local_css,
-    set_streamlit_page_config,
-)
 from utils.FileReader import Manifest
-from utils.helpers import (
-    get_db_hosts,
-    get_port,
-    format_ensemble_params,
+
+from smartdashboard.utils.helpers import (
     flatten_nested_keyvalue_containers,
+    format_ensemble_params,
+    get_db_hosts,
+    get_ensemble_members,
+    get_entities_with_name,
     get_exe_args,
-    get_value,
     get_interface,
     get_loaded_entities,
-    get_ensemble_members,
     get_member,
-    get_entities_with_name,
+    get_port,
+    get_value,
 )
+from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
+from smartdashboard.utils.errors import MalformedManifestError
 
 
 set_streamlit_page_config()
-local_css("assets/style.css")
 
+curr_path = pathlib.Path(os.path.abspath(__file__)).parent
+local_css(str(curr_path / "static/style.css"))
 
 # get real path and manifest.json
 try:
     manifest = Manifest.from_file("tests/test_utils/manifest_files/manifesttest.json")
 except FileNotFoundError:
     manifest = Manifest.create_empty_manifest()
-
 
 if manifest.experiment == {}:
     st.header("Experiment Not Found")
@@ -80,9 +81,7 @@ with application:
             [app["name"] for app in rendered_apps],
         )
     if selected_app_name is not None:
-        SELECTED_APPLICATION = get_entities_with_name(
-            selected_app_name, rendered_apps
-        )
+        SELECTED_APPLICATION = get_entities_with_name(selected_app_name, rendered_apps)
     else:
         SELECTED_APPLICATION = None
 

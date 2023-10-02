@@ -1,0 +1,2 @@
+include smartdashboard/static/*.png
+include smartdashboard/static/*.css
