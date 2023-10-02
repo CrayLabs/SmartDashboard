@@ -73,6 +73,7 @@ with application:
         try:
             rendered_apps = manifest.applications
         except MalformedManifestError:
+            st.error("Applications are malformed.")
             rendered_apps = []
         selected_app_name: t.Optional[str] = st.selectbox(
             "Select an application:",
@@ -175,6 +176,7 @@ with orchestrators:
         try:
             rendered_orcs = manifest.orchestrators
         except MalformedManifestError:
+            st.error("Orchestrators are malformed.")
             rendered_orcs = []
         selected_orc_name: t.Optional[str] = st.selectbox(
             "Select an orchestrator:",
@@ -229,6 +231,7 @@ with ensembles:
         try:
             rendered_ensembles = manifest.ensembles
         except MalformedManifestError:
+            st.error("Ensembles are malformed.")
             rendered_orcs = []
         selected_ensemble_name: t.Optional[str] = st.selectbox(
             "Select an ensemble:",
