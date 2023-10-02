@@ -28,7 +28,7 @@ local_css("assets/style.css")
 
 # get real path and manifest.json
 try:
-    manifest = Manifest.from_file("tests/test_utils/manifest_files/no_orchestrator_manifest.json")
+    manifest = Manifest.from_file("tests/test_utils/manifest_files/manifesttest.json")
 except FileNotFoundError:
     manifest = Manifest.create_empty_manifest()
 
@@ -68,13 +68,13 @@ with experiment:
 ### Applications ###
 with application:
     st.subheader("Application Configuration")
+    try:
+        rendered_apps = manifest.applications
+    except MalformedManifestError:
+        st.error("Applications are malformed.")
+        rendered_apps = []
     col1, col2 = st.columns([4, 4])
     with col1:
-        try:
-            rendered_apps = manifest.applications
-        except MalformedManifestError:
-            st.error("Applications are malformed.")
-            rendered_apps = []
         selected_app_name: t.Optional[str] = st.selectbox(
             "Select an application:",
             [app["name"] for app in rendered_apps],
@@ -171,13 +171,13 @@ with application:
 ### Orchestrator ###
 with orchestrators:
     st.subheader("Orchestrator Configuration")
+    try:
+        rendered_orcs = manifest.orchestrators
+    except MalformedManifestError:
+        st.error("Orchestrators are malformed.")
+        rendered_orcs = []
     col1, col2 = st.columns([4, 4])
     with col1:
-        try:
-            rendered_orcs = manifest.orchestrators
-        except MalformedManifestError:
-            st.error("Orchestrators are malformed.")
-            rendered_orcs = []
         selected_orc_name: t.Optional[str] = st.selectbox(
             "Select an orchestrator:",
             [orc["name"] for orc in rendered_orcs],
@@ -226,13 +226,13 @@ with orchestrators:
 ### Ensembles ###
 with ensembles:
     st.subheader("Ensemble Configuration")
+    try:
+        rendered_ensembles = manifest.ensembles
+    except MalformedManifestError:
+        st.error("Ensembles are malformed.")
+        rendered_orcs = []
     col1, col2 = st.columns([4, 4])
     with col1:
-        try:
-            rendered_ensembles = manifest.ensembles
-        except MalformedManifestError:
-            st.error("Ensembles are malformed.")
-            rendered_orcs = []
         selected_ensemble_name: t.Optional[str] = st.selectbox(
             "Select an ensemble:",
             [ensemble["name"] for ensemble in rendered_ensembles],
