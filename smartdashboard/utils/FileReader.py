@@ -3,7 +3,7 @@ import json
 import os
 from typing import Any, Dict, List, Union
 
-from utils.errors import MalformedManifestError
+from smartdashboard.utils.errors import MalformedManifestError
 
 
 class Manifest:
@@ -25,8 +25,8 @@ class Manifest:
             if not isinstance(apps, list):
                 raise TypeError
             return apps
-        except (KeyError, TypeError):
-            raise MalformedManifestError("Applications are malformed.")
+        except (KeyError, TypeError) as exc:
+            raise MalformedManifestError("Applications are malformed.") from exc
 
     @property
     def orchestrators(self) -> List[Dict[str, Any]]:
@@ -35,8 +35,8 @@ class Manifest:
             if not isinstance(orcs, list):
                 raise TypeError
             return orcs
-        except (KeyError, TypeError):
-            raise MalformedManifestError("Orchestrators are malformed.")
+        except (KeyError, TypeError) as exc:
+            raise MalformedManifestError('Orchestrators are malformed.') from exc
 
     @property
     def ensembles(self) -> List[Dict[str, Any]]:
@@ -47,13 +47,13 @@ class Manifest:
             if not isinstance(ensembles, list):
                 raise TypeError
             return ensembles
-        except (KeyError, TypeError):
-            raise MalformedManifestError("Ensembles are malformed.")
+        except (KeyError, TypeError) as exc:
+            raise MalformedManifestError("Ensembles are malformed.") from exc
 
     @classmethod
     def from_file(cls, path: Union[str, os.PathLike[str]]) -> "Manifest":
-        with open(path) as f:
-            return cls.from_io_stream(f)
+        with open(path, encoding="utf-8") as file:
+            return cls.from_io_stream(file)
 
     @classmethod
     def from_io_stream(cls, stream: io.TextIOBase) -> "Manifest":

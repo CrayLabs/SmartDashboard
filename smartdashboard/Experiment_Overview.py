@@ -4,8 +4,9 @@ import typing as t
 
 import pandas as pd
 import streamlit as st
-from utils.FileReader import Manifest
+from smartdashboard.utils.FileReader import Manifest
 
+from smartdashboard.utils.errors import MalformedManifestError
 from smartdashboard.utils.helpers import (
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
@@ -20,8 +21,6 @@ from smartdashboard.utils.helpers import (
     get_value,
 )
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
-from smartdashboard.utils.errors import MalformedManifestError
-
 
 set_streamlit_page_config()
 
