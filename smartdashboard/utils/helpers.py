@@ -218,7 +218,7 @@ def get_entities_with_name(
         Optional[Dict[str, Any]]: If found, returns the entity.
         Otherwise returns None.
     """
-    entities = [e for e in entity_list if entity_name == e["name"]]
+    entities: Optional[List[Dict[str, Any]]] = [e for e in entity_list if entity_name == e["name"]]
 
     if entities:
         return entities[0]
