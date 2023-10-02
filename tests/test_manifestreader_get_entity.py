@@ -1,6 +1,8 @@
 import pytest
-from ..utils.FileReader import Manifest
-from utils.helpers import get_entities_with_name
+
+from smartdashboard.utils.FileReader import Manifest
+from smartdashboard.utils.helpers import get_entities_with_name
+
 from .test_utils.test_entities import *
 
 

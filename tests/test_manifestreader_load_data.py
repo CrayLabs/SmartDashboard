@@ -1,5 +1,6 @@
 import pytest
-from utils.FileReader import Manifest
+
+from smartdashboard.utils.FileReader import Manifest
 
 
 @pytest.mark.parametrize(

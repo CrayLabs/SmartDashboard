@@ -1,7 +1,7 @@
-import json
 import io
+import json
 import os
-from typing import Any, Union, Dict, List
+from typing import Any, Dict, List, Union
 
 
 class Manifest:
@@ -31,8 +31,8 @@ class Manifest:
     @classmethod
     def from_file(cls, path: Union[str, os.PathLike[str]]) -> "Manifest":
         try:
-            with open(path) as f:
-                return cls.from_io_stream(f)
+            with open(path, encoding="utf-8") as file:
+                return cls.from_io_stream(file)
         except FileNotFoundError:
             return cls.create_empty_manifest()
 

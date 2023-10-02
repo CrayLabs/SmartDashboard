@@ -1,6 +1,8 @@
 import pytest
+
+from smartdashboard.utils.helpers import flatten_nested_keyvalue_containers
+
 from .test_utils.test_entities import *
-from utils.helpers import flatten_nested_keyvalue_containers
 
 
 @pytest.mark.parametrize(

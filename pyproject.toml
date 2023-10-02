@@ -1,0 +1,169 @@
+# BSD 2-Clause License
+#
+# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+[build-system]
+requires = ["setuptools", "wheel", "cmake>=3.13"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "smartdashboard"
+version = "0.0.1"
+requires-python = ">=3.8,<3.11"
+authors = [
+  {name = "CrayLabs: a Hewlett Packard Enterprise OSS Organization", email = "craylabs@hpe.com"},
+]
+description = "Visualize SmartSim Experiments"
+license = { text = "BSD 2-Clause License" }
+keywords = ["scientific", "ai", "workflow", "hpc", "analysis"]
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: BSD License",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+]
+readme = "README.md"
+dependencies = [
+    "pandas>=2.1.1",
+    "streamlit>=1.27.1",
+    "watchdog>=3.0.0",
+]
+
+[project.urls]
+Homepage = "https://www.craylabs.org"
+Documentation = "https://github.com/CrayLabs/SmartDashboard"
+Repository = "https://github.com/CrayLabs/SmartDashboard"
+
+
+[project.optional-dependencies]
+dev = [
+  "black>=20.8b1",
+  "isort>=5.6.4",
+  "pylint>=2.10.0",
+  "pytest>=6.0.0",
+  "pytest-cov>=2.10.1",
+]
+mypy = [
+  "mypy>=1.3.0",
+  "pandas-stubs",
+  "types-Pillow",
+]
+
+
+[project.scripts]
+smart-dash = "smartdashboard._cli.__main__:main"
+
+
+[tool.setuptools]
+packages = ["smartdashboard", "smartdashboard._cli", "smartdashboard.pages", "smartdashboard.utils"]
+include-package-data = true
+
+
+[tool.setuptools.package-data]
+assets = ["*.png", "*.scss"]
+
+
+[tool.setuptools.exclude-package-data]
+tests = ["tests"]
+
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310']
+exclude = '''
+(
+  | \.egg
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.nox
+  | \.tox
+  | \.venv
+  | _build
+  | build
+  | dist
+  | setup.py
+)
+'''
+
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "debug"
+
+
+[tool.isort]
+# supress circular import warning
+profile = "black"
+# skip = []
+
+
+[tool.coverage.run]
+source = ["smartdashboard"]
+# see test_configs/*_cov.cfg for "omit"
+
+[tool.coverage.report]
+ignore_errors = true
+# see test_configs/*_cov.cfg for "exclude_lines"
+
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+
+[tool.mypy]
+namespace_packages = true
+files = [
+  "smartdashboard"
+]
+plugins = []
+ignore_errors = false
+
+# Dynamic typing
+disallow_any_generics = true
+warn_return_any = true
+
+# Strict fn defs
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+
+# Safety/Upgrading Mypy
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+show_error_codes = true
+
+
+[[tool.mypy.overrides]]
+# Ignore packages that are not used or not typed
+module = []
+ignore_missing_imports = true
+ignore_errors = true

@@ -1,31 +1,32 @@
+import os
+import pathlib
+import typing as t
+
 import pandas as pd
 import streamlit as st
-import typing as t
-from utils.pageSetup import (
-    local_css,
-    set_streamlit_page_config,
-)
-from utils.FileReader import Manifest
-from utils.helpers import (
-    get_db_hosts,
-    get_port,
-    format_ensemble_params,
+
+from smartdashboard.utils.FileReader import Manifest
+from smartdashboard.utils.helpers import (
     flatten_nested_keyvalue_containers,
+    format_ensemble_params,
+    get_db_hosts,
+    get_ensemble_members,
+    get_entities_with_name,
     get_exe_args,
-    get_value,
     get_interface,
     get_loaded_entities,
-    get_ensemble_members,
     get_member,
-    get_entities_with_name,
+    get_port,
+    get_value,
 )
+from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 
 set_streamlit_page_config()
-local_css("assets/style.scss")
+curr_path = pathlib.Path(os.path.abspath(__file__)).parent
+local_css(str(curr_path / "assets/style.scss"))
 
 # get real path and manifest.json
-manifest = Manifest.from_file("tests/test_utils/manifest_files/manifesttest.json")
-
+manifest = Manifest.from_file(str(curr_path / "tests/test_utils/manifest_files/manifesttest.json"))
 
 if manifest.experiment == {}:
     st.header("Experiment Not Found")

@@ -1,6 +1,8 @@
 import pytest
+
+from smartdashboard.utils.helpers import get_interface
+
 from .test_utils.test_entities import *
-from utils.helpers import get_interface
 
 
 @pytest.mark.parametrize(
