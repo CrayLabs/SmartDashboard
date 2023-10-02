@@ -22,7 +22,7 @@ from smartdashboard.utils.helpers import (
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 
 set_streamlit_page_config()
-curr_path = pathlib.Path(os.path.abspath(__file__)).parent.parent
+curr_path = pathlib.Path(os.path.abspath(__file__)).parent
 local_css(str(curr_path / "assets/style.scss"))
 
 # get real path and manifest.json

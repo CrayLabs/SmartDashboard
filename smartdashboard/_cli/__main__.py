@@ -24,13 +24,15 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
+import pathlib
 import sys
 
-from smartdashboard import Experiment_Overview
-
+from subprocess import run
 
 def main() -> int:
-    overview = Experiment_Overview.application
+    curr_path = pathlib.Path(os.path.abspath(__file__)).parent.parent
+    run(["streamlit", "run", str(curr_path / "Experiment_Overview.py")])
     return 0
 
 
