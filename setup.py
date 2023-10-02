@@ -24,44 +24,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Welcome to the SmartSim setup.py
-#
-# The following environment variables represent build time
-# options for SmartSim. These are only relevant to when a user
-# or CI is invoking the setup.py script.
-#
-#
-# NO_CHECKS
-#   If set to 1, the build process will not check for
-#   build dependencies like make, gcc, etc
-#
-# SMARTSIM_REDIS
-#   The version of redis to retrive and build with
-#
-# SMARTSIM_REDIS_URL
-#   The URL from which to retrieve redis source code
-#
-# SMARTREDIS_VERSION
-#   The version of SmartRedis to install.
-#
-# CC
-#   The C compiler to use
-#
-# CXX
-#   the CPP compiler to use
-#
-# MALLOC
-#   The memory allocator to use for Redis (options: libc, jemalloc)
-#
-# BUILD_JOBS
-#   Number of jobs to use in the build (defaults to max on node)
-#
-# SMARTSIM_SUFFIX
-#  if set, the version number is set to a developer build
-#  with the current version, git-sha, and suffix. This version
-#  is then written into SmartSim/smartsim/version.py
-#
-#
+# Welcome to the SmartDashboard setup.py
+
 # This future is needed to print Python2 EOL message
 from __future__ import print_function
 import sys
@@ -71,54 +35,9 @@ if sys.version_info < (3,):
     sys.exit(-1)
 
 
-import os
-import importlib.util
-from pathlib import Path
-
 from setuptools import setup
 from setuptools.dist import Distribution
-from setuptools.command.install import install
-from setuptools.command.build_py import build_py
 
-# # Some necessary evils we have to do to be able to use
-# # the _install tools in smartsim/smartsim/_core/_install
-# # in both the setup.py and in the smart cli
-
-# # import the installer classes
-# setup_path = Path(os.path.abspath(os.path.dirname(__file__)))
-# _install_dir = setup_path.joinpath("smartdashboard/_core/_install")
-
-# # import buildenv module
-# buildenv_path = _install_dir.joinpath("buildenv.py")
-# buildenv_spec = importlib.util.spec_from_file_location("buildenv", str(buildenv_path))
-# buildenv = importlib.util.module_from_spec(buildenv_spec)
-# buildenv_spec.loader.exec_module(buildenv)
-
-# # import builder module
-# builder_path = _install_dir.joinpath("builder.py")
-# builder_spec = importlib.util.spec_from_file_location("builder", str(builder_path))
-# builder = importlib.util.module_from_spec(builder_spec)
-# builder_spec.loader.exec_module(builder)
-
-# # helper classes for building dependencies that are
-# # also utilized by the Smart CLI
-# build_env = buildenv.BuildEnv(checks=False)
-# versions = buildenv.Versioner()
-
-# # check for compatible python versions
-# if not build_env.is_compatible_python(versions.PYTHON_MIN):
-#     print("You are using Python {}. Python >={} is required.".format(build_env.python_version,
-#                                                                      ".".join((versions.PYTHON_MIN))))
-#     sys.exit(-1)
-
-# if build_env.is_windows():
-#     print("Windows is not supported by SmartSim")
-#     sys.exit(-1)
-
-# write the SmartSim version into
-# smartsim/version.py and to be set as
-# __version__ in smartsim/__init__.py
-# smartsim_version = versions.write_version(setup_path)
 
 # Tested with wheel v0.29.0
 class BinaryDistribution(Distribution):
@@ -136,9 +55,6 @@ deps = [
     "pandas>=2.1.1",
     "streamlit>=1.27.1",
 ]
-
-# Add SmartRedis at specific version
-# deps.append("smartredis>={}".format(versions.SMARTREDIS))
 
 extras_require = {
     "dev": [
@@ -158,7 +74,7 @@ extras_require = {
 
 # rest in setup.cfg
 setup(
-    version="0.0.1",  # smartsim_version,
+    version="0.0.1",
     install_requires=deps,
     packages=["smartdashboard"],
     package_data={"smartdashboard": [

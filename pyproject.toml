@@ -55,7 +55,7 @@ log_cli_level = "debug"
 [tool.isort]
 # supress circular import warning
 profile = "black"
-# skip = ["tests/test_configs/circular_config"]
+# skip = []
 
 [tool.coverage.run]
 source = ["smartdashboard"]
