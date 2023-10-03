@@ -1,13 +1,12 @@
 import io
 import json
-import os
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from smartdashboard.utils.errors import MalformedManifestError
 
 
 class Manifest:
-    def __init__(self, manifest: dict[str, Any]) -> None:
+    def __init__(self, manifest: Dict[str, Any]) -> None:
         self._data = manifest
 
     @property
@@ -15,13 +14,13 @@ class Manifest:
         return self._data.get("experiment")
 
     @property
-    def runs(self) -> Optional[List[Dict[str, Any]]]:
-        return self._data.get("runs")
+    def runs(self) -> List[Dict[str, Any]]:
+        return self._data.get("runs", [])
 
     @property
     def applications(self) -> List[Dict[str, Any]]:
         try:
-            apps = [app for run in self.runs for app in run.get("model")]
+            apps = [app for run in self.runs for app in run.get("model", None) if app]
             if not isinstance(apps, list):
                 raise TypeError
             return apps
@@ -31,7 +30,12 @@ class Manifest:
     @property
     def orchestrators(self) -> List[Dict[str, Any]]:
         try:
-            orcs = [orch for run in self.runs for orch in run.get("orchestrator")]
+            orcs = [
+                orch
+                for run in self.runs
+                for orch in run.get("orchestrator", None)
+                if orch
+            ]
             if not isinstance(orcs, list):
                 raise TypeError
             return orcs
@@ -42,7 +46,10 @@ class Manifest:
     def ensembles(self) -> List[Dict[str, Any]]:
         try:
             ensembles = [
-                ensemble for run in self.runs for ensemble in run.get("ensemble")
+                ensemble
+                for run in self.runs
+                for ensemble in run.get("ensemble", None)
+                if ensemble
             ]
             if not isinstance(ensembles, list):
                 raise TypeError
@@ -51,7 +58,7 @@ class Manifest:
             raise MalformedManifestError("Ensembles are malformed.") from exc
 
     @classmethod
-    def from_file(cls, path: Union[str, os.PathLike[str]]) -> "Manifest":
+    def from_file(cls, path: str) -> "Manifest":
         with open(path, encoding="utf-8") as file:
             return cls.from_io_stream(file)
 
