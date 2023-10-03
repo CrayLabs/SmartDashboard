@@ -30,12 +30,11 @@ import sys
 from subprocess import run
 
 
-def main() -> int:
+def main() -> None:
     curr_path = pathlib.Path(os.path.abspath(__file__)).parent.parent
-    run(["streamlit", "run", str(curr_path / "Experiment_Overview.py")])
-    return 0
+    run(["streamlit", "run", str(curr_path / "Experiment_Overview.py")], check=False)
+    sys.exit(0)
 
 
 if __name__ == "__main__":
-    rc = main()
-    sys.exit(rc)
+    main()
