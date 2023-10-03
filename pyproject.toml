@@ -50,7 +50,7 @@ classifiers = [
 ]
 readme = "README.md"
 dependencies = [
-    "pandas>=2.1.1",
+    "pandas>=2.0.0",
     "streamlit>=1.27.1",
     "watchdog>=3.0.0",
 ]

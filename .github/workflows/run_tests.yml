@@ -74,7 +74,9 @@ jobs:
           echo "$(brew --prefix)/opt/make/libexec/gnubin" >> $GITHUB_PATH
 
       - name: Install SmartDashboard
-        run: python -m pip install .[dev,mypy]
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .[dev,mypy]
 
       - name: Run mypy
         run: |
