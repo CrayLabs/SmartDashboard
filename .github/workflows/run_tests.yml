@@ -33,6 +33,7 @@ on:
   push:
     branches:
       - develop
+      - dash_519
 
 env:
   HOMEBREW_NO_ANALYTICS: "ON" # Make Homebrew installation a little quicker
