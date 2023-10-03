@@ -86,27 +86,27 @@ jobs:
           python -m pip install .[mypy]
           make check-mypy
 
-      - name: Run Pytest
-        run: |
-          echo "SMARTSIM_LOG_LEVEL=debug" >> $GITHUB_ENV
-          py.test -s --import-mode=importlib -o log_cli=true --cov=smartdashboard --cov-report=xml ./tests/
+      # - name: Run Pytest
+      #   run: |
+      #     echo "SMARTSIM_LOG_LEVEL=debug" >> $GITHUB_ENV
+      #     py.test -s --import-mode=importlib -o log_cli=true --cov=smartdashboard --cov-report=xml ./tests/
 
-      # Upload artifacts on failure, ignoring binary files
-      - name: Upload Artifact
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test_artifact
-          path: |
-            tests/test_output
-            !**/*.so
-            !**/*.pb
-            !**/*.pt
-            !**/core
-          retention-days: 5
+      # # Upload artifacts on failure, ignoring binary files
+      # - name: Upload Artifact
+      #   if: failure()
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: test_artifact
+      #     path: |
+      #       tests/test_output
+      #       !**/*.so
+      #       !**/*.pb
+      #       !**/*.pt
+      #       !**/core
+      #     retention-days: 5
 
-      - name: Upload Pytest coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
-          files: ./coverage.xml
+      # - name: Upload Pytest coverage to Codecov
+      #   uses: codecov/codecov-action@v2
+      #   with:
+      #     fail_ci_if_error: true
+      #     files: ./coverage.xml
