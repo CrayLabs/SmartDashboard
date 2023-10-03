@@ -2,7 +2,7 @@ import pytest
 
 from smartdashboard.utils.helpers import format_ensemble_params
 
-from .test_utils.test_entities import *
+from tests.test_utils.test_entities import *
 
 
 @pytest.mark.parametrize(
