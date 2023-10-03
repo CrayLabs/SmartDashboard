@@ -1,2 +1,0 @@
-[console_scripts]
-smart-dash = smartdashboard._cli.__main__:main

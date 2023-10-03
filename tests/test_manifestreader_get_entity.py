@@ -3,7 +3,7 @@ import pytest
 from smartdashboard.utils.FileReader import Manifest
 from smartdashboard.utils.helpers import get_entities_with_name
 
-from .test_utils.test_entities import *
+from tests.test_utils.test_entities import *
 
 
 @pytest.mark.parametrize(

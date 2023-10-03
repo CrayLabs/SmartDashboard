@@ -2,7 +2,7 @@ import pytest
 
 from smartdashboard.utils.helpers import get_loaded_entities
 
-from .test_utils.test_entities import *
+from tests.test_utils.test_entities import *
 
 
 @pytest.mark.parametrize(

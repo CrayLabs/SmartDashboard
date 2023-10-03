@@ -3,5 +3,5 @@ __pycache__
 .mypy_cache
 .vscode
 .coverage
-
+coverage.xml
 dist/

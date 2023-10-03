@@ -2,7 +2,7 @@ import pytest
 
 from smartdashboard.utils.helpers import get_ensemble_members
 
-from .test_utils.test_entities import *
+from tests.test_utils.test_entities import *
 
 
 @pytest.mark.parametrize(
