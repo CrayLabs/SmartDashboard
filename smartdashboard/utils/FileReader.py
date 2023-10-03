@@ -7,7 +7,7 @@ from smartdashboard.utils.errors import MalformedManifestError
 
 
 class Manifest:
-    def __init__(self, manifest: dict[str, Any]) -> None:
+    def __init__(self, manifest: Dict[str, Any]) -> None:
         self._data = manifest
 
     @property
