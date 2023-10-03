@@ -30,7 +30,12 @@ class Manifest:
     @property
     def orchestrators(self) -> List[Dict[str, Any]]:
         try:
-            orcs = [orch for run in self.runs for orch in run.get("orchestrator", None) if orch]
+            orcs = [
+                orch
+                for run in self.runs
+                for orch in run.get("orchestrator", None)
+                if orch
+            ]
             if not isinstance(orcs, list):
                 raise TypeError
             return orcs
@@ -41,7 +46,10 @@ class Manifest:
     def ensembles(self) -> List[Dict[str, Any]]:
         try:
             ensembles = [
-                ensemble for run in self.runs for ensemble in run.get("ensemble", None) if ensemble
+                ensemble
+                for run in self.runs
+                for ensemble in run.get("ensemble", None)
+                if ensemble
             ]
             if not isinstance(ensembles, list):
                 raise TypeError
