@@ -273,7 +273,7 @@ with ensembles:
         members = get_ensemble_members(SELECTED_ENSEMBLE)
         selected_member_name: t.Optional[str] = st.selectbox(
             "Select a member:",
-            [member["name"] for member in members],
+            [member["name"] for member in members if member],
         )
 
     if selected_member_name is not None:
