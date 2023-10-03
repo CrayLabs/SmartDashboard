@@ -51,7 +51,7 @@ class Manifest:
             raise MalformedManifestError("Ensembles are malformed.") from exc
 
     @classmethod
-    def from_file(cls, path: Union[str, os.PathLike[str]]) -> "Manifest":
+    def from_file(cls, path: Union[str, os.PathLike]) -> "Manifest":
         with open(path, encoding="utf-8") as file:
             return cls.from_io_stream(file)
 
