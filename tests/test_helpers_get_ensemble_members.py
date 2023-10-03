@@ -1,7 +1,6 @@
 import pytest
 
 from smartdashboard.utils.helpers import get_ensemble_members
-
 from tests.test_utils.test_entities import *
 
 
