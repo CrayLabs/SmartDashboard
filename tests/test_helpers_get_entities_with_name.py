@@ -1,7 +1,7 @@
 import pytest
 
 from smartdashboard.utils.helpers import get_entities_with_name
-from smartdashboard.utils.ManifestReader import Manifest
+from smartdashboard.utils.ManifestReader import ManifestFileReader
 from tests.test_utils.test_entities import *
 
 
@@ -33,11 +33,12 @@ from tests.test_utils.test_entities import *
 )
 def test_get_entity_apps(json_file, app_name, application):
     try:
-        dash_data = Manifest.from_file(json_file)
+        manifest_file_reader = ManifestFileReader(json_file)
+        manifest = manifest_file_reader.get_manifest()
     except FileNotFoundError:
         assert FileNotFoundError == application
         return
-    app = get_entities_with_name(app_name, dash_data.applications)
+    app = get_entities_with_name(app_name, manifest.applications)
     assert app == application
 
 
@@ -74,11 +75,12 @@ def test_get_entity_apps(json_file, app_name, application):
 )
 def test_get_entity_orchestrator(json_file, orc_name, orchestrator):
     try:
-        dash_data = Manifest.from_file(json_file)
+        manifest_file_reader = ManifestFileReader(json_file)
+        manifest = manifest_file_reader.get_manifest()
     except FileNotFoundError:
         assert FileNotFoundError == orchestrator
         return
-    orc = get_entities_with_name(orc_name, dash_data.orchestrators)
+    orc = get_entities_with_name(orc_name, manifest.orchestrators)
     assert orc == orchestrator
 
 
@@ -110,9 +112,10 @@ def test_get_entity_orchestrator(json_file, orc_name, orchestrator):
 )
 def test_get_entity_ensemble(json_file, ensemble_name, ensemble):
     try:
-        dash_data = Manifest.from_file(json_file)
+        manifest_file_reader = ManifestFileReader(json_file)
+        manifest = manifest_file_reader.get_manifest()
     except FileNotFoundError:
         assert FileNotFoundError == ensemble
         return
-    ens = get_entities_with_name(ensemble_name, dash_data.ensembles)
+    ens = get_entities_with_name(ensemble_name, manifest.ensembles)
     assert ens == ensemble

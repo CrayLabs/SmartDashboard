@@ -1,6 +1,6 @@
 import pytest
 
-from smartdashboard.utils.ManifestReader import Manifest
+from smartdashboard.utils.ManifestReader import ManifestFileReader
 
 
 @pytest.mark.parametrize(
@@ -21,9 +21,10 @@ from smartdashboard.utils.ManifestReader import Manifest
         ),
     ],
 )
-def test_load_data(json_file, runs_length, app_length, orc_length, ens_length):
-    dash_data = Manifest.from_file(json_file)
-    assert len(dash_data.runs) == runs_length
-    assert len(dash_data.applications) == app_length
-    assert len(dash_data.orchestrators) == orc_length
-    assert len(dash_data.ensembles) == ens_length
+def test_get_manifest(json_file, runs_length, app_length, orc_length, ens_length):
+    manifest_file_reader = ManifestFileReader(json_file)
+    manifest = manifest_file_reader.get_manifest()
+    assert len(manifest.runs) == runs_length
+    assert len(manifest.applications) == app_length
+    assert len(manifest.orchestrators) == orc_length
+    assert len(manifest.ensembles) == ens_length
