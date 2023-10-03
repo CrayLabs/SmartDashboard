@@ -1,7 +1,7 @@
 import io
 import json
 import os
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from smartdashboard.utils.errors import MalformedManifestError
 
@@ -11,11 +11,11 @@ class Manifest:
         self._data = manifest
 
     @property
-    def experiment(self) -> Dict[str, Any]:
+    def experiment(self) -> Optional[Dict[str, Any]]:
         return self._data.get("experiment")
 
     @property
-    def runs(self) -> List[Dict[str, Any]]:
+    def runs(self) -> Optional[List[Dict[str, Any]]]:
         return self._data.get("runs")
 
     @property
@@ -36,7 +36,7 @@ class Manifest:
                 raise TypeError
             return orcs
         except (KeyError, TypeError) as exc:
-            raise MalformedManifestError('Orchestrators are malformed.') from exc
+            raise MalformedManifestError("Orchestrators are malformed.") from exc
 
     @property
     def ensembles(self) -> List[Dict[str, Any]]:

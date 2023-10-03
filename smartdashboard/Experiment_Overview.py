@@ -4,9 +4,9 @@ import typing as t
 
 import pandas as pd
 import streamlit as st
-from smartdashboard.utils.FileReader import Manifest
 
 from smartdashboard.utils.errors import MalformedManifestError
+from smartdashboard.utils.FileReader import Manifest
 from smartdashboard.utils.helpers import (
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
@@ -137,8 +137,10 @@ with application:
     with st.expander(label="Colocated Database"):
         with st.container():
             col1, col2 = st.columns([6, 6])
-            app_colocated_db: t.Optional[t.Dict[str, t.Any]] = get_value(
-                "colocated_db", SELECTED_APPLICATION
+            app_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
+                SELECTED_APPLICATION.get("colocated_db")
+                if SELECTED_APPLICATION is not None
+                else {}
             )
             with col1:
                 st.write("Summary")
@@ -327,8 +329,10 @@ with ensembles:
     with st.expander(label="Colocated Database"):
         with st.container():
             col1, col2 = st.columns([6, 6])
-            mem_colocated_db: t.Optional[t.Dict[str, t.Any]] = get_value(
-                "colocated_db", SELECTED_MEMBER
+            mem_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
+                SELECTED_MEMBER.get("colocated_db")
+                if SELECTED_MEMBER is not None
+                else {}
             )
             with col1:
                 st.write("Summary")

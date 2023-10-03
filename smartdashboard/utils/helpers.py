@@ -200,7 +200,7 @@ def get_loaded_entities(
 
 
 def get_entities_with_name(
-    entity_name: str, entity_list: Optional[Dict[str, Any]]
+    entity_name: str, entity_list: List[Dict[str, Any]]
 ) -> Optional[Dict[str, Any]]:
     """
     Gets an entity from a list of entities when you only
@@ -218,7 +218,9 @@ def get_entities_with_name(
         Optional[Dict[str, Any]]: If found, returns the entity.
         Otherwise returns None.
     """
-    entities: Optional[List[Dict[str, Any]]] = [e for e in entity_list if entity_name == e["name"]]
+    entities: List[Dict[str, Any]] = [
+        e for e in entity_list if entity_name == e["name"]
+    ]
 
     if entities:
         return entities[0]
