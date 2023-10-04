@@ -1,6 +1,6 @@
 import pytest
 
-from smartdashboard.utils.helpers import get_interface
+from smartdashboard.utils.helpers import get_interfaces
 from tests.test_utils.test_entities import *
 
 
@@ -13,6 +13,6 @@ from tests.test_utils.test_entities import *
         pytest.param(application_1, ""),
     ],
 )
-def test_get_interface(entity, expected_value):
-    val = get_interface(entity)
+def test_get_interfaces(entity, expected_value):
+    val = get_interfaces(entity)
     assert val == expected_value

@@ -15,7 +15,7 @@ local_css(str(curr_path / "static/style.css"))
 
 # get real path and manifest.json
 manifest_file_reader = ManifestFileReader(
-    "tests/test_utils/manifest_files/no_experiment_manifest.json"
+    "tests/test_utils/manifest_files/manifesttest.json"
 )
 manifest = manifest_file_reader.get_manifest()
 

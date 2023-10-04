@@ -2,9 +2,14 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 
 def get_value(key: str, entity: Optional[Dict[str, Any]]) -> str:
-    """
-    Gets the value of the key-value pair. Returns an empty string
-    if entity is None for dashboard displaying purposes.
+    """Get the value of a key-value pair
+
+    :param key: Key of the dictionary
+    :type key: str
+    :param entity: The entity represented by a dictionary
+    :type entity: Optional[Dict[str, Any]]
+    :return: The value of the key-value pair
+    :rtype: str
     """
     if entity:
         return entity.get(key, "")
@@ -13,9 +18,12 @@ def get_value(key: str, entity: Optional[Dict[str, Any]]) -> str:
 
 
 def get_exe_args(entity: Optional[Dict[str, Any]]) -> List[str]:
-    """
-    Gets the exe_args of the entity. Returns an empty list
-    if entity is None for dashboard displaying purposes.
+    """Get the exe_args of an entity
+
+    :param entity: The entity represented by a dictionary
+    :type entity: Optional[Dict[str, Any]]
+    :return: The exe_args of the entity
+    :rtype: List[str]
     """
     if entity:
         return entity.get("exe_args", [])
@@ -23,10 +31,13 @@ def get_exe_args(entity: Optional[Dict[str, Any]]) -> List[str]:
     return []
 
 
-def get_interface(entity: Optional[Dict[str, Any]]) -> str:
-    """
-    Gets and formats the interface(s) of the entity. Returns an empty
-    string if entity is None for dashboard displaying purposes.
+def get_interfaces(entity: Optional[Dict[str, Any]]) -> str:
+    """Get and format the interfaces of an entity
+
+    :param entity: The entity represented by a dictionary
+    :type entity: Optional[Dict[str, Any]]
+    :return: The interfaces
+    :rtype: str
     """
     if entity:
         value: str = entity.get("interface", "")
@@ -40,9 +51,12 @@ def get_interface(entity: Optional[Dict[str, Any]]) -> str:
 def get_ensemble_members(
     ensemble: Optional[Dict[str, Any]]
 ) -> List[Optional[Dict[str, Any]]]:
-    """
-    Gets all of the members inside of an ensemble. Returns an empty
-    list if entity is None for dashboard displaying purposes.
+    """Get the members of an ensemble
+
+    :param ensemble: The ensemble represented by a dictionary
+    :type ensemble: Optional[Dict[str, Any]]
+    :return: The members of the ensemble
+    :rtype: List[Optional[Dict[str, Any]]]
     """
     if ensemble:
         return ensemble.get("models", [])
@@ -53,8 +67,14 @@ def get_ensemble_members(
 def get_member(
     member_name: str, ensemble: Optional[Dict[str, Any]]
 ) -> Optional[Dict[str, Any]]:
-    """
-    Gets a specific member from an ensemble. Returns None if not found.
+    """Get a specific member of an ensemble
+
+    :param member_name: The name of the selected member
+    :type member_name: str
+    :param ensemble: The ensemble represented by a dictionary
+    :type ensemble: Optional[Dict[str, Any]]
+    :return: The selected member
+    :rtype: Optional[Dict[str, Any]]
     """
     for member in get_ensemble_members(ensemble):
         if member and "name" in member and member["name"] == member_name:
@@ -68,6 +88,15 @@ def get_port(orc: Optional[Dict[str, Any]]) -> str:
     Gets the port to display for the Orchestrator. The ports within
     the shards should be the same, otherwise raise an exception.
     Return empty string if entity is None for displaying purposes.
+    """
+    """Get the port of an orchestrator
+
+    The ports in all of the shards
+
+    :param orc: The orchestrator represented by a dictionary
+    :type orc: Optional[Dict[str, Any]]
+    :return: The port
+    :rtype: str
     """
     shard_ports = set()
 

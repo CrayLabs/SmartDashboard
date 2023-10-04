@@ -78,10 +78,8 @@ class ManifestFileReader(ManifestReader):
 
     @classmethod
     def from_io_stream(cls, stream: io.TextIOBase) -> Dict[str, Any]:
-        try:
-            data = json.loads(stream.read())
-        except json.decoder.JSONDecodeError:
-            raise json.decoder.JSONDecodeError(
-                "The file passed into the dashboard could not be decoded."
-            )
+        # try:
+        data: Dict[str, Any] = json.loads(stream.read())
+        # except json.decoder.JSONDecodeError:
+        #     raise json.decoder.JSONDecodeError
         return data

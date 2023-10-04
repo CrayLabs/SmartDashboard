@@ -11,7 +11,7 @@ from smartdashboard.utils.helpers import (
     get_ensemble_members,
     get_entities_with_name,
     get_exe_args,
-    get_interface,
+    get_interfaces,
     get_loaded_entities,
     get_member,
     get_port,
@@ -167,7 +167,7 @@ def orc_builder(manifest: Manifest) -> None:
     st.write("Status: :green[Running]")
     st.write("Type: " + get_value("type", SELECTED_ORC))
     st.write("Port: " + get_port(SELECTED_ORC))
-    st.write("Interface: " + get_interface(SELECTED_ORC))
+    st.write("Interface: " + get_interfaces(SELECTED_ORC))
 
     st.write("")
     with st.expander(label="Database Hosts"):
