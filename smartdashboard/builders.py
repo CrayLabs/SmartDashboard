@@ -3,7 +3,7 @@ import typing as t
 import pandas as pd
 import streamlit as st
 
-from smartdashboard.utils.errors import MalformedManifestError
+from smartdashboard.utils.errors import MalformedManifestError, SSDashboardError
 from smartdashboard.utils.helpers import (
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
@@ -18,9 +18,24 @@ from smartdashboard.utils.helpers import (
     get_value,
 )
 from smartdashboard.utils.ManifestReader import Manifest
+from smartdashboard.views import (
+    ApplicationView,
+    EnsembleView,
+    ExperimentView,
+    OrchestratorView,
+)
 
 
-def exp_builder(manifest: Manifest) -> None:
+def error_builder(error: SSDashboardError) -> None:
+    st.header(error.title)
+    st.error(
+        f"""{error.body}  
+         File: {error.file}"""
+    )
+
+
+def exp_builder(manifest: Manifest) -> ExperimentView:
+    view = ExperimentView()
     st.subheader("Experiment Configuration")
     st.write("")
     col1, col2 = st.columns([4, 4])
@@ -39,9 +54,11 @@ def exp_builder(manifest: Manifest) -> None:
         with col2:
             st.write("Error")
             st.info("")
+    return view
 
 
-def app_builder(manifest: Manifest) -> None:
+def app_builder(manifest: Manifest) -> ApplicationView:
+    view = ApplicationView()
     st.subheader("Application Configuration")
     try:
         rendered_apps = manifest.applications
@@ -143,8 +160,11 @@ def app_builder(manifest: Manifest) -> None:
                 st.write("Error")
                 st.info("")
 
+    return view
 
-def orc_builder(manifest: Manifest) -> None:
+
+def orc_builder(manifest: Manifest) -> OrchestratorView:
+    view = OrchestratorView()
     st.subheader("Orchestrator Configuration")
     try:
         rendered_orcs = manifest.orchestrators
@@ -185,7 +205,6 @@ def orc_builder(manifest: Manifest) -> None:
             )
             st.write("")
             st.write("Output")
-            out = st.empty()
             st.info("")
 
         with col2:
@@ -195,11 +214,13 @@ def orc_builder(manifest: Manifest) -> None:
             st.write("")
             st.write("")
             st.write("Error")
-            err = st.empty()
             st.info("")
 
+    return view
 
-def ens_builder(manifest: Manifest) -> None:
+
+def ens_builder(manifest: Manifest) -> EnsembleView:
+    view = EnsembleView()
     st.subheader("Ensemble Configuration")
     try:
         rendered_ensembles = manifest.ensembles
@@ -333,3 +354,5 @@ def ens_builder(manifest: Manifest) -> None:
         with col2:
             st.write("Error")
             st.info("")
+
+    return view

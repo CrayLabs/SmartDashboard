@@ -3,9 +3,16 @@ import pathlib
 
 import streamlit as st
 
-from smartdashboard.builders import *
+from smartdashboard.builders import (
+    app_builder,
+    ens_builder,
+    error_builder,
+    exp_builder,
+    orc_builder,
+)
+from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import get_value
-from smartdashboard.utils.ManifestReader import ManifestFileReader
+from smartdashboard.utils.ManifestReader import load_manifest
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 
 set_streamlit_page_config()
@@ -13,32 +20,35 @@ set_streamlit_page_config()
 curr_path = pathlib.Path(os.path.abspath(__file__)).parent
 local_css(str(curr_path / "static/style.css"))
 
-# get real path and manifest.json
-manifest_file_reader = ManifestFileReader(
-    "tests/test_utils/manifest_files/manifesttest.json"
-)
-manifest = manifest_file_reader.get_manifest()
 
-st.header("Experiment Overview: " + get_value("name", manifest.experiment))
+try:
+    manifest = load_manifest("tests/test_utils/manifest_files/no_apps_manifest.json")
+except SSDashboardError as ss:
+    error_builder(ss)
+    manifest = None
 
-st.write("")
 
-experiment, application, orchestrators, ensembles = st.tabs(
-    ["Experiment", "Applications", "Orchestrators", "Ensembles"]
-)
+if manifest:
+    st.header("Experiment Overview: " + get_value("name", manifest.experiment))
 
-### Experiment ###
-with experiment:
-    exp_builder(manifest)
+    st.write("")
 
-### Applications ###
-with application:
-    app_builder(manifest)
+    experiment, application, orchestrators, ensembles = st.tabs(
+        ["Experiment", "Applications", "Orchestrators", "Ensembles"]
+    )
 
-### Orchestrator ###
-with orchestrators:
-    orc_builder(manifest)
+    ### Experiment ###
+    with experiment:
+        exp_view = exp_builder(manifest)
 
-### Ensembles ###
-with ensembles:
-    ens_builder(manifest)
+    ### Applications ###
+    with application:
+        app_view = app_builder(manifest)
+
+    ### Orchestrator ###
+    with orchestrators:
+        orc_view = orc_builder(manifest)
+
+    ### Ensembles ###
+    with ensembles:
+        ens_view = ens_builder(manifest)

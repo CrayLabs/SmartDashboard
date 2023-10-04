@@ -193,7 +193,7 @@ def get_loaded_entities(
 ) -> Union[List[Dict[str, str]], Dict[str, List[Any]]]:
     """Combine and format loaded entities
 
-    DB Models and DB Scripts are combined so they can be displayed as 
+    DB Models and DB Scripts are combined so they can be displayed as
     "Loaded Entities" in the dashboard.
 
     :param entity: Entity represented by a dictionary

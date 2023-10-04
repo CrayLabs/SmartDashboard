@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-from smartdashboard.utils.errors import MalformedManifestError
+from smartdashboard.utils.errors import MalformedManifestError, ManifestError
 
 
 @dataclass
@@ -18,7 +18,7 @@ class Manifest:
 
 class ManifestReader(ABC):
     @abstractmethod
-    def get_manifest(self) -> "Manifest":
+    def get_manifest(self) -> Manifest:
         ...
 
 
@@ -27,7 +27,12 @@ class ManifestFileReader(ManifestReader):
         self._file_path = file_path
         self._data = self.from_file(self._file_path)
 
-    def get_manifest(self) -> "Manifest":
+    def get_manifest(self) -> Manifest:
+        """Get the Manifest from self._data
+]
+        :return: Manifest
+        :rtype: Manifest
+        """
         experiment = self._data.get("experiment")
         runs = self._data.get("runs", [])
         try:
@@ -35,7 +40,9 @@ class ManifestFileReader(ManifestReader):
             if not isinstance(apps, list):
                 raise TypeError
         except (KeyError, TypeError) as exc:
-            raise MalformedManifestError("Applications are malformed.") from exc
+            raise MalformedManifestError(
+                "Applications are malformed.", file=self._file_path, body=exc
+            ) from exc
 
         try:
             orcs = [
@@ -44,7 +51,9 @@ class ManifestFileReader(ManifestReader):
             if not isinstance(orcs, list):
                 raise TypeError
         except (KeyError, TypeError) as exc:
-            raise MalformedManifestError("Orchestrators are malformed.") from exc
+            raise MalformedManifestError(
+                "Orchestrators are malformed.", file=self._file_path, body=exc
+            ) from exc
 
         try:
             ensembles = [
@@ -56,7 +65,9 @@ class ManifestFileReader(ManifestReader):
             if not isinstance(ensembles, list):
                 raise TypeError
         except (KeyError, TypeError) as exc:
-            raise MalformedManifestError("Ensembles are malformed.") from exc
+            raise MalformedManifestError(
+                "Ensembles are malformed.", file=self._file_path, body=exc
+            ) from exc
 
         return Manifest(
             experiment=experiment,
@@ -67,19 +78,39 @@ class ManifestFileReader(ManifestReader):
         )
 
     @classmethod
-    def from_file(cls, path: str) -> Dict[str, Any]:
+    def from_file(cls, file_path: str) -> Dict[str, Any]:
+        """Initialize self._data 
+
+        :param file_path: File path of the manifest
+        :type file_path: str
+        :return: self._data 
+        :rtype: Dict[str, Any]
+        """
         try:
-            file = open(path, encoding="utf-8")
-        except FileNotFoundError:
-            raise FileNotFoundError(
-                "The file passed into the dashboard could not be found."
-            )
+            file = open(file_path, encoding="utf-8")
+        except FileNotFoundError as fnf:
+            raise fnf
         return cls.from_io_stream(file)
 
     @classmethod
     def from_io_stream(cls, stream: io.TextIOBase) -> Dict[str, Any]:
-        # try:
-        data: Dict[str, Any] = json.loads(stream.read())
-        # except json.decoder.JSONDecodeError:
-        #     raise json.decoder.JSONDecodeError
+        try:
+            data: Dict[str, Any] = json.loads(stream.read())
+        except json.decoder.JSONDecodeError as e:
+            raise e
         return data
+
+
+def load_manifest(path: str) -> Optional[Manifest]:
+    try:
+        manifest_file_reader = ManifestFileReader(path)
+        manifest = manifest_file_reader.get_manifest()
+    except FileNotFoundError as fnf:
+        manifest = None
+        raise ManifestError(title="Manifest file does not exist.", file=path, body=fnf)
+    except json.decoder.JSONDecodeError as jde:
+        manifest = None
+        raise ManifestError(
+            title="Manifest file could not be decoded.", file=path, body=jde
+        )
+    return manifest
