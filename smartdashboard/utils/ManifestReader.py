@@ -94,6 +94,13 @@ class ManifestFileReader(ManifestReader):
 
     @classmethod
     def from_io_stream(cls, stream: io.TextIOBase) -> Dict[str, Any]:
+        """Continue initializing self._data 
+
+        :param stream: io.TextIOBase to be decoded
+        :type stream: io.TextIOBase
+        :return: self._data 
+        :rtype: Dict[str, Any]
+        """
         try:
             data: Dict[str, Any] = json.loads(stream.read())
         except json.decoder.JSONDecodeError as e:
@@ -102,6 +109,17 @@ class ManifestFileReader(ManifestReader):
 
 
 def load_manifest(path: str) -> Optional[Manifest]:
+    """Instantiate and call get_manifest
+
+    This is where we're checking for any errors
+    that could occur when creating a manifest 
+    from file. 
+
+    :param path: Path to the manifest file
+    :type path: str
+    :return: Manifest
+    :rtype: Optional[Manifest]
+    """
     try:
         manifest_file_reader = ManifestFileReader(path)
         manifest = manifest_file_reader.get_manifest()

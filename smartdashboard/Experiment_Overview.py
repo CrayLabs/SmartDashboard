@@ -3,7 +3,7 @@ import pathlib
 
 import streamlit as st
 
-from smartdashboard.builders import (
+from smartdashboard.view_builders import (
     app_builder,
     ens_builder,
     error_builder,
