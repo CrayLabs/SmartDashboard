@@ -17,6 +17,7 @@ from smartdashboard.utils.helpers import (
     get_member,
     get_port,
     get_value,
+    render_dataframe_with_title,
 )
 from smartdashboard.utils.ManifestReader import Manifest
 from smartdashboard.views import (
@@ -122,52 +123,44 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     with st.expander(label="Batch and Run Settings"):
         col1, col2 = st.columns([4, 4])
         with col1:
-            st.write("Batch")
-            st.dataframe(
+            render_dataframe_with_title(
+                "Batch",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
                         "batch_settings", selected_application
                     ),
                     columns=["Name", "Value"],
                 ),
-                hide_index=True,
-                use_container_width=True,
             )
         with col2:
-            st.write("Run")
-            st.dataframe(
+            render_dataframe_with_title(
+                "Run",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
                         "run_settings", selected_application
                     ),
                     columns=["Name", "Value"],
                 ),
-                hide_index=True,
-                use_container_width=True,
             )
 
     st.write("")
     with st.expander(label="Parameters and Generator Files"):
         col1, col2 = st.columns([4, 4])
         with col1:
-            st.write("Parameters")
-            st.dataframe(
+            render_dataframe_with_title(
+                "Parameters",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers("params", selected_application),
                     columns=["Name", "Value"],
                 ),
-                hide_index=True,
-                use_container_width=True,
             )
         with col2:
-            st.write("Files")
-            st.dataframe(
+            render_dataframe_with_title(
+                "Files",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers("files", selected_application),
                     columns=["Type", "File"],
                 ),
-                hide_index=True,
-                use_container_width=True,
             )
 
     st.write("")
@@ -180,24 +173,19 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 else {}
             )
             with col1:
-                st.write("Summary")
-                st.dataframe(
+                render_dataframe_with_title(
+                    "Summary",
                     pd.DataFrame(
                         flatten_nested_keyvalue_containers(
                             "settings", app_colocated_db
                         ),
                         columns=["Name", "Value"],
                     ),
-                    hide_index=True,
-                    use_container_width=True,
                 )
-
             with col2:
-                st.write("Loaded Entities")
-                st.dataframe(
+                render_dataframe_with_title(
+                    "Loaded Entities",
                     pd.DataFrame(get_loaded_entities(app_colocated_db)),
-                    hide_index=True,
-                    use_container_width=True,
                 )
 
     st.write("")
@@ -359,50 +347,42 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with st.expander(label="Batch and Run Settings"):
         col1, col2 = st.columns([4, 4])
         with col1:
-            st.write("Batch")
-            st.dataframe(
+            render_dataframe_with_title(
+                "Batch",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
                         "batch_settings", selected_member
                     ),
                     columns=["Name", "Value"],
                 ),
-                hide_index=True,
-                use_container_width=True,
             )
         with col2:
-            st.write("Run")
-            st.dataframe(
+            render_dataframe_with_title(
+                "Run",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers("run_settings", selected_member),
                     columns=["Name", "Value"],
                 ),
-                hide_index=True,
-                use_container_width=True,
             )
 
     st.write("")
     with st.expander(label="Parameters and Generator Files"):
         col1, col2 = st.columns([4, 4])
         with col1:
-            st.write("Parameters")
-            st.dataframe(
+            render_dataframe_with_title(
+                "Parameters",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers("params", selected_member),
                     columns=["Name", "Value"],
                 ),
-                hide_index=True,
-                use_container_width=True,
             )
         with col2:
-            st.write("Files")
-            st.dataframe(
+            render_dataframe_with_title(
+                "Files",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers("files", selected_member),
                     columns=["Type", "File"],
                 ),
-                hide_index=True,
-                use_container_width=True,
             )
 
     st.write("")
@@ -415,24 +395,20 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
                 else {}
             )
             with col1:
-                st.write("Summary")
-                st.dataframe(
+                render_dataframe_with_title(
+                    "Summary",
                     pd.DataFrame(
                         flatten_nested_keyvalue_containers(
                             "settings", mem_colocated_db
                         ),
                         columns=["Name", "Value"],
                     ),
-                    hide_index=True,
-                    use_container_width=True,
                 )
 
             with col2:
-                st.write("Loaded Entities")
-                st.dataframe(
+                render_dataframe_with_title(
+                    "Loaded Entities",
                     pd.DataFrame(get_loaded_entities(mem_colocated_db)),
-                    hide_index=True,
-                    use_container_width=True,
                 )
 
     st.write("")

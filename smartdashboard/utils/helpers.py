@@ -1,5 +1,8 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import pandas as pd
+import streamlit as st
+
 
 def get_value(key: str, entity: Optional[Dict[str, Any]]) -> str:
     """Get the value of a key-value pair
@@ -251,3 +254,12 @@ def get_entities_with_name(
         return entities[0]
 
     return None
+
+
+def render_dataframe_with_title(title: str, dataframe: pd.DataFrame) -> None:
+    st.write(title)
+    st.dataframe(
+        dataframe,
+        hide_index=True,
+        use_container_width=True,
+    )
