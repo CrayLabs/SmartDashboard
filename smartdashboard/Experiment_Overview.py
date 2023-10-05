@@ -3,6 +3,10 @@ import pathlib
 
 import streamlit as st
 
+from smartdashboard.utils.errors import SSDashboardError
+from smartdashboard.utils.helpers import get_value
+from smartdashboard.utils.ManifestReader import load_manifest
+from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import (
     app_builder,
     ens_builder,
@@ -10,10 +14,6 @@ from smartdashboard.view_builders import (
     exp_builder,
     orc_builder,
 )
-from smartdashboard.utils.errors import SSDashboardError
-from smartdashboard.utils.helpers import get_value
-from smartdashboard.utils.ManifestReader import load_manifest
-from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 
 set_streamlit_page_config()
 
@@ -22,14 +22,14 @@ local_css(str(curr_path / "static/style.css"))
 
 
 try:
-    manifest = load_manifest("tests/test_utils/manifest_files/no_apps_manifest.json")
+    MANIFEST = load_manifest("tests/test_utils/manifest_files/manifesttest.json")
 except SSDashboardError as ss:
     error_builder(ss)
-    manifest = None
+    MANIFEST = None
 
 
-if manifest:
-    st.header("Experiment Overview: " + get_value("name", manifest.experiment))
+if MANIFEST:
+    st.header("Experiment Overview: " + get_value("name", MANIFEST.experiment))
 
     st.write("")
 
@@ -39,16 +39,16 @@ if manifest:
 
     ### Experiment ###
     with experiment:
-        exp_view = exp_builder(manifest)
+        exp_view = exp_builder(MANIFEST)
 
     ### Applications ###
     with application:
-        app_view = app_builder(manifest)
+        app_view = app_builder(MANIFEST)
 
     ### Orchestrator ###
     with orchestrators:
-        orc_view = orc_builder(manifest)
+        orc_view = orc_builder(MANIFEST)
 
     ### Ensembles ###
     with ensembles:
-        ens_view = ens_builder(manifest)
+        ens_view = ens_builder(MANIFEST)

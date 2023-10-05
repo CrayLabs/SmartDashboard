@@ -29,7 +29,7 @@ class ManifestFileReader(ManifestReader):
 
     def get_manifest(self) -> Manifest:
         """Get the Manifest from self._data
-]
+
         :return: Manifest
         :rtype: Manifest
         """
@@ -41,7 +41,7 @@ class ManifestFileReader(ManifestReader):
                 raise TypeError
         except (KeyError, TypeError) as exc:
             raise MalformedManifestError(
-                "Applications are malformed.", file=self._file_path, body=exc
+                "Applications are malformed.", file=self._file_path, exception=exc
             ) from exc
 
         try:
@@ -52,7 +52,7 @@ class ManifestFileReader(ManifestReader):
                 raise TypeError
         except (KeyError, TypeError) as exc:
             raise MalformedManifestError(
-                "Orchestrators are malformed.", file=self._file_path, body=exc
+                "Orchestrators are malformed.", file=self._file_path, exception=exc
             ) from exc
 
         try:
@@ -66,7 +66,7 @@ class ManifestFileReader(ManifestReader):
                 raise TypeError
         except (KeyError, TypeError) as exc:
             raise MalformedManifestError(
-                "Ensembles are malformed.", file=self._file_path, body=exc
+                "Ensembles are malformed.", file=self._file_path, exception=exc
             ) from exc
 
         return Manifest(
@@ -79,26 +79,26 @@ class ManifestFileReader(ManifestReader):
 
     @classmethod
     def from_file(cls, file_path: str) -> Dict[str, Any]:
-        """Initialize self._data 
+        """Initialize self._data
 
         :param file_path: File path of the manifest
         :type file_path: str
-        :return: self._data 
+        :return: self._data
         :rtype: Dict[str, Any]
         """
         try:
-            file = open(file_path, encoding="utf-8")
+            with open(file_path, encoding="utf-8") as file:
+                return cls.from_io_stream(file)
         except FileNotFoundError as fnf:
             raise fnf
-        return cls.from_io_stream(file)
 
     @classmethod
     def from_io_stream(cls, stream: io.TextIOBase) -> Dict[str, Any]:
-        """Continue initializing self._data 
+        """Continue initializing self._data
 
         :param stream: io.TextIOBase to be decoded
         :type stream: io.TextIOBase
-        :return: self._data 
+        :return: self._data
         :rtype: Dict[str, Any]
         """
         try:
@@ -112,8 +112,8 @@ def load_manifest(path: str) -> Optional[Manifest]:
     """Instantiate and call get_manifest
 
     This is where we're checking for any errors
-    that could occur when creating a manifest 
-    from file. 
+    that could occur when creating a manifest
+    from file.
 
     :param path: Path to the manifest file
     :type path: str
@@ -125,10 +125,12 @@ def load_manifest(path: str) -> Optional[Manifest]:
         manifest = manifest_file_reader.get_manifest()
     except FileNotFoundError as fnf:
         manifest = None
-        raise ManifestError(title="Manifest file does not exist.", file=path, body=fnf)
+        raise ManifestError(
+            title="Manifest file does not exist.", file=path, exception=fnf
+        ) from fnf
     except json.decoder.JSONDecodeError as jde:
         manifest = None
         raise ManifestError(
-            title="Manifest file could not be decoded.", file=path, body=jde
-        )
+            title="Manifest file could not be decoded.", file=path, exception=jde
+        ) from jde
     return manifest
