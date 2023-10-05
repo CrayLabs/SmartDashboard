@@ -9,7 +9,7 @@ from smartdashboard.views import OrchestratorView
     "json_file, return_type",
     [
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json", OrchestratorView
+            "tests/utils/manifest_files/manifesttest.json", OrchestratorView
         ),
     ],
 )

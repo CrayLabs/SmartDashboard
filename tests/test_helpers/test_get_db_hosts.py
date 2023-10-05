@@ -1,7 +1,7 @@
 import pytest
 
 from smartdashboard.utils.helpers import get_db_hosts
-from tests.test_utils.test_entities import *
+from tests.utils.test_entities import *
 
 
 @pytest.mark.parametrize(

@@ -8,10 +8,10 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
     "json_file, runs_length, app_length, orc_length, ens_length, return_type",
     [
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json", 2, 4, 3, 3, Manifest
+            "tests/utils/manifest_files/manifesttest.json", 2, 4, 3, 3, Manifest
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/no_experiment_manifest.json",
+            "tests/utils/manifest_files/no_experiment_manifest.json",
             0,
             0,
             0,
@@ -19,7 +19,7 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
             Manifest,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/no_apps_manifest.json",
+            "tests/utils/manifest_files/no_apps_manifest.json",
             2,
             0,
             3,
@@ -27,23 +27,23 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
             Manifest,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/no_orchestrator_manifest.json",
-            2,
-            4,
-            0,
-            3,
-            Manifest,
-        ),
-        pytest.param(
-            "tests/test_utils/manifest_files/no_ensembles_manifest.json",
+            "tests/utils/manifest_files/no_orchestrator_manifest.json",
             2,
             4,
+            0,
+            3,
+            Manifest,
+        ),
+        pytest.param(
+            "tests/utils/manifest_files/no_ensembles_manifest.json",
+            2,
+            4,
             3,
             0,
             Manifest,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/malformed_apps.json",
+            "tests/utils/manifest_files/malformed_apps.json",
             0,
             0,
             0,
@@ -51,7 +51,7 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
             MalformedManifestError,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/malformed_orcs.json",
+            "tests/utils/manifest_files/malformed_orcs.json",
             0,
             0,
             0,
@@ -59,7 +59,7 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
             MalformedManifestError,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/malformed_ensembles.json",
+            "tests/utils/manifest_files/malformed_ensembles.json",
             0,
             0,
             0,

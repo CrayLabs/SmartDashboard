@@ -1,7 +1,7 @@
 import pytest
 
 from smartdashboard.utils.helpers import format_ensemble_params
-from tests.test_utils.test_entities import (
+from tests.utils.test_entities import (
     ensemble_1,
     ensemble_2,
     ensemble_3,

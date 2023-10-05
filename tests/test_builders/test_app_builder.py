@@ -9,7 +9,7 @@ from smartdashboard.views import ApplicationView
     "json_file, return_type",
     [
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json", ApplicationView
+            "tests/utils/manifest_files/manifesttest.json", ApplicationView
         ),
     ],
 )

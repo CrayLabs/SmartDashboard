@@ -8,7 +8,7 @@ from smartdashboard.views import EnsembleView
 @pytest.mark.parametrize(
     "json_file, return_type",
     [
-        pytest.param("tests/test_utils/manifest_files/manifesttest.json", EnsembleView),
+        pytest.param("tests/utils/manifest_files/manifesttest.json", EnsembleView),
     ],
 )
 def test_ens_builder(json_file, return_type):

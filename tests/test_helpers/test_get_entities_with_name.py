@@ -2,29 +2,29 @@ import pytest
 
 from smartdashboard.utils.helpers import get_entities_with_name
 from smartdashboard.utils.ManifestReader import ManifestFileReader
-from tests.test_utils.test_entities import *
+from tests.utils.test_entities import *
 
 
 @pytest.mark.parametrize(
     "json_file, app_name, application",
     [
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json",
+            "tests/utils/manifest_files/manifesttest.json",
             "app1",
             application_1,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json",
+            "tests/utils/manifest_files/manifesttest.json",
             "app2",
             application_2,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json",
+            "tests/utils/manifest_files/manifesttest.json",
             "app3",
             application_3,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/no_apps_manifest.json",
+            "tests/utils/manifest_files/no_apps_manifest.json",
             "app1",
             None,
         ),
@@ -46,28 +46,28 @@ def test_get_entity_apps(json_file, app_name, application):
     "json_file, orc_name, orchestrator",
     [
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json",
+            "tests/utils/manifest_files/manifesttest.json",
             "orchestrator_1",
             orchestrator_1,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json",
+            "tests/utils/manifest_files/manifesttest.json",
             "orchestrator_2",
             orchestrator_2,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json",
+            "tests/utils/manifest_files/manifesttest.json",
             "orchestrator_3",
             orchestrator_3,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json",
+            "tests/utils/manifest_files/manifesttest.json",
             "orc_doesnt_exist",
             None,
         ),
         pytest.param("file_doesnt_exist.json", "orchestrator_1", FileNotFoundError),
         pytest.param(
-            "tests/test_utils/manifest_files/no_orchestrator_manifest.json",
+            "tests/utils/manifest_files/no_orchestrator_manifest.json",
             "orchestrator_1",
             None,
         ),
@@ -88,23 +88,23 @@ def test_get_entity_orchestrator(json_file, orc_name, orchestrator):
     "json_file, ensemble_name, ensemble",
     [
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json",
+            "tests/utils/manifest_files/manifesttest.json",
             "ensemble_1",
             ensemble_1,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json",
+            "tests/utils/manifest_files/manifesttest.json",
             "ensemble_3",
             ensemble_3,
         ),
         pytest.param("file_doesnt_exist.json", "ensemble4", FileNotFoundError),
         pytest.param(
-            "tests/test_utils/manifest_files/manifesttest.json",
+            "tests/utils/manifest_files/manifesttest.json",
             "ensemble_doesnt_exist",
             None,
         ),
         pytest.param(
-            "tests/test_utils/manifest_files/no_ensembles_manifest.json",
+            "tests/utils/manifest_files/no_ensembles_manifest.json",
             "ensemble_1",
             None,
         ),
