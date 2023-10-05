@@ -379,6 +379,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with st.expander(label="Parameters and Generator Files"):
         col1, col2 = st.columns([4, 4])
         with col1:
+            st.write("Parameters")
             st.dataframe(
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers("params", selected_member),
