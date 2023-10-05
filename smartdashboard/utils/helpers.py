@@ -257,6 +257,13 @@ def get_entities_with_name(
 
 
 def render_dataframe_with_title(title: str, dataframe: pd.DataFrame) -> None:
+    """Renders dataframe with titles
+
+    :param title: Title of the dataframe
+    :type title: str
+    :param dataframe: Dataframe to be rendered
+    :type dataframe: pandas.Dataframe
+    """
     st.write(title)
     st.dataframe(
         dataframe,
