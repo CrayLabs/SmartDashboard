@@ -19,3 +19,8 @@ class OrchestratorView:
 class EnsembleView:
     def __init__(self) -> None:
         self.status: t.Optional[str] = None
+
+
+class ErrorView:
+    def __init__(self) -> None:
+        self.status: t.Optional[str] = None

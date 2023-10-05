@@ -22,17 +22,21 @@ from smartdashboard.utils.ManifestReader import Manifest
 from smartdashboard.views import (
     ApplicationView,
     EnsembleView,
+    ErrorView,
     ExperimentView,
     OrchestratorView,
 )
 
 
-def error_builder(error: SSDashboardError) -> None:
+def error_builder(error: SSDashboardError) -> ErrorView:
     """Error view displayed when errors are caught
 
     :param error: Error to get information from
     :type error: SSDashboardError
+    :return: An error view
+    :rtype: ErrorView
     """
+    view = ErrorView()
     st.header(error.title)
     st.error(
         f"""Error found in file: {error.file}  
@@ -41,6 +45,8 @@ def error_builder(error: SSDashboardError) -> None:
 
     with st.expander(label="Traceback"):
         st.code(traceback.format_exc(), language="python")
+
+    return view
 
 
 def exp_builder(manifest: Manifest) -> ExperimentView:
