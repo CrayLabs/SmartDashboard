@@ -41,7 +41,7 @@ application_1 = {
         "step_id": 111,
     },
     "out_file": "test_dashboard/log_files/model_0.out",
-    "err_path": "test_dashboard/log_files/model_0.err",
+    "err_file": "test_dashboard/log_files/model_0.err",
 }
 
 application_2 = {
