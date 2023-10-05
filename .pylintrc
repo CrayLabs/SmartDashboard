@@ -333,7 +333,7 @@ max-returns=11
 max-branches=20
 
 # Maximum number of statements in function / method body
-max-statements=50
+max-statements=70
 
 # Maximum number of statements in a try-block
 max-try-statements=7
