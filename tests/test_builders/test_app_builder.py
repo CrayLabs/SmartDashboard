@@ -8,9 +8,7 @@ from smartdashboard.views import ApplicationView
 @pytest.mark.parametrize(
     "json_file, return_type",
     [
-        pytest.param(
-            "tests/utils/manifest_files/manifesttest.json", ApplicationView
-        ),
+        pytest.param("tests/utils/manifest_files/manifesttest.json", ApplicationView),
     ],
 )
 def test_app_builder(json_file, return_type):

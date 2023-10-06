@@ -8,9 +8,7 @@ from smartdashboard.views import ExperimentView
 @pytest.mark.parametrize(
     "json_file, return_type",
     [
-        pytest.param(
-            "tests/utils/manifest_files/manifesttest.json", ExperimentView
-        ),
+        pytest.param("tests/utils/manifest_files/manifesttest.json", ExperimentView),
     ],
 )
 def test_exp_builder(json_file, return_type):
