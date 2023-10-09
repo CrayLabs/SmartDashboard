@@ -226,22 +226,22 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
         )
 
     if selected_orc_name is not None:
-        selected_orc = get_entity_from_name(selected_orc_name, manifest.orchestrators)
+        view.selected_orchestrator = get_entity_from_name(selected_orc_name, manifest.orchestrators)
     else:
-        selected_orc = None
+        view.selected_orchestrator = None
 
     st.write("")
     st.write("Status: :green[Running]")
-    st.write("Type: " + get_value("type", selected_orc))
-    st.write("Port: " + get_port(selected_orc))
-    st.write("Interface: " + get_interfaces(selected_orc))
+    st.write("Type: " + get_value("type", view.selected_orchestrator))
+    st.write("Port: " + get_port(view.selected_orchestrator))
+    st.write("Interface: " + get_interfaces(view.selected_orchestrator))
 
     st.write("")
     with st.expander(label="Database Hosts"):
         st.dataframe(
             pd.DataFrame(
                 {
-                    "Hosts": get_db_hosts(selected_orc),
+                    "Hosts": get_db_hosts(view.selected_orchestrator),
                 }
             ),
             hide_index=True,
@@ -251,12 +251,21 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])
         with col1:
-            st.session_state["shard_name"] = st.selectbox(
-                label="Shard", options=("Shard 1", "Shard 2", "Shard 3", "Shard 4")
+            shards = get_all_shards(view.selected_orchestrator)
+            selected_shard_name: t.Optional[str] = st.selectbox(
+                "Select a shard:",
+                [shard["name"] for shard in shards if shard is not None],
             )
+            if selected_shard_name is not None:
+                SELECTED_SHARD = get_shard(selected_shard_name, view.selected_orchestrator)
+                # shard_out_logs = LogReader(get_value("out_file", SELECTED_SHARD))
+                # shard_err_logs = LogReader(get_value("err_file", SELECTED_SHARD))
+            else:
+                SELECTED_SHARD = None
+
             st.write("")
             st.write("Output")
-            st.info("")
+            shard_out = st.code("")
 
         with col2:
             st.write("#")
@@ -265,7 +274,25 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
             st.write("")
             st.write("")
             st.write("Error")
-            st.info("")
+            shard_err = st.code("")
+    # with st.expander(label="Logs"):
+    #     col1, col2 = st.columns([6, 6])
+    #     with col1:
+    #         st.session_state["shard_name"] = st.selectbox(
+    #             label="Shard", options=("Shard 1", "Shard 2", "Shard 3", "Shard 4")
+    #         )
+    #         st.write("")
+    #         st.write("Output")
+    #         st.info("")
+
+    #     with col2:
+    #         st.write("#")
+    #         st.write("")
+    #         st.write("")
+    #         st.write("")
+    #         st.write("")
+    #         st.write("Error")
+    #         st.info("")
 
     return view
 

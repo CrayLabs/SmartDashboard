@@ -30,7 +30,16 @@ class ApplicationView(ViewBase):
 
 class OrchestratorView(ViewBase):
     def __init__(self) -> None:
+        self.selected_orchestrator: t.Optional[t.Dict[str, t.Any]] = None
         self.status: t.Optional[str] = None
+        self.err_logs: str = ""
+        self.err_logs_element: t.Optional[DeltaGenerator] = None
+        self.out_logs: str = ""
+        self.out_logs_element: t.Optional[DeltaGenerator] = None
+
+    def update(self) -> None:
+        self.out_logs_element.code(self.out_logs)
+        self.err_logs_element.code(self.err_logs)
 
 
 class EnsembleView(ViewBase):
