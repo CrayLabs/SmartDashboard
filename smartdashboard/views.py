@@ -6,6 +6,7 @@ from smartdashboard.utils.helpers import get_value
 from smartdashboard.utils.LogReader import get_logs
 
 
+
 class ViewBase:
     ...
 
