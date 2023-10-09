@@ -5,7 +5,9 @@ if t.TYPE_CHECKING:
 
 
 class ViewBase(t.Protocol):
-    def update
+    def update(self) -> None:
+        ...
+
 
 class ExperimentView(ViewBase):
     def __init__(self) -> None:
@@ -13,16 +15,17 @@ class ExperimentView(ViewBase):
 
 
 class ApplicationView(ViewBase):
-    def __init__(self, error_elemet) -> None:
+    def __init__(self) -> None:
         self.selected_application: t.Optional[t.Dict[str, t.Any]] = None
         self.status: t.Optional[str] = None
-        self.err_logs: str = "ERROR LOGS"
-        self.error_element: DeltaGenerator
-        self.out_logs: str = "OUTPUT LOGS"
+        self.err_logs: str = ""
+        self.err_logs_element: t.Optional[DeltaGenerator] = None
+        self.out_logs: str = ""
+        self.out_logs_element: t.Optional[DeltaGenerator] = None
 
-    def update(self):
-        self.error_element.code(self.err_logs)
-
+    def update(self) -> None:
+        self.out_logs_element.code(self.out_logs)
+        self.err_logs_element.code(self.err_logs)
 
 
 class OrchestratorView(ViewBase):
@@ -31,11 +34,6 @@ class OrchestratorView(ViewBase):
 
 
 class EnsembleView(ViewBase):
-    def __init__(self) -> None:
-        self.status: t.Optional[str] = None
-
-
-class ErrorView:
     def __init__(self) -> None:
         self.status: t.Optional[str] = None
 
@@ -52,3 +50,8 @@ class OverviewView:
         self.app_view = app_view
         self.ens_view = ens_view
         self.orc_view = orc_view
+
+
+class ErrorView(ViewBase):
+    def __init__(self) -> None:
+        self.status: t.Optional[str] = None

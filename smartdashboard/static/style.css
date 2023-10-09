@@ -21,3 +21,13 @@ div[data-testid="stExpander"] div[role="button"] p {
 
 /* remove "Made by Streamlit" footer */
 footer {visibility: hidden;}
+
+/* add height and scrolling capabilities to logs */
+div[data-testid="stCodeBlock"] {
+    height: 350px !important;
+    overflow-y: auto !important;
+}
+
+code {
+    white-space: pre-wrap !important;
+  }
