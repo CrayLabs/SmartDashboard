@@ -87,7 +87,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             selected_app_name, manifest.applications
         )
     else:
-        selected_application = None
+        view.selected_application = None
 
     st.write("")
     st.write("Status: ")
@@ -98,7 +98,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         st.dataframe(
             pd.DataFrame(
                 {
-                    "All Arguments": get_exe_args(selected_application),
+                    "All Arguments": get_exe_args(view.selected_application),
                 }
             ),
             hide_index=True,
@@ -113,7 +113,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 "Batch Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
-                        "batch_settings", selected_application
+                        "batch_settings", view.selected_application
                     ),
                     columns=["Name", "Value"],
                 ),
@@ -123,7 +123,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 "Run Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
-                        "run_settings", selected_application
+                        "run_settings", view.selected_application
                     ),
                     columns=["Name", "Value"],
                 ),
@@ -136,7 +136,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             render_dataframe_with_title(
                 "Parameters",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("params", selected_application),
+                    flatten_nested_keyvalue_containers("params", view.selected_application),
                     columns=["Name", "Value"],
                 ),
             )
@@ -144,7 +144,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             render_dataframe_with_title(
                 "Files",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("files", selected_application),
+                    flatten_nested_keyvalue_containers("files", view.selected_application),
                     columns=["Type", "File"],
                 ),
             )
@@ -154,8 +154,8 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             app_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                selected_application.get("colocated_db")
-                if selected_application is not None
+                view.selected_application.get("colocated_db")
+                if view.selected_application is not None
                 else {}
             )
             with col1:
