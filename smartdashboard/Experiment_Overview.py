@@ -8,7 +8,6 @@ import time
 
 from subprocess import run
 import streamlit as st
-from smartdashboard.views import ViewBase
 
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import get_value

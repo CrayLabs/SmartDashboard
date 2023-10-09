@@ -1,4 +1,5 @@
 import typing as t
+
 from smartdashboard.utils.helpers import get_value
 from smartdashboard.utils.LogReader import get_logs
 
@@ -41,12 +42,8 @@ class ApplicationView(EntityView):
     ...
 
     def update(self) -> None:
-        self.out_logs = get_logs(
-            file=get_value("out_file", self.selected_application)
-        )
-        self.err_logs = get_logs(
-            file=get_value("err_file", self.selected_application)
-        )
+        self.out_logs = get_logs(file=get_value("out_file", self.selected_application))
+        self.err_logs = get_logs(file=get_value("err_file", self.selected_application))
         self.out_logs_element.code(self.out_logs)
         self.err_logs_element.code(self.err_logs)
 

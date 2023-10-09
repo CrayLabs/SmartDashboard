@@ -20,8 +20,6 @@ from smartdashboard.utils.helpers import (
     get_shard,
     get_value,
     render_dataframe_with_title,
-    get_all_shards,
-    get_shard
 )
 from smartdashboard.utils.ManifestReader import Manifest
 from smartdashboard.views import (
