@@ -8,6 +8,7 @@ from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import (
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
+    get_all_shards,
     get_db_hosts,
     get_ensemble_members,
     get_entity_from_name,
@@ -16,10 +17,9 @@ from smartdashboard.utils.helpers import (
     get_loaded_entities,
     get_member,
     get_port,
+    get_shard,
     get_value,
     render_dataframe_with_title,
-    get_all_shards,
-    get_shard
 )
 from smartdashboard.utils.ManifestReader import Manifest
 from smartdashboard.views import (
@@ -259,7 +259,9 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
                 [shard["name"] for shard in shards if shard is not None],
             )
             if selected_shard_name is not None:
-                view.selected_shard = get_shard(selected_shard_name, view.selected_orchestrator)
+                view.selected_shard = get_shard(
+                    selected_shard_name, view.selected_orchestrator
+                )
             else:
                 view.selected_shard = None
 
@@ -275,7 +277,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
             st.write("")
             st.write("Error")
             view.err_logs_element = st.code(view.err_logs)
-            
+
     return view
 
 

@@ -90,7 +90,7 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir": "/path/to/status dir",
+                        "status_dir": "tests/utils/status_files/model_0",
                         "job_id": "111",
                         "step_id": 111
                     },
@@ -177,7 +177,7 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir": "/path/to/status dir",
+                        "status_dir": "tests/utils/status_files/model_1",
                         "job_id": "111",
                         "step_id": 111
                     },
@@ -198,11 +198,11 @@
                             "name": "shard 1",
                             "host": "shard1_host",
                             "port": "11111",
-                            "out_file": "/path/to/shard/output/logs",
-                            "err_file": "/path/to/shard/error/logs",
+                            "out_file": "tests/utils/log_files/model_1.out",
+                            "err_file": "tests/utils/log_files/model_1.err",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status/dir",
+                                "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -211,11 +211,11 @@
                             "name": "shard 2",
                             "host": "shard2_host",
                             "port": "11111",
-                            "out_file": "/path/to/shard/output/logs",
-                            "err_file": "/path/to/shard/error/logs",
+                            "out_file": "tests/utils/log_files/model_0.out",
+                            "err_file": "tests/utils/log_files/model_0.err",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status/dir",
+                                "status_dir": "tests/utils/status_files/model_1",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -313,7 +313,7 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status dir",
+                                "status_dir": "tests/utils/status_files/model_0",
                                 "job_id": "111",
                                 "step_id": 111
                             },
@@ -390,7 +390,7 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir": "/path/to/status dir",
+                        "status_dir": "tests/utils/status_files/model_3",
                         "job_id": "111",
                         "step_id": 111
                     },
@@ -473,12 +473,12 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir": "/path/to/status dir",
+                        "status_dir": "tests/utils/status_files/model_1",
                         "job_id": "111",
                         "step_id": 111
                     },
                     "out_file": "tests/utils/log_files/model_1.out",
-                    "err_file": "tests/utils/log_files/model_1.err"
+                    "err_file": "tests/utils/log_files/model_0.err"
                 }
             ],
             "orchestrator": [
@@ -493,11 +493,11 @@
                             "name": "orc 2 shard 1",
                             "host": "shard1_host",
                             "port": 22222,
-                            "out_file": "/path/to/shard/output/logs",
-                            "err_file": "/path/to/shard/error/logs",
+                            "out_file": "tests/utils/log_files/model_0.out",
+                            "err_file": "tests/utils/log_files/model_0.err",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status/dir",
+                                "status_dir": "tests/utils/status_files/model_0",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -506,11 +506,11 @@
                             "name": "orc 2 shard 2",
                             "host": "shard2_host",
                             "port": 22222,
-                            "out_file": "/path/to/shard/output/logs",
-                            "err_file": "/path/to/shard/error/logs",
+                            "out_file": "tests/utils/log_files/model_1.out",
+                            "err_file": "tests/utils/log_files/model_1.err",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status/dir",
+                                "status_dir": "tests/utils/status_files/model_1",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -526,11 +526,11 @@
                             "name": "orc 3 shard 1",
                             "host": "shard1_host",
                             "port": "12345",
-                            "out_file": "/path/to/shard/output/logs",
-                            "err_file": "/path/to/shard/error/logs",
+                            "out_file": "tests/utils/log_files/orchestrator_0.out",
+                            "err_file": "tests/utils/log_files/orchestrator_0.err",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status/dir",
+                                "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -602,10 +602,13 @@
                                 "scripts": [],
                                 "models": []
                             },
-                            "job_id": "111",
-                            "step_id": 111,
-                            "out_file": "tests/utils/log_files/model_1.out",
-                            "err_file": "tests/utils/log_files/model_1.err"
+                            "telemetry_metadata": {
+                                "status_dir": "tests/utils/status_files/model_0",
+                                "job_id": "111",
+                                "step_id": 111
+                            },
+                            "out_file": "tests/utils/log_files/model_0.out",
+                            "err_file": "tests/utils/log_files/model_0.err"
                         }
                     ]
                 },
@@ -699,7 +702,7 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status dir",
+                                "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": 111
                             },
@@ -781,7 +784,7 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status dir",
+                                "status_dir": "tests/utils/status_files/model_1",
                                 "job_id": "111",
                                 "step_id": 111
                             },
