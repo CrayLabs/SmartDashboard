@@ -7,8 +7,8 @@
         "name": "my-experiment",
         "path": "experiment/path",
         "launcher": "local",
-        "out_file": "test_dashboard/log_files/model_0.out",
-        "err_file": "test_dashboard/log_files/model_0.err"
+        "out_file": "tests/utils/log_files/model_0.out",
+        "err_file": "tests/utils/log_files/model_0.err"
     },
     "runs": [
         {
@@ -17,7 +17,9 @@
                 {
                     "name": "app1",
                     "path": "app/1/path",
-                    "exe_args": ["string"],
+                    "exe_args": [
+                        "string"
+                    ],
                     "batch_settings": {
                         "batch_cmd": "command",
                         "batch_args": {
@@ -37,9 +39,17 @@
                         "param": "param value"
                     },
                     "files": {
-                        "Symlink": ["file1", "file2"],
-                        "Configure": ["file3"],
-                        "Copy": ["file4", "file5"]
+                        "Symlink": [
+                            "file1",
+                            "file2"
+                        ],
+                        "Configure": [
+                            "file3"
+                        ],
+                        "Copy": [
+                            "file4",
+                            "file5"
+                        ]
                     },
                     "colocated_db": {
                         "settings": {
@@ -64,7 +74,7 @@
                                 }
                             }
                         ],
-                        "models":[
+                        "models": [
                             {
                                 "model1": {
                                     "backend": "model1_tf",
@@ -80,17 +90,21 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir":"/path/to/status dir",
+                        "status_dir": "/path/to/status dir",
                         "job_id": "111",
                         "step_id": 111
                     },
-                    "out_file": "test_dashboard/log_files/model_0.out",
-                    "err_file": "test_dashboard/log_files/model_0.err"
+                    "out_file": "tests/utils/log_files/model_0.out",
+                    "err_file": "tests/utils/log_files/model_0.err"
                 },
                 {
                     "name": "app2",
                     "path": "app/2/path",
-                    "exe_args": ["string1", "string2", "string3"],
+                    "exe_args": [
+                        "string1",
+                        "string2",
+                        "string3"
+                    ],
                     "batch_settings": {
                         "batch_cmd": "command",
                         "batch_args": {
@@ -107,12 +121,22 @@
                         }
                     },
                     "params": {
-                        "string": ["Any"]
+                        "string": [
+                            "Any"
+                        ]
                     },
                     "files": {
-                        "Symlink": ["file1", "file2"],
-                        "Configure": ["file3"],
-                        "Copy": ["file4", "file5"]
+                        "Symlink": [
+                            "file1",
+                            "file2"
+                        ],
+                        "Configure": [
+                            "file3"
+                        ],
+                        "Copy": [
+                            "file4",
+                            "file5"
+                        ]
                     },
                     "colocated_db": {
                         "settings": {
@@ -137,7 +161,7 @@
                                 }
                             }
                         ],
-                        "models":[
+                        "models": [
                             {
                                 "model1": {
                                     "backend": "model1_tf",
@@ -153,19 +177,22 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir":"/path/to/status dir",
+                        "status_dir": "/path/to/status dir",
                         "job_id": "111",
                         "step_id": 111
                     },
-                    "out_file": "test_dashboard/log_files/model_1.out",
-                    "err_file": "test_dashboard/log_files/model_1.err"
+                    "out_file": "tests/utils/log_files/model_1.out",
+                    "err_file": "tests/utils/log_files/model_1.err"
                 }
             ],
             "orchestrator": [
                 {
                     "name": "orchestrator_1",
                     "type": "redis",
-                    "interface": ["lo", "lo2"],
+                    "interface": [
+                        "lo",
+                        "lo2"
+                    ],
                     "shards": [
                         {
                             "name": "shard 1",
@@ -175,7 +202,7 @@
                             "err_file": "/path/to/shard/error/logs",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status/dir",
+                                "status_dir": "/path/to/status/dir",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -188,14 +215,14 @@
                             "err_file": "/path/to/shard/error/logs",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status/dir",
+                                "status_dir": "/path/to/status/dir",
                                 "job_id": "111",
                                 "step_id": 111
                             }
                         }
                     ]
                 }
-           ],
+            ],
             "ensemble": [
                 {
                     "name": "ensemble_1",
@@ -204,13 +231,18 @@
                         "string": "Any0"
                     },
                     "params": {
-                        "string": ["Any1", "Any3"]
+                        "string": [
+                            "Any1",
+                            "Any3"
+                        ]
                     },
                     "models": [
                         {
                             "name": "ensemble_1_member_1",
                             "path": "string",
-                            "exe_args": ["string"],
+                            "exe_args": [
+                                "string"
+                            ],
                             "batch_settings": {
                                 "batch_cmd": "command",
                                 "batch_args": {
@@ -230,9 +262,17 @@
                                 "string": "Any"
                             },
                             "files": {
-                                "Symlink": ["file1", "file2"],
-                                "Configure": ["file3"],
-                                "Copy": ["file4", "file5"]
+                                "Symlink": [
+                                    "file1",
+                                    "file2"
+                                ],
+                                "Configure": [
+                                    "file3"
+                                ],
+                                "Copy": [
+                                    "file4",
+                                    "file5"
+                                ]
                             },
                             "colocated_db": {
                                 "settings": {
@@ -257,7 +297,7 @@
                                         }
                                     }
                                 ],
-                                "models":[
+                                "models": [
                                     {
                                         "model1": {
                                             "backend": "model1_tf",
@@ -273,12 +313,12 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status dir",
+                                "status_dir": "/path/to/status dir",
                                 "job_id": "111",
                                 "step_id": 111
                             },
-                            "out_file": "test_dashboard/log_files/model_0.out",
-                            "err_file": "test_dashboard/log_files/model_0.err"
+                            "out_file": "tests/utils/log_files/model_0.out",
+                            "err_file": "tests/utils/log_files/model_0.err"
                         }
                     ]
                 }
@@ -290,7 +330,9 @@
                 {
                     "name": "app3",
                     "path": "app/3/path",
-                    "exe_args": ["string"],
+                    "exe_args": [
+                        "string"
+                    ],
                     "batch_settings": {
                         "batch_cmd": "command",
                         "batch_args": {
@@ -310,9 +352,17 @@
                         "string": "Any"
                     },
                     "files": {
-                        "Symlink": ["file1", "file2"],
-                        "Configure": ["file3"],
-                        "Copy": ["file4", "file5"]
+                        "Symlink": [
+                            "file1",
+                            "file2"
+                        ],
+                        "Configure": [
+                            "file3"
+                        ],
+                        "Copy": [
+                            "file4",
+                            "file5"
+                        ]
                     },
                     "colocated_db": {
                         "settings": {
@@ -324,7 +374,7 @@
                             "debug": "False"
                         },
                         "scripts": [],
-                        "models":[
+                        "models": [
                             {
                                 "model1": {
                                     "backend": "model1_tf",
@@ -340,17 +390,19 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir":"/path/to/status dir",
+                        "status_dir": "/path/to/status dir",
                         "job_id": "111",
                         "step_id": 111
                     },
-                    "out_file": "test_dashboard/log_files/model_0.out",
-                    "err_file": "test_dashboard/log_files/model_0.err"
+                    "out_file": "tests/utils/log_files/model_0.out",
+                    "err_file": "tests/utils/log_files/model_0.err"
                 },
                 {
                     "name": "app4",
                     "path": "app/4/path",
-                    "exe_args": ["string"],
+                    "exe_args": [
+                        "string"
+                    ],
                     "batch_settings": {
                         "batch_cmd": "command",
                         "batch_args": {
@@ -370,9 +422,17 @@
                         "string": "Any"
                     },
                     "files": {
-                        "Symlink": ["file1", "file2"],
-                        "Configure": ["file3"],
-                        "Copy": ["file4", "file5"]
+                        "Symlink": [
+                            "file1",
+                            "file2"
+                        ],
+                        "Configure": [
+                            "file3"
+                        ],
+                        "Copy": [
+                            "file4",
+                            "file5"
+                        ]
                     },
                     "colocated_db": {
                         "settings": {
@@ -397,7 +457,7 @@
                                 }
                             }
                         ],
-                        "models":[
+                        "models": [
                             {
                                 "model1": {
                                     "backend": "model1_tf",
@@ -413,18 +473,21 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir":"/path/to/status dir",
+                        "status_dir": "/path/to/status dir",
                         "job_id": "111",
                         "step_id": 111
                     },
-                    "out_file": "test_dashboard/log_files/model_1.out",
-                    "err_file": "test_dashboard/log_files/model_1.err"
+                    "out_file": "tests/utils/log_files/model_1.out",
+                    "err_file": "tests/utils/log_files/model_1.err"
                 }
-            ],"orchestrator": [
+            ],
+            "orchestrator": [
                 {
                     "name": "orchestrator_2",
                     "type": "redis",
-                    "interface": ["lo"],
+                    "interface": [
+                        "lo"
+                    ],
                     "shards": [
                         {
                             "name": "orc 2 shard 1",
@@ -434,7 +497,7 @@
                             "err_file": "/path/to/shard/error/logs",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status/dir",
+                                "status_dir": "/path/to/status/dir",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -447,7 +510,7 @@
                             "err_file": "/path/to/shard/error/logs",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status/dir",
+                                "status_dir": "/path/to/status/dir",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -467,14 +530,14 @@
                             "err_file": "/path/to/shard/error/logs",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status/dir",
+                                "status_dir": "/path/to/status/dir",
                                 "job_id": "111",
                                 "step_id": 111
                             }
                         }
                     ]
                 }
-           ],
+            ],
             "ensemble": [
                 {
                     "name": "ensemble_2",
@@ -483,13 +546,19 @@
                         "string": "Any1"
                     },
                     "params": {
-                        "string": ["Any1", "Any2", "Any3"]
+                        "string": [
+                            "Any1",
+                            "Any2",
+                            "Any3"
+                        ]
                     },
                     "models": [
                         {
                             "name": "ensemble_2_member_1",
                             "path": "string",
-                            "exe_args": ["string"],
+                            "exe_args": [
+                                "string"
+                            ],
                             "batch_settings": {
                                 "batch_cmd": "command",
                                 "batch_args": {
@@ -509,9 +578,17 @@
                                 "string": "Any"
                             },
                             "files": {
-                                "Symlink": ["file1", "file2"],
-                                "Configure": ["file3"],
-                                "Copy": ["file4", "file5"]
+                                "Symlink": [
+                                    "file1",
+                                    "file2"
+                                ],
+                                "Configure": [
+                                    "file3"
+                                ],
+                                "Copy": [
+                                    "file4",
+                                    "file5"
+                                ]
                             },
                             "colocated_db": {
                                 "settings": {
@@ -523,12 +600,12 @@
                                     "debug": "False"
                                 },
                                 "scripts": [],
-                                "models":[]
+                                "models": []
                             },
                             "job_id": "111",
                             "step_id": 111,
-                            "out_file": "test_dashboard/log_files/model_1.out",
-                            "err_file": "test_dashboard/log_files/model_1.err"
+                            "out_file": "tests/utils/log_files/model_1.out",
+                            "err_file": "tests/utils/log_files/model_1.err"
                         }
                     ]
                 },
@@ -539,13 +616,19 @@
                         "string": "Any1"
                     },
                     "params": {
-                        "string": ["Any1", "Any2", "Any3"]
+                        "string": [
+                            "Any1",
+                            "Any2",
+                            "Any3"
+                        ]
                     },
                     "models": [
                         {
                             "name": "ensemble_3_member_1",
                             "path": "member 1 path",
-                            "exe_args": ["string"],
+                            "exe_args": [
+                                "string"
+                            ],
                             "batch_settings": {
                                 "batch_cmd": "command",
                                 "batch_args": {
@@ -565,9 +648,17 @@
                                 "string": "Any"
                             },
                             "files": {
-                                "Symlink": ["file1", "file2"],
-                                "Configure": ["file3"],
-                                "Copy": ["file4", "file5"]
+                                "Symlink": [
+                                    "file1",
+                                    "file2"
+                                ],
+                                "Configure": [
+                                    "file3"
+                                ],
+                                "Copy": [
+                                    "file4",
+                                    "file5"
+                                ]
                             },
                             "colocated_db": {
                                 "settings": {
@@ -592,7 +683,7 @@
                                         }
                                     }
                                 ],
-                                "models":[
+                                "models": [
                                     {
                                         "model1": {
                                             "backend": "model1_tf",
@@ -608,17 +699,19 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status dir",
+                                "status_dir": "/path/to/status dir",
                                 "job_id": "111",
                                 "step_id": 111
                             },
-                            "out_file": "test_dashboard/log_files/model_0.out",
-                            "err_file": "test_dashboard/log_files/model_0.err"
+                            "out_file": "tests/utils/log_files/model_0.out",
+                            "err_file": "tests/utils/log_files/model_0.err"
                         },
                         {
                             "name": "ensemble_3_member_2",
                             "path": "member 2 path",
-                            "exe_args": ["string"],
+                            "exe_args": [
+                                "string"
+                            ],
                             "batch_settings": {
                                 "batch_cmd": "command",
                                 "batch_args": {
@@ -637,9 +730,17 @@
                                 "string": "Any"
                             },
                             "files": {
-                                "Symlink": ["file1", "file2"],
-                                "Configure": ["file3"],
-                                "Copy": ["file4", "file5"]
+                                "Symlink": [
+                                    "file1",
+                                    "file2"
+                                ],
+                                "Configure": [
+                                    "file3"
+                                ],
+                                "Copy": [
+                                    "file4",
+                                    "file5"
+                                ]
                             },
                             "colocated_db": {
                                 "settings": {
@@ -664,7 +765,7 @@
                                         }
                                     }
                                 ],
-                                "models":[
+                                "models": [
                                     {
                                         "model1": {
                                             "backend": "model1_tf",
@@ -680,12 +781,12 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status dir",
+                                "status_dir": "/path/to/status dir",
                                 "job_id": "111",
                                 "step_id": 111
                             },
-                            "out_file": "test_dashboard/log_files/model_1.out",
-                            "err_file": "test_dashboard/log_files/model_1.err"
+                            "out_file": "tests/utils/log_files/model_1.out",
+                            "err_file": "tests/utils/log_files/model_1.err"
                         }
                     ]
                 }

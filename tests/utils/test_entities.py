@@ -41,8 +41,8 @@ application_1 = {
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_0.out",
-    "err_file": "test_dashboard/log_files/model_0.err",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
 }
 
 application_2 = {
@@ -88,8 +88,8 @@ application_2 = {
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_1.out",
-    "err_file": "test_dashboard/log_files/model_1.err",
+    "out_file": "tests/utils/log_files/model_1.out",
+    "err_file": "tests/utils/log_files/model_1.err",
 }
 
 application_3 = {
@@ -132,8 +132,8 @@ application_3 = {
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_0.out",
-    "err_file": "test_dashboard/log_files/model_0.err",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
 }
 application_4 = {
     "name": "app3",
@@ -174,8 +174,8 @@ application_4 = {
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_0.out",
-    "err_file": "test_dashboard/log_files/model_0.err",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
 }
 
 orchestrator_1 = {
@@ -360,8 +360,8 @@ ensemble_1 = {
                 "job_id": "111",
                 "step_id": 111,
             },
-            "out_file": "test_dashboard/log_files/model_0.out",
-            "err_file": "test_dashboard/log_files/model_0.err",
+            "out_file": "tests/utils/log_files/model_0.out",
+            "err_file": "tests/utils/log_files/model_0.err",
         }
     ],
 }
@@ -409,8 +409,8 @@ ensemble_1_member_1 = {
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_0.out",
-    "err_file": "test_dashboard/log_files/model_0.err",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
 }
 
 ensemble_2 = {
@@ -470,8 +470,8 @@ ensemble_3 = {
                 "job_id": "111",
                 "step_id": 111,
             },
-            "out_file": "test_dashboard/log_files/model_0.out",
-            "err_file": "test_dashboard/log_files/model_0.err",
+            "out_file": "tests/utils/log_files/model_0.out",
+            "err_file": "tests/utils/log_files/model_0.err",
         },
         {
             "name": "ensemble_3_member_2",
@@ -515,8 +515,8 @@ ensemble_3 = {
                 "job_id": "111",
                 "step_id": 111,
             },
-            "out_file": "test_dashboard/log_files/model_1.out",
-            "err_file": "test_dashboard/log_files/model_1.err",
+            "out_file": "tests/utils/log_files/model_1.out",
+            "err_file": "tests/utils/log_files/model_1.err",
         },
     ],
 }
@@ -563,8 +563,8 @@ ensemble_3_member_1 = {
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_0.out",
-    "err_file": "test_dashboard/log_files/model_0.err",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
 }
 
 ensemble_3_member_2 = {
@@ -606,8 +606,8 @@ ensemble_3_member_2 = {
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_1.out",
-    "err_file": "test_dashboard/log_files/model_1.err",
+    "out_file": "tests/utils/log_files/model_1.out",
+    "err_file": "tests/utils/log_files/model_1.err",
 }
 
 
@@ -644,6 +644,6 @@ no_db_scripts_or_models = {
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_1.out",
-    "err_file": "test_dashboard/log_files/model_1.err",
+    "out_file": "tests/utils/log_files/model_1.out",
+    "err_file": "tests/utils/log_files/model_1.err",
 }

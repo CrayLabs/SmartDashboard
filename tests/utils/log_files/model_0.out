@@ -1,0 +1,5 @@
+SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_FILE is not set. Defaulting to stdout
+SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_LEVEL is not set. Defaulting to INFO
+Freq (hz) = 0.1
+Sleep time = 10.0
+Number of messages = 10

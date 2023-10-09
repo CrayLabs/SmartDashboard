@@ -7,8 +7,8 @@
         "name": "my-experiment",
         "path": "experiment/path",
         "launcher": "local",
-        "out_file": "test_dashboard/log_files/model_0.out",
-        "err_file": "test_dashboard/log_files/model_0.err"
+        "out_file": "tests/utils/log_files/model_0.out",
+        "err_file": "tests/utils/log_files/model_0.err"
     },
     "runs": [
         {
@@ -18,7 +18,10 @@
                 {
                     "name": "orchestrator_0",
                     "type": "redis",
-                    "interface": ["lo", "lo2"],
+                    "interface": [
+                        "lo",
+                        "lo2"
+                    ],
                     "shards": [
                         {
                             "name": "shard 1",
@@ -28,7 +31,7 @@
                             "err_file": "/path/to/shard/error/logs",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status/dir",
+                                "status_dir": "/path/to/status/dir",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -41,16 +44,14 @@
                             "err_file": "/path/to/shard/error/logs",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status/dir",
+                                "status_dir": "/path/to/status/dir",
                                 "job_id": "111",
                                 "step_id": 111
                             }
                         }
                     ]
                 }
-           ]
+            ]
         }
     ]
 }
-    
-

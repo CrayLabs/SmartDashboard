@@ -7,8 +7,8 @@
         "name": "my-experiment",
         "path": "experiment/path",
         "launcher": "local",
-        "out_file": "test_dashboard/log_files/model_0.out",
-        "err_file": "test_dashboard/log_files/model_0.err"
+        "out_file": "tests/utils/log_files/model_0.out",
+        "err_file": "tests/utils/log_files/model_0.err"
     },
     "runs": [
         {
@@ -22,13 +22,18 @@
                         "string": "Any0"
                     },
                     "params": {
-                        "string": ["Any1", "Any3"]
+                        "string": [
+                            "Any1",
+                            "Any3"
+                        ]
                     },
                     "models": [
                         {
                             "name": "ensemble_1_member_1",
                             "path": "string",
-                            "exe_args": ["string"],
+                            "exe_args": [
+                                "string"
+                            ],
                             "batch_settings": {
                                 "batch_cmd": "command",
                                 "batch_args": {
@@ -48,9 +53,17 @@
                                 "string": "Any"
                             },
                             "files": {
-                                "Symlink": ["file1", "file2"],
-                                "Configure": ["file3"],
-                                "Copy": ["file4", "file5"]
+                                "Symlink": [
+                                    "file1",
+                                    "file2"
+                                ],
+                                "Configure": [
+                                    "file3"
+                                ],
+                                "Copy": [
+                                    "file4",
+                                    "file5"
+                                ]
                             },
                             "colocated_db": {
                                 "settings": {
@@ -75,7 +88,7 @@
                                         }
                                     }
                                 ],
-                                "models":[
+                                "models": [
                                     {
                                         "model1": {
                                             "backend": "model1_tf",
@@ -91,12 +104,12 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir":"/path/to/status dir",
+                                "status_dir": "/path/to/status dir",
                                 "job_id": "111",
                                 "step_id": 111
                             },
-                            "out_file": "test_dashboard/log_files/model_0.out",
-                            "err_file": "test_dashboard/log_files/model_0.err"
+                            "out_file": "tests/utils/log_files/model_0.out",
+                            "err_file": "tests/utils/log_files/model_0.err"
                         }
                     ]
                 }
