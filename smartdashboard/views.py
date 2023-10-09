@@ -9,8 +9,8 @@ class ExperimentView:
 class ApplicationView:
     def __init__(self) -> None:
         self.status: t.Optional[str] = None
-        self.err_logs = None
-        self.out_logs = None
+        self.err_logs = t.Optional[str] = None
+        self.out_logs = t.Optional[str] = None
 
 
 class OrchestratorView:

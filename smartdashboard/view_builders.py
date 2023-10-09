@@ -195,11 +195,11 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             col1, col2 = st.columns([6, 6])
             with col1:
                 st.write("Output")
-                st.info("")
+                st.code(view.out_logs)
 
             with col2:
                 st.write("Error")
-                st.info("")
+                st.code(view.err_logs)
 
     return view
 
