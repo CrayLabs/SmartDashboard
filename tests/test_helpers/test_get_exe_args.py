@@ -1,7 +1,7 @@
 import pytest
 
 from smartdashboard.utils.helpers import get_exe_args
-from tests.utils.test_entities import *
+from ..utils.test_entities import *
 
 
 @pytest.mark.parametrize(
