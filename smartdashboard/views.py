@@ -38,6 +38,9 @@ class ExperimentView(ViewBase):
 class ApplicationView(EntityView):
     ...
 
+    def update(self) -> None:
+        self.out_logs_element.code(self.out_logs)
+        self.err_logs_element.code(self.err_logs)
 
 class OrchestratorView(EntityView):
     ...
@@ -61,3 +64,8 @@ class OverviewView:
         self.app_view = app_view
         self.ens_view = ens_view
         self.orc_view = orc_view
+
+
+class ErrorView(ViewBase):
+    def __init__(self) -> None:
+        self.status: t.Optional[str] = None

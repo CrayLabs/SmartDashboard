@@ -136,7 +136,9 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             render_dataframe_with_title(
                 "Parameters",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("params", view.selected_application),
+                    flatten_nested_keyvalue_containers(
+                        "params", view.selected_application
+                    ),
                     columns=["Name", "Value"],
                 ),
             )
@@ -144,7 +146,9 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             render_dataframe_with_title(
                 "Files",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("files", view.selected_application),
+                    flatten_nested_keyvalue_containers(
+                        "files", view.selected_application
+                    ),
                     columns=["Type", "File"],
                 ),
             )
