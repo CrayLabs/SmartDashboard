@@ -63,5 +63,5 @@ with st.expander(label="Support"):
     st.markdown(
         """The complete SmartSim documentation can be found 
         [here](https://www.craylabs.org/docs/overview.html).  
-        You can also contact us at contact.us@idk.yet"""
+        You can also contact us at craylabs@hpe.com"""
     )
