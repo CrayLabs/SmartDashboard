@@ -2,7 +2,7 @@ import pytest
 
 from smartdashboard.utils.helpers import get_entities_with_name
 from smartdashboard.utils.ManifestReader import ManifestFileReader
-from tests.utils.test_entities import *
+from ..utils.test_entities import *
 
 
 @pytest.mark.parametrize(
