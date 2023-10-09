@@ -18,6 +18,8 @@ from smartdashboard.utils.helpers import (
     get_port,
     get_value,
     render_dataframe_with_title,
+    get_all_shards,
+    get_shard
 )
 from smartdashboard.utils.ManifestReader import Manifest
 from smartdashboard.views import (
@@ -257,15 +259,13 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
                 [shard["name"] for shard in shards if shard is not None],
             )
             if selected_shard_name is not None:
-                SELECTED_SHARD = get_shard(selected_shard_name, view.selected_orchestrator)
-                # shard_out_logs = LogReader(get_value("out_file", SELECTED_SHARD))
-                # shard_err_logs = LogReader(get_value("err_file", SELECTED_SHARD))
+                view.selected_shard = get_shard(selected_shard_name, view.selected_orchestrator)
             else:
-                SELECTED_SHARD = None
+                view.selected_shard = None
 
             st.write("")
             st.write("Output")
-            shard_out = st.code("")
+            view.out_logs_element = st.code(view.out_logs)
 
         with col2:
             st.write("#")
@@ -274,26 +274,8 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
             st.write("")
             st.write("")
             st.write("Error")
-            shard_err = st.code("")
-    # with st.expander(label="Logs"):
-    #     col1, col2 = st.columns([6, 6])
-    #     with col1:
-    #         st.session_state["shard_name"] = st.selectbox(
-    #             label="Shard", options=("Shard 1", "Shard 2", "Shard 3", "Shard 4")
-    #         )
-    #         st.write("")
-    #         st.write("Output")
-    #         st.info("")
-
-    #     with col2:
-    #         st.write("#")
-    #         st.write("")
-    #         st.write("")
-    #         st.write("")
-    #         st.write("")
-    #         st.write("Error")
-    #         st.info("")
-
+            view.err_logs_element = st.code(view.err_logs)
+            
     return view
 
 
