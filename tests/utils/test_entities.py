@@ -675,3 +675,30 @@ no_db_scripts_or_models = {
     "out_file": "tests/utils/log_files/model_1.out",
     "err_file": "tests/utils/log_files/model_1.err",
 }
+
+model0_out_logs = """SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_FILE is not set. Defaulting to stdout
+SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_LEVEL is not set. Defaulting to INFO
+Freq (hz) = 0.1
+Sleep time = 10.0
+Number of messages = 10
+"""
+
+model0_err_logs = """Traceback (most recent call last):
+  File "/lus/cls01029/mellis/cray_labs/SmartSim/tests/test_configs/bad.py", line 42, in <module>
+    divide_by_zero(args.time)
+  File "/lus/cls01029/mellis/cray_labs/SmartSim/tests/test_configs/bad.py", line 34, in divide_by_zero
+    print(1 / 0)
+ZeroDivisionError: division by zero"""
+
+model1_out_logs = """SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_FILE is not set. Defaulting to stdout
+SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_LEVEL is not set. Defaulting to INFO
+Freq (hz) = 1.0
+Sleep time = 1.0
+Number of messages = 100"""
+
+model1_err_logs = """Traceback (most recent call last):
+  File "/lus/cls01029/alyssacote/cray_labs/SmartSim/tests/test_configs/bad.py", line 42, in <module>
+    divide_by_zero(args.time)
+  File "/lus/cls01029/alyssacote/cray_labs/SmartSim/tests/test_configs/bad.py", line 34, in divide_by_zero
+    print(1 / 0)
+ZeroDivisionError: division by zero"""

@@ -12,6 +12,7 @@ from ..utils.test_entities import *
         pytest.param(orchestrator_2, "lo"),
         pytest.param(orchestrator_3, "lo"),
         pytest.param(application_1, ""),
+        pytest.param(None, ""),
     ],
 )
 def test_get_interfaces(entity, expected_value):
