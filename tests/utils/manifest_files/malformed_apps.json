@@ -30,7 +30,7 @@
                             "err_file": "/path/to/shard/error/logs",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status/dir",
+                                "status_dir": "tests/utils/status_files/model_1us/dir",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -43,7 +43,7 @@
                             "err_file": "/path/to/shard/error/logs",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status/dir",
+                                "status_dir": "tests/utils/status_files/model_1us/dir",
                                 "job_id": "111",
                                 "step_id": 111
                             }
@@ -141,7 +141,7 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status dir",
+                                "status_dir": "tests/utils/status_files/model_1",
                                 "job_id": "111",
                                 "step_id": 111
                             },

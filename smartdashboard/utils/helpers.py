@@ -171,7 +171,9 @@ def flatten_nested_keyvalue_containers(
     return list(zip(keys, values))
 
 
-def format_ensemble_params(entity: t.Optional[t.Dict[str, t.Any]]) -> t.List[t.Tuple[str, str]]:
+def format_ensemble_params(
+    entity: t.Optional[t.Dict[str, t.Any]]
+) -> t.List[t.Tuple[str, str]]:
     """Format ensemble params to be displayed
 
     :param entity: Entity represented by a dictionary
@@ -268,7 +270,9 @@ def render_dataframe_with_title(title: str, dataframe: pd.DataFrame) -> None:
     )
 
 
-def get_all_shards(orc: t.Optional[t.Dict[str, t.Any]]) -> t.List[t.Optional[t.Dict[str, t.Any]]]:
+def get_all_shards(
+    orc: t.Optional[t.Dict[str, t.Any]]
+) -> t.List[t.Optional[t.Dict[str, t.Any]]]:
     """Get all shards in an Orchestrator
 
     :param orc: Orchestrator represented by a dictionary

@@ -16,6 +16,9 @@ class ExperimentView(ViewBase):
     def __init__(self) -> None:
         self.status: t.Optional[str] = None
 
+    def update(self) -> None:
+        ...
+
 
 class ApplicationView(ViewBase):
     def __init__(self) -> None:
@@ -29,8 +32,10 @@ class ApplicationView(ViewBase):
     def update(self) -> None:
         self.out_logs = get_logs(file=get_value("out_file", self.selected_application))
         self.err_logs = get_logs(file=get_value("err_file", self.selected_application))
-        self.out_logs_element.code(self.out_logs)
-        self.err_logs_element.code(self.err_logs)
+        if self.out_logs_element is not None:
+            self.out_logs_element.code(self.out_logs)
+        if self.err_logs_element is not None:
+            self.err_logs_element.code(self.err_logs)
 
 
 class OrchestratorView(ViewBase):
@@ -46,13 +51,29 @@ class OrchestratorView(ViewBase):
     def update(self) -> None:
         self.out_logs = get_logs(file=get_value("out_file", self.selected_shard))
         self.err_logs = get_logs(file=get_value("err_file", self.selected_shard))
-        self.out_logs_element.code(self.out_logs)
-        self.err_logs_element.code(self.err_logs)
+        if self.out_logs_element is not None:
+            self.out_logs_element.code(self.out_logs)
+        if self.err_logs_element is not None:
+            self.err_logs_element.code(self.err_logs)
 
 
 class EnsembleView(ViewBase):
     def __init__(self) -> None:
+        self.selected_ensemble: t.Optional[t.Dict[str, t.Any]] = None
+        self.selected_member: t.Optional[t.Dict[str, t.Any]] = None
         self.status: t.Optional[str] = None
+        self.err_logs: str = ""
+        self.err_logs_element: t.Optional[DeltaGenerator] = None
+        self.out_logs: str = ""
+        self.out_logs_element: t.Optional[DeltaGenerator] = None
+
+    def update(self) -> None:
+        self.out_logs = get_logs(file=get_value("out_file", self.selected_member))
+        self.err_logs = get_logs(file=get_value("err_file", self.selected_member))
+        if self.out_logs_element is not None:
+            self.out_logs_element.code(self.out_logs)
+        if self.err_logs_element is not None:
+            self.err_logs_element.code(self.err_logs)
 
 
 class OverviewView:
@@ -70,5 +91,5 @@ class OverviewView:
 
 
 class ErrorView(ViewBase):
-    def __init__(self) -> None:
-        self.status: t.Optional[str] = None
+    def update(self) -> None:
+        ...

@@ -90,7 +90,7 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir": "/path/to/status dir",
+                        "status_dir": "tests/utils/status_files/model_3",
                         "job_id": "111",
                         "step_id": 111
                     },
@@ -175,7 +175,7 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir": "/path/to/status dir",
+                        "status_dir": "tests/utils/status_files/model_3",
                         "job_id": "111",
                         "step_id": 111
                     },
@@ -274,7 +274,7 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status dir",
+                                "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": 111
                             },
@@ -351,7 +351,7 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir": "/path/to/status dir",
+                        "status_dir": "tests/utils/status_files/model_3",
                         "job_id": "111",
                         "step_id": 111
                     },
@@ -434,7 +434,7 @@
                         ]
                     },
                     "telemetry_metadata": {
-                        "status_dir": "/path/to/status dir",
+                        "status_dir": "tests/utils/status_files/model_3",
                         "job_id": "111",
                         "step_id": 111
                     },
@@ -604,7 +604,7 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status dir",
+                                "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": 111
                             },
@@ -686,7 +686,7 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir": "/path/to/status dir",
+                                "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": 111
                             },
