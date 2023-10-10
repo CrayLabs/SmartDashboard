@@ -15,9 +15,19 @@ class ViewBase(t.Protocol):
 class ExperimentView(ViewBase):
     def __init__(self) -> None:
         self.status: t.Optional[str] = None
+        self.experiment: t.Optional[t.Dict[str, t.Any]] = None
+        self.err_logs: str = ""
+        self.err_logs_element: t.Optional[DeltaGenerator] = None
+        self.out_logs: str = ""
+        self.out_logs_element: t.Optional[DeltaGenerator] = None
 
     def update(self) -> None:
-        ...
+        self.out_logs = get_logs(file=get_value("out_file", self.experiment))
+        self.err_logs = get_logs(file=get_value("err_file", self.experiment))
+        if self.out_logs_element is not None:
+            self.out_logs_element.code(self.out_logs)
+        if self.err_logs_element is not None:
+            self.err_logs_element.code(self.err_logs)
 
 
 class ApplicationView(ViewBase):

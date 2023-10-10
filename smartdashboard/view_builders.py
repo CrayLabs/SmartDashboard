@@ -64,6 +64,7 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     view = ExperimentView()
     st.subheader("Experiment Configuration")
     st.write("")
+    view.experiment = manifest.experiment
     col1, col2 = st.columns([4, 4])
     with col1:
         st.write("Status: :green[Running]")
@@ -75,11 +76,11 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
         col1, col2 = st.columns([6, 6])
         with col1:
             st.write("Output")
-            st.info("")
+            view.out_logs_element = st.code(view.out_logs)
 
         with col2:
             st.write("Error")
-            st.info("")
+            view.err_logs_element = st.code(view.err_logs)
     return view
 
 
