@@ -227,6 +227,20 @@ orch_1_shard_1 = {
             },
         }
 
+orch_1_shard_2 = {
+            "name": "shard 2",
+            "host": "shard2_host",
+            "port": "11111",
+            "out_file": "tests/utils/log_files/model_0.out",
+            "err_file": "tests/utils/log_files/model_0.err",
+            "conf_file": "/path/to/conf_file",
+            "telemetry_metadata": {
+                "status_dir": "tests/utils/status_files/model_1",
+                "job_id": "111",
+                "step_id": 111,
+            },
+        }
+
 orchestrator_2 = {
     "name": "orchestrator_2",
     "run_id": 2,
