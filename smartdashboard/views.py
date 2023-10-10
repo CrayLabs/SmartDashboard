@@ -37,6 +37,9 @@ class EntityView(ViewBase):
 class ExperimentView(ViewBase):
     ...
 
+    def update(self) -> None:
+        ...
+
 
 class ApplicationView(EntityView):
     ...
@@ -44,8 +47,10 @@ class ApplicationView(EntityView):
     def update(self) -> None:
         self.out_logs = get_logs(file=get_value("out_file", self.selected_application))
         self.err_logs = get_logs(file=get_value("err_file", self.selected_application))
-        self.out_logs_element.code(self.out_logs)
-        self.err_logs_element.code(self.err_logs)
+        if self.out_logs_element is not None:
+            self.out_logs_element.code(self.out_logs)
+        if self.err_logs_element is not None:
+            self.err_logs_element.code(self.err_logs)
 
 class OrchestratorView(EntityView):
     ...
@@ -72,5 +77,5 @@ class OverviewView:
 
 
 class ErrorView(ViewBase):
-    def __init__(self) -> None:
-        self.status: t.Optional[str] = None
+    def update(self) -> None:
+        ...
