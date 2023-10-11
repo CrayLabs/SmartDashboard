@@ -24,7 +24,7 @@ footer {visibility: hidden;}
 
 /* add height and scrolling capabilities to logs */
 div[data-testid="stCodeBlock"] {
-    height: 350px !important;
+    max-height: 350px !important;
     overflow-y: auto !important;
 }
 
