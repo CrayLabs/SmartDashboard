@@ -1,6 +1,6 @@
 import pytest
 
-from smartdashboard.utils.errors import MalformedManifestError
+from smartdashboard.utils.errors import MalformedManifestError, SSDashboardError
 from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
 
 
@@ -74,7 +74,7 @@ def test_get_manifest(
     try:
         manifest_file_reader = ManifestFileReader(json_file)
         manifest = manifest_file_reader.get_manifest()
-    except MalformedManifestError as m:
+    except SSDashboardError as m:
         assert return_type == MalformedManifestError
         return
     assert len(manifest.runs) == runs_length

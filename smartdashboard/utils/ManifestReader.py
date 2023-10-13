@@ -39,7 +39,8 @@ class ManifestFileReader(ManifestReader):
             apps = [
                 {**app, "run_id": run["run_id"]}
                 for run in runs
-                for app in run.get("model", [])
+                for app in run.get("model", None)
+                if app
             ]
         except Exception as exc:
             raise MalformedManifestError(
@@ -50,7 +51,8 @@ class ManifestFileReader(ManifestReader):
             orcs = [
                 {**orch, "run_id": run["run_id"]}
                 for run in runs
-                for orch in run.get("orchestrator", [])
+                for orch in run.get("orchestrator", None)
+                if orch
             ]
         except Exception as exc:
             raise MalformedManifestError(
@@ -61,7 +63,8 @@ class ManifestFileReader(ManifestReader):
             ensembles = [
                 {**ensemble, "run_id": run["run_id"]}
                 for run in runs
-                for ensemble in run.get("ensemble", [])
+                for ensemble in run.get("ensemble", None)
+                if ensemble
             ]
         except Exception as exc:
             raise MalformedManifestError(

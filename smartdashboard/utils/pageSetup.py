@@ -13,8 +13,6 @@ def local_css(file_name: str) -> None:
     with open(file_name, encoding="utf-8") as file:
         st.markdown(f"<style>{file.read()}</style>", unsafe_allow_html=True)
 
-    # st.markdown("""<link href="http://localhost:8501/app/static/style.css" type="text/css">""", unsafe_allow_html=True)
-
 
 def set_streamlit_page_config() -> None:
     """Add Streamlit page configuration

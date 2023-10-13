@@ -18,11 +18,11 @@ from smartdashboard.view_builders import (
 set_streamlit_page_config()
 
 curr_path = pathlib.Path(os.path.abspath(__file__)).parent
-local_css(curr_path / "static/style.css")
+local_css(str(curr_path / "static/style.css"))
 
 
 try:
-    MANIFEST = load_manifest("tests/utils/manifest_files/manifesttest.json")
+    MANIFEST = load_manifest("tests/utils/manifest_files/malformed_apps.json")
 except SSDashboardError as ss:
     error_builder(ss)
 else:
