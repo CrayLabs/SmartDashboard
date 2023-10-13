@@ -15,7 +15,7 @@ def get_value(key: str, entity: Optional[Dict[str, Any]]) -> str:
     :rtype: str
     """
     if entity:
-        return entity.get(key, "")
+        return str(entity.get(key, ""))
 
     return ""
 
@@ -29,7 +29,7 @@ def get_exe_args(entity: Optional[Dict[str, Any]]) -> List[str]:
     :rtype: List[str]
     """
     if entity:
-        return entity.get("exe_args", [])
+        return list(entity.get("exe_args", []))
 
     return []
 
@@ -60,7 +60,7 @@ def get_ensemble_members(ensemble: Optional[Dict[str, Any]]) -> List[Dict[str, A
     :rtype: List[Dict[str, Any]]
     """
     if ensemble:
-        return ensemble.get("models", [])
+        return list(ensemble.get("models", []))
 
     return []
 
