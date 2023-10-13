@@ -2,20 +2,22 @@ import typing as t
 
 from smartdashboard.utils.helpers import get_value
 from smartdashboard.utils.LogReader import get_logs
+from abc import ABC, abstractmethod
 
 if t.TYPE_CHECKING:
     from streamlit.delta_generator import DeltaGenerator
 
 
-class ViewBase(t.Protocol):
+class ViewBase(ABC):
+    @abstractmethod
     def update(self) -> None:
         ...
 
 
 class ExperimentView(ViewBase):
     def __init__(self) -> None:
-        self.status: t.Optional[str] = None
-        self.experiment: t.Optional[t.Dict[str, t.Any]] = None
+        self.experiment: t.Dict[str, t.Any] = {}
+        self.status: str = ""
         self.err_logs: str = ""
         self.err_logs_element: DeltaGenerator
         self.out_logs: str = ""
@@ -31,7 +33,7 @@ class ExperimentView(ViewBase):
 class ApplicationView(ViewBase):
     def __init__(self) -> None:
         self.selected_application: t.Optional[t.Dict[str, t.Any]] = None
-        self.status: t.Optional[str] = None
+        self.status: str = ""
         self.err_logs: str = ""
         self.err_logs_element: DeltaGenerator
         self.out_logs: str = ""
@@ -48,7 +50,7 @@ class OrchestratorView(ViewBase):
     def __init__(self) -> None:
         self.selected_orchestrator: t.Optional[t.Dict[str, t.Any]] = None
         self.selected_shard: t.Optional[t.Dict[str, t.Any]] = None
-        self.status: t.Optional[str] = None
+        self.status: str = ""
         self.err_logs: str = ""
         self.err_logs_element: DeltaGenerator
         self.out_logs: str = ""
@@ -65,7 +67,7 @@ class EnsembleView(ViewBase):
     def __init__(self) -> None:
         self.selected_ensemble: t.Optional[t.Dict[str, t.Any]] = None
         self.selected_member: t.Optional[t.Dict[str, t.Any]] = None
-        self.status: t.Optional[str] = None
+        self.status: str = ""
         self.err_logs: str = ""
         self.err_logs_element: DeltaGenerator
         self.out_logs: str = ""
