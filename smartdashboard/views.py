@@ -17,17 +17,15 @@ class ExperimentView(ViewBase):
         self.status: t.Optional[str] = None
         self.experiment: t.Optional[t.Dict[str, t.Any]] = None
         self.err_logs: str = ""
-        self.err_logs_element: t.Optional[DeltaGenerator] = None
+        self.err_logs_element: DeltaGenerator
         self.out_logs: str = ""
-        self.out_logs_element: t.Optional[DeltaGenerator] = None
+        self.out_logs_element: DeltaGenerator
 
     def update(self) -> None:
         self.out_logs = get_logs(file=get_value("out_file", self.experiment))
         self.err_logs = get_logs(file=get_value("err_file", self.experiment))
-        if self.out_logs_element is not None:
-            self.out_logs_element.code(self.out_logs)
-        if self.err_logs_element is not None:
-            self.err_logs_element.code(self.err_logs)
+        self.out_logs_element.code(self.out_logs)
+        self.err_logs_element.code(self.err_logs)
 
 
 class ApplicationView(ViewBase):
@@ -35,17 +33,15 @@ class ApplicationView(ViewBase):
         self.selected_application: t.Optional[t.Dict[str, t.Any]] = None
         self.status: t.Optional[str] = None
         self.err_logs: str = ""
-        self.err_logs_element: t.Optional[DeltaGenerator] = None
+        self.err_logs_element: DeltaGenerator
         self.out_logs: str = ""
-        self.out_logs_element: t.Optional[DeltaGenerator] = None
+        self.out_logs_element: DeltaGenerator
 
     def update(self) -> None:
         self.out_logs = get_logs(file=get_value("out_file", self.selected_application))
         self.err_logs = get_logs(file=get_value("err_file", self.selected_application))
-        if self.out_logs_element is not None:
-            self.out_logs_element.code(self.out_logs)
-        if self.err_logs_element is not None:
-            self.err_logs_element.code(self.err_logs)
+        self.out_logs_element.code(self.out_logs)
+        self.err_logs_element.code(self.err_logs)
 
 
 class OrchestratorView(ViewBase):
@@ -54,17 +50,15 @@ class OrchestratorView(ViewBase):
         self.selected_shard: t.Optional[t.Dict[str, t.Any]] = None
         self.status: t.Optional[str] = None
         self.err_logs: str = ""
-        self.err_logs_element: t.Optional[DeltaGenerator] = None
+        self.err_logs_element: DeltaGenerator
         self.out_logs: str = ""
-        self.out_logs_element: t.Optional[DeltaGenerator] = None
+        self.out_logs_element: DeltaGenerator
 
     def update(self) -> None:
         self.out_logs = get_logs(file=get_value("out_file", self.selected_shard))
         self.err_logs = get_logs(file=get_value("err_file", self.selected_shard))
-        if self.out_logs_element is not None:
-            self.out_logs_element.code(self.out_logs)
-        if self.err_logs_element is not None:
-            self.err_logs_element.code(self.err_logs)
+        self.out_logs_element.code(self.out_logs)
+        self.err_logs_element.code(self.err_logs)
 
 
 class EnsembleView(ViewBase):
@@ -73,17 +67,15 @@ class EnsembleView(ViewBase):
         self.selected_member: t.Optional[t.Dict[str, t.Any]] = None
         self.status: t.Optional[str] = None
         self.err_logs: str = ""
-        self.err_logs_element: t.Optional[DeltaGenerator] = None
+        self.err_logs_element: DeltaGenerator
         self.out_logs: str = ""
-        self.out_logs_element: t.Optional[DeltaGenerator] = None
+        self.out_logs_element: DeltaGenerator
 
     def update(self) -> None:
         self.out_logs = get_logs(file=get_value("out_file", self.selected_member))
         self.err_logs = get_logs(file=get_value("err_file", self.selected_member))
-        if self.out_logs_element is not None:
-            self.out_logs_element.code(self.out_logs)
-        if self.err_logs_element is not None:
-            self.err_logs_element.code(self.err_logs)
+        self.out_logs_element.code(self.out_logs)
+        self.err_logs_element.code(self.err_logs)
 
 
 class OverviewView:
