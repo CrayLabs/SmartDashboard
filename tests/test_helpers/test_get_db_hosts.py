@@ -1,6 +1,7 @@
 import pytest
 
 from smartdashboard.utils.helpers import get_db_hosts
+
 from ..utils.test_entities import *
 
 

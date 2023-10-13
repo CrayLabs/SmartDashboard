@@ -51,15 +51,13 @@ def get_interfaces(entity: Optional[Dict[str, Any]]) -> str:
     return ""
 
 
-def get_ensemble_members(
-    ensemble: Optional[Dict[str, Any]]
-) -> List[Optional[Dict[str, Any]]]:
+def get_ensemble_members(ensemble: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Get the members of an ensemble
 
     :param ensemble: Ensemble represented by a dictionary
     :type ensemble: Optional[Dict[str, Any]]
     :return: All members of the ensemble
-    :rtype: List[Optional[Dict[str, Any]]]
+    :rtype: List[Dict[str, Any]]
     """
     if ensemble:
         return ensemble.get("models", [])
@@ -80,7 +78,7 @@ def get_member(
     :rtype: Optional[Dict[str, Any]]
     """
     for member in get_ensemble_members(ensemble):
-        if member and "name" in member and member["name"] == member_name:
+        if member.get("name", None) == member_name:
             return member
 
     return None
@@ -107,7 +105,10 @@ def get_port(orc: Optional[Dict[str, Any]]) -> str:
         if len(shard_ports) == 1:
             return shard_ports.pop()
 
-        raise Exception("Shards within an Orchestrator should have the same port.")
+        return (
+            "Warning! Shards within an Orchestrator should have the same port. "
+            + ", ".join(sorted(shard_ports))
+        )
 
     return ""
 
@@ -227,14 +228,13 @@ def get_loaded_entities(
                     }
                 )
 
-        if not loaded_data:
-            return {"Name": [], "Type": [], "Backend": [], "Device": []}
-        return loaded_data
+    if not loaded_data:
+        return {"Name": [], "Type": [], "Backend": [], "Device": []}
 
-    return {"Name": [], "Type": [], "Backend": [], "Device": []}
+    return loaded_data
 
 
-def get_entities_with_name(
+def get_entity_from_name(
     entity_name: str, entity_list: List[Dict[str, Any]]
 ) -> Optional[Dict[str, Any]]:
     """Get a specific entity from a list of entities
@@ -246,14 +246,10 @@ def get_entities_with_name(
     :return: Entity represented by a dictionary
     :rtype: Optional[Dict[str, Any]]
     """
-    entities: List[Dict[str, Any]] = [
-        e for e in entity_list if entity_name == e["name"]
-    ]
-
-    if entities:
-        return entities[0]
-
-    return None
+    return next(
+        (e for e in entity_list if entity_name == f'{e["name"]}: Run {e["run_id"]}'),
+        None,
+    )
 
 
 def render_dataframe_with_title(title: str, dataframe: pd.DataFrame) -> None:

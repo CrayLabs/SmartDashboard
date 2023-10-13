@@ -1,5 +1,6 @@
 application_1 = {
     "name": "app1",
+    "run_id": 1,
     "path": "app/1/path",
     "exe_args": ["string"],
     "batch_settings": {
@@ -46,6 +47,7 @@ application_1 = {
 
 application_2 = {
     "name": "app2",
+    "run_id": 1,
     "path": "app/2/path",
     "exe_args": ["string1", "string2", "string3"],
     "batch_settings": {
@@ -92,6 +94,7 @@ application_2 = {
 
 application_3 = {
     "name": "app3",
+    "run_id": 2,
     "path": "app/3/path",
     "exe_args": ["string"],
     "batch_settings": {
@@ -177,6 +180,7 @@ application_4 = {
 
 orchestrator_1 = {
     "name": "orchestrator_1",
+    "run_id": 1,
     "type": "redis",
     "interface": ["lo", "lo2"],
     "shards": [
@@ -211,6 +215,7 @@ orchestrator_1 = {
 
 orchestrator_2 = {
     "name": "orchestrator_2",
+    "run_id": 2,
     "type": "redis",
     "interface": ["lo"],
     "shards": [
@@ -245,6 +250,7 @@ orchestrator_2 = {
 
 orchestrator_3 = {
     "name": "orchestrator_3",
+    "run_id": 2,
     "type": "redis",
     "interface": "lo",
     "shards": [
@@ -307,6 +313,7 @@ no_shards_orchestrator = {
 
 ensemble_1 = {
     "name": "ensemble_1",
+    "run_id": 1,
     "perm_strat": "string0",
     "batch_settings": {"string": "Any0"},
     "params": {"string": ["Any1", "Any3"]},
@@ -416,6 +423,7 @@ ensemble_2 = {
 
 ensemble_3 = {
     "name": "ensemble_3",
+    "run_id": 2,
     "perm_strat": "string2",
     "batch_settings": {"string": "Any1"},
     "params": {"string": ["Any1", "Any2", "Any3"]},

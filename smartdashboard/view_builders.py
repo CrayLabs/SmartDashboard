@@ -10,7 +10,7 @@ from smartdashboard.utils.helpers import (
     format_ensemble_params,
     get_db_hosts,
     get_ensemble_members,
-    get_entities_with_name,
+    get_entity_from_name,
     get_exe_args,
     get_interfaces,
     get_loaded_entities,
@@ -38,7 +38,7 @@ def error_builder(error: SSDashboardError) -> ErrorView:
     :rtype: ErrorView
     """
     view = ErrorView()
-    st.header(error.title)
+    st.header(str(error))
     st.error(
         f"""Error found in file: {error.file}  
              Error Message: {error.exception}"""
@@ -64,8 +64,8 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     col1, col2 = st.columns([4, 4])
     with col1:
         st.write("Status: :green[Running]")
-        st.write("Path: " + get_value("path", manifest.experiment))
-        st.write("Launcher: " + get_value("launcher", manifest.experiment))
+        st.write("Path: " + manifest.experiment.get("path", ""))
+        st.write("Launcher: " + manifest.experiment.get("launcher", ""))
 
     st.write("")
     with st.expander(label="Logs"):
@@ -94,10 +94,10 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     with col1:
         selected_app_name: t.Optional[str] = st.selectbox(
             "Select an application:",
-            [app["name"] for app in manifest.applications],
+            [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
         )
     if selected_app_name is not None:
-        selected_application = get_entities_with_name(
+        selected_application = get_entity_from_name(
             selected_app_name, manifest.applications
         )
     else:
@@ -217,11 +217,11 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     with col1:
         selected_orc_name: t.Optional[str] = st.selectbox(
             "Select an orchestrator:",
-            [orc["name"] for orc in manifest.orchestrators],
+            [f'{orc["name"]}: Run {orc["run_id"]}' for orc in manifest.orchestrators],
         )
 
     if selected_orc_name is not None:
-        selected_orc = get_entities_with_name(selected_orc_name, manifest.orchestrators)
+        selected_orc = get_entity_from_name(selected_orc_name, manifest.orchestrators)
     else:
         selected_orc = None
 
@@ -279,11 +279,14 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with col1:
         selected_ensemble_name: t.Optional[str] = st.selectbox(
             "Select an ensemble:",
-            [ensemble["name"] for ensemble in manifest.ensembles],
+            [
+                f'{ensemble["name"]}: Run {ensemble["run_id"]}'
+                for ensemble in manifest.ensembles
+            ],
         )
 
     if selected_ensemble_name is not None:
-        selected_ensemble = get_entities_with_name(
+        selected_ensemble = get_entity_from_name(
             selected_ensemble_name, manifest.ensembles
         )
     else:

@@ -2,14 +2,14 @@ import io
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from smartdashboard.utils.errors import MalformedManifestError, ManifestError
 
 
 @dataclass
 class Manifest:
-    experiment: Optional[Dict[str, Any]]
+    experiment: Dict[str, Any]
     runs: List[Dict[str, Any]]
     applications: List[Dict[str, Any]]
     orchestrators: List[Dict[str, Any]]
@@ -33,38 +33,37 @@ class ManifestFileReader(ManifestReader):
         :return: Manifest
         :rtype: Manifest
         """
-        experiment = self._data.get("experiment")
+        experiment = self._data.get("experiment", {})
         runs = self._data.get("runs", [])
         try:
-            apps = [app for run in runs for app in run.get("model", None) if app]
-            if not isinstance(apps, list):
-                raise TypeError
-        except (KeyError, TypeError) as exc:
+            apps = [
+                {**app, "run_id": run["run_id"]}
+                for run in runs
+                for app in run.get("model", [])
+            ]
+        except Exception as exc:
             raise MalformedManifestError(
                 "Applications are malformed.", file=self._file_path, exception=exc
             ) from exc
 
         try:
             orcs = [
-                orch for run in runs for orch in run.get("orchestrator", None) if orch
+                {**orch, "run_id": run["run_id"]}
+                for run in runs
+                for orch in run.get("orchestrator", [])
             ]
-            if not isinstance(orcs, list):
-                raise TypeError
-        except (KeyError, TypeError) as exc:
+        except Exception as exc:
             raise MalformedManifestError(
                 "Orchestrators are malformed.", file=self._file_path, exception=exc
             ) from exc
 
         try:
             ensembles = [
-                ensemble
+                {**ensemble, "run_id": run["run_id"]}
                 for run in runs
-                for ensemble in run.get("ensemble", None)
-                if ensemble
+                for ensemble in run.get("ensemble", [])
             ]
-            if not isinstance(ensembles, list):
-                raise TypeError
-        except (KeyError, TypeError) as exc:
+        except Exception as exc:
             raise MalformedManifestError(
                 "Ensembles are malformed.", file=self._file_path, exception=exc
             ) from exc
@@ -86,11 +85,8 @@ class ManifestFileReader(ManifestReader):
         :return: self._data
         :rtype: Dict[str, Any]
         """
-        try:
-            with open(file_path, encoding="utf-8") as file:
-                return cls.from_io_stream(file)
-        except FileNotFoundError as fnf:
-            raise fnf
+        with open(file_path, encoding="utf-8") as file:
+            return cls.from_io_stream(file)
 
     @classmethod
     def from_io_stream(cls, stream: io.TextIOBase) -> Dict[str, Any]:
@@ -101,14 +97,11 @@ class ManifestFileReader(ManifestReader):
         :return: self._data
         :rtype: Dict[str, Any]
         """
-        try:
-            data: Dict[str, Any] = json.loads(stream.read())
-        except json.decoder.JSONDecodeError as e:
-            raise e
+        data: Dict[str, Any] = json.loads(stream.read())
         return data
 
 
-def load_manifest(path: str) -> Optional[Manifest]:
+def load_manifest(path: str) -> Manifest:
     """Instantiate and call get_manifest
 
     This is where we're checking for any errors
@@ -124,12 +117,10 @@ def load_manifest(path: str) -> Optional[Manifest]:
         manifest_file_reader = ManifestFileReader(path)
         manifest = manifest_file_reader.get_manifest()
     except FileNotFoundError as fnf:
-        manifest = None
         raise ManifestError(
             title="Manifest file does not exist.", file=path, exception=fnf
         ) from fnf
     except json.decoder.JSONDecodeError as jde:
-        manifest = None
         raise ManifestError(
             title="Manifest file could not be decoded.", file=path, exception=jde
         ) from jde

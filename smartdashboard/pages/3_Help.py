@@ -8,7 +8,7 @@ from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 set_streamlit_page_config()
 
 curr_path = pathlib.Path(os.path.abspath(__file__)).parent.parent
-local_css(str(curr_path / "static/style.css"))
+local_css(curr_path / "static/style.css")
 
 st.header("Welcome to the SmartSim Dashboard Help Page")
 st.write("")
