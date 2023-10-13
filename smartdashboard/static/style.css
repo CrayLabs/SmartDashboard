@@ -12,13 +12,12 @@ div[data-testid="stExpander"] div[role="button"] p {
 
 /* add logo above tabs */
 [data-testid="stSidebarNav"] {
-    background-image: url(http://localhost:8501/app/static/SmartSim.png);
+    background-image: url(./app/static/SmartSim.png);
     background-repeat: no-repeat;
     padding-top: 50px;
     background-position: 25px 40px;
     background-size: 300px;
 }
-
 
 /* remove "Made by Streamlit" footer */
 footer {visibility: hidden;}
