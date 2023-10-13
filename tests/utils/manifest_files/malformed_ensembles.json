@@ -1,0 +1,56 @@
+{
+    "schema info": {
+        "schema_name": "entity manifest",
+        "version": "0.0.1"
+    },
+    "experiment": {
+        "name": "my-experiment",
+        "path": "experiment/path",
+        "launcher": "local",
+        "out_file": "test_dashboard/log_files/model_0.out",
+        "err_file": "test_dashboard/log_files/model_0.err"
+    },
+    "runs": [
+        {
+            "run_id": 1,
+            "model": [],
+            "orchestrator": [
+                {
+                    "name": "orchestrator_0",
+                    "type": "redis",
+                    "interface": ["lo", "lo2"],
+                    "shards": [
+                        {
+                            "name": "shard 1",
+                            "host": "shard1_host",
+                            "port": "11111",
+                            "out_file": "/path/to/shard/output/logs",
+                            "err_file": "/path/to/shard/error/logs",
+                            "conf_file": "/path/to/conf_file",
+                            "telemetry_metadata": {
+                                "status_dir":"/path/to/status/dir",
+                                "job_id": "111",
+                                "step_id": 111
+                            }
+                        },
+                        {
+                            "name": "shard 2",
+                            "host": "shard2_host",
+                            "port": "11111",
+                            "out_file": "/path/to/shard/output/logs",
+                            "err_file": "/path/to/shard/error/logs",
+                            "conf_file": "/path/to/conf_file",
+                            "telemetry_metadata": {
+                                "status_dir":"/path/to/status/dir",
+                                "job_id": "111",
+                                "step_id": 111
+                            }
+                        }
+                    ]
+                }
+           ]
+        }
+    ]
+}
+    
+
