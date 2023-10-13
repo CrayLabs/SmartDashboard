@@ -4,7 +4,6 @@ import pathlib
 import streamlit as st
 
 from smartdashboard.utils.errors import SSDashboardError
-from smartdashboard.utils.helpers import get_value
 from smartdashboard.utils.ManifestReader import load_manifest
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import (
@@ -22,11 +21,11 @@ local_css(str(curr_path / "static/style.css"))
 
 
 try:
-    MANIFEST = load_manifest("tests/utils/manifest_files/manifesttest.json")
+    MANIFEST = load_manifest("tests/utils/manifest_files/sdfsd.json")
 except SSDashboardError as ss:
     error_builder(ss)
 else:
-    st.header("Experiment Overview: " + get_value("name", MANIFEST.experiment))
+    st.header("Experiment Overview: " + MANIFEST.experiment.get("path", ""))
 
     st.write("")
 
