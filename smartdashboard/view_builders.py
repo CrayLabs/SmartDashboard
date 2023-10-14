@@ -83,7 +83,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
         )
     if selected_app_name is not None:
-        selected_application = get_entity_from_name(
+        view.selected_application = get_entity_from_name(
             selected_app_name, manifest.applications
         )
     else:
