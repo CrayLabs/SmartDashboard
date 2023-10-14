@@ -1,8 +1,8 @@
 import typing as t
+from abc import ABC, abstractmethod
 
 from smartdashboard.utils.helpers import get_value
 from smartdashboard.utils.LogReader import get_logs
-from abc import ABC, abstractmethod
 
 if t.TYPE_CHECKING:
     from streamlit.delta_generator import DeltaGenerator

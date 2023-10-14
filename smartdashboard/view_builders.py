@@ -101,7 +101,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
         )
     if selected_app_name is not None:
-        selected_application = get_entity_from_name(
+        view.selected_application = get_entity_from_name(
             selected_app_name, manifest.applications
         )
     else:
@@ -229,7 +229,9 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
         )
 
     if selected_orc_name is not None:
-        view.selected_orchestrator = get_entity_from_name(selected_orc_name, manifest.orchestrators)
+        view.selected_orchestrator = get_entity_from_name(
+            selected_orc_name, manifest.orchestrators
+        )
     else:
         view.selected_orchestrator = None
 

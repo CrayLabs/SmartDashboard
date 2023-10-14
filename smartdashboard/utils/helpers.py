@@ -51,7 +51,9 @@ def get_interfaces(entity: t.Optional[t.Dict[str, t.Any]]) -> str:
     return ""
 
 
-def get_ensemble_members(ensemble: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def get_ensemble_members(
+    ensemble: t.Optional[t.Dict[str, t.Any]]
+) -> t.List[t.Dict[str, t.Any]]:
     """Get the members of an ensemble
 
     :param ensemble: Ensemble represented by a dictionary
@@ -236,7 +238,7 @@ def get_loaded_entities(
     return loaded_data
 
 
-def get_entities_with_name(
+def get_entity_from_name(
     entity_name: str, entity_list: t.List[t.Dict[str, t.Any]]
 ) -> t.Optional[t.Dict[str, t.Any]]:
     """Get a specific entity from a list of entities
@@ -281,7 +283,7 @@ def get_all_shards(
     :rtype: List[Optional[Dict[str, Any]]]
     """
     if orc:
-        return orc.get("shards", [])
+        return list(orc.get("shards", []))
 
     return []
 
