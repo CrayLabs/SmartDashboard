@@ -1,21 +1,22 @@
 import pytest
 
-import tests.utils.test_entities as e
 from smartdashboard.utils.helpers import get_value
 from smartdashboard.utils.LogReader import get_logs
+
+from ..utils.test_entities import *
 
 parameterize_creator = pytest.mark.parametrize(
     "entity, expected_output_log, expected_error_log",
     [
         pytest.param(
-            e.application_1,
-            e.model0_out_logs,
-            e.model0_err_logs,
+            application_1,
+            model0_out_logs,
+            model0_err_logs,
         ),
         pytest.param(
-            e.application_2,
-            e.model1_out_logs,
-            e.model1_err_logs,
+            application_2,
+            model1_out_logs,
+            model1_err_logs,
         ),
         pytest.param(
             None,
