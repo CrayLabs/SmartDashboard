@@ -83,11 +83,11 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
         )
     if selected_app_name is not None:
-        view.selected_application = get_entity_from_name(
+        selected_application = get_entity_from_name(
             selected_app_name, manifest.applications
         )
     else:
-        view.selected_application = None
+        selected_application = None
 
     st.write("")
     st.write("Status: ")
@@ -98,7 +98,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         st.dataframe(
             pd.DataFrame(
                 {
-                    "All Arguments": get_exe_args(view.selected_application),
+                    "All Arguments": get_exe_args(selected_application),
                 }
             ),
             hide_index=True,
@@ -113,7 +113,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 "Batch Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
-                        "batch_settings", view.selected_application
+                        "batch_settings", selected_application
                     ),
                     columns=["Name", "Value"],
                 ),
@@ -123,7 +123,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 "Run Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
-                        "run_settings", view.selected_application
+                        "run_settings", selected_application
                     ),
                     columns=["Name", "Value"],
                 ),
@@ -136,9 +136,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             render_dataframe_with_title(
                 "Parameters",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers(
-                        "params", view.selected_application
-                    ),
+                    flatten_nested_keyvalue_containers("params", selected_application),
                     columns=["Name", "Value"],
                 ),
             )
@@ -146,9 +144,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             render_dataframe_with_title(
                 "Files",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers(
-                        "files", view.selected_application
-                    ),
+                    flatten_nested_keyvalue_containers("files", selected_application),
                     columns=["Type", "File"],
                 ),
             )
@@ -158,8 +154,8 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             app_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                view.selected_application.get("colocated_db")
-                if view.selected_application is not None
+                selected_application.get("colocated_db")
+                if selected_application is not None
                 else {}
             )
             with col1:
@@ -287,11 +283,11 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         )
 
     if selected_ensemble_name is not None:
-        view.selected_ensemble = get_entity_from_name(
+        selected_ensemble = get_entity_from_name(
             selected_ensemble_name, manifest.ensembles
         )
     else:
-        view.selected_ensemble = None
+        selected_ensemble = None
 
     st.write("")
     st.write("Status: ")
@@ -300,9 +296,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with st.expander(label="Batch Settings"):
         st.dataframe(
             pd.DataFrame(
-                flatten_nested_keyvalue_containers(
-                    "batch_settings", view.selected_ensemble
-                ),
+                flatten_nested_keyvalue_containers("batch_settings", selected_ensemble),
                 columns=["Name", "Value"],
             ),
             hide_index=True,
@@ -327,16 +321,16 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         st.subheader("Member Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        members = get_ensemble_members(view.selected_ensemble)
+        members = get_ensemble_members(selected_ensemble)
         selected_member_name: t.Optional[str] = st.selectbox(
             "Select a member:",
             [member["name"] for member in members if member],
         )
 
     if selected_member_name is not None:
-        view.selected_member = get_member(selected_member_name, view.selected_ensemble)
+        selected_member = get_member(selected_member_name, selected_ensemble)
     else:
-        view.selected_member = None
+        selected_member = None
 
     st.write("")
     st.write("Status: ")
@@ -344,7 +338,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     st.write("")
     with st.expander(label="Executable Arguments"):
         st.dataframe(
-            pd.DataFrame({"All Arguments": get_exe_args(view.selected_member)}),
+            pd.DataFrame({"All Arguments": get_exe_args(selected_member)}),
             hide_index=True,
             use_container_width=True,
         )
@@ -357,7 +351,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
                 "Batch Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
-                        "batch_settings", view.selected_member
+                        "batch_settings", selected_member
                     ),
                     columns=["Name", "Value"],
                 ),
@@ -366,9 +360,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Run Settings",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers(
-                        "run_settings", view.selected_member
-                    ),
+                    flatten_nested_keyvalue_containers("run_settings", selected_member),
                     columns=["Name", "Value"],
                 ),
             )
@@ -380,7 +372,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Parameters",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("params", view.selected_member),
+                    flatten_nested_keyvalue_containers("params", selected_member),
                     columns=["Name", "Value"],
                 ),
             )
@@ -388,7 +380,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Files",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("files", view.selected_member),
+                    flatten_nested_keyvalue_containers("files", selected_member),
                     columns=["Type", "File"],
                 ),
             )
@@ -398,8 +390,8 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             mem_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                view.selected_member.get("colocated_db")
-                if view.selected_member is not None
+                selected_member.get("colocated_db")
+                if selected_member is not None
                 else {}
             )
             with col1:
@@ -420,7 +412,6 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
                 )
 
     view = EnsembleView(selected_member)
-
     st.write("")
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])
