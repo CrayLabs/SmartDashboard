@@ -32,7 +32,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser("smart-dash", prefix_chars="-")
     parser.add_argument(
         "-d",
-        "--dir",
+        "--directory",
         help="The path to an experiment to load. Default to current directory",
         type=str,
         default=None,
@@ -76,8 +76,8 @@ def cli() -> None:
 
     exp_path = pathlib.Path(os.getcwd())
 
-    if args.dir is not None:
-        exp_path = pathlib.Path(args.dir)
+    if args.directory is not None:
+        exp_path = pathlib.Path(args.directory)
 
     app_port: int = args.port
 
@@ -92,8 +92,8 @@ def execute(args: t.List[str]) -> None:
     # default behavior will load a demo manifest from the test samples
     exp_path = pathlib.Path(__file__).parent.parent
     manifest_path = exp_path / "tests/utils/manifest_files/manifesttest.json"
-    if parsed_args.dir is not None:
-        exp_path = pathlib.Path(parsed_args.dir)
+    if parsed_args.directory is not None:
+        exp_path = pathlib.Path(parsed_args.directory)
         manifest_path = exp_path / ".smartsim/telemetry/manifest.json"
 
     build_app(str(manifest_path))

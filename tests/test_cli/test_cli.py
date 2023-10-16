@@ -28,24 +28,24 @@ def test_cli_args_dir():
     parser = expo.get_parser()
     args = parser.parse_args(param_str)
     
-    assert args.dir
-    assert args.dir == exp_dir
+    assert args.directory
+    assert args.directory == exp_dir
 
-    param_str = f"--dir {exp_dir}".split(" ")
+    param_str = f"--directory {exp_dir}".split(" ")
     parser = expo.get_parser()
     args = parser.parse_args(param_str)
     
-    assert args.dir
-    assert args.dir == exp_dir
+    assert args.directory
+    assert args.directory == exp_dir
 
 
 def test_cli_args_all():
     """ensure all parameters are parsed"""
     exp_port = 1234
     exp_dir = "/foo/bar/baz"
-    param_str = f"-p {exp_port} --dir {exp_dir}".split(" ")
+    param_str = f"-p {exp_port} --directory {exp_dir}".split(" ")
     parser = expo.get_parser()
     args = parser.parse_args(param_str)
     
     assert args.port == exp_port
-    assert args.dir == exp_dir
+    assert args.directory == exp_dir
