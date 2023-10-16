@@ -38,4 +38,3 @@ class OverviewView:
         self.app_view = app_view
         self.ens_view = ens_view
         self.orc_view = orc_view
-        super().__init__()
