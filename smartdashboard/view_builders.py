@@ -430,7 +430,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
 
 
 def overview_builder(manifest: Manifest) -> OverviewView:
-    st.header("Experiment Overview: " + manifest.experiment.get("path", ""))
+    st.header("Experiment Overview: " + manifest.experiment.get("name", ""))
     st.write("")
 
     experiment, application, orchestrators, ensembles = st.tabs(
