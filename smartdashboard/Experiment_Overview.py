@@ -21,8 +21,8 @@ def build_app(manifest_path: str) -> None:
 
     try:
         manifest = load_manifest(manifest_path)
-    except SSDashboardError as ss:
-        error_builder(ss)
+    except SSDashboardError as ex:
+        error_builder(ex)
     else:
         overview_builder(manifest)
 
