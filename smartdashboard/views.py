@@ -1,5 +1,4 @@
 import typing as t
-from abc import ABC, abstractmethod
 
 from smartdashboard.utils.helpers import get_value
 from smartdashboard.utils.LogReader import get_logs
@@ -8,76 +7,40 @@ if t.TYPE_CHECKING:
     from streamlit.delta_generator import DeltaGenerator
 
 
-class ViewBase(ABC):
-    @abstractmethod
-    def update(self) -> None:
-        ...
+class ViewBase:
+    ...
 
 
-class ExperimentView(ViewBase):
-    def __init__(self) -> None:
-        self.experiment: t.Dict[str, t.Any] = {}
+class EntityView(ViewBase):
+    def __init__(self, view_model: t.Optional[t.Dict[str, t.Any]]) -> None:
         self.status: str = ""
         self.err_logs: str = ""
         self.err_logs_element: DeltaGenerator
         self.out_logs: str = ""
         self.out_logs_element: DeltaGenerator
+        self.view_model = view_model
 
     def update(self) -> None:
-        self.out_logs = get_logs(file=get_value("out_file", self.experiment))
-        self.err_logs = get_logs(file=get_value("err_file", self.experiment))
+        self.out_logs = get_logs(file=get_value("out_file", self.view_model))
+        self.err_logs = get_logs(file=get_value("err_file", self.view_model))
         self.out_logs_element.code(self.out_logs)
         self.err_logs_element.code(self.err_logs)
 
 
-class ApplicationView(ViewBase):
-    def __init__(self) -> None:
-        self.selected_application: t.Optional[t.Dict[str, t.Any]] = None
-        self.status: str = ""
-        self.err_logs: str = ""
-        self.err_logs_element: DeltaGenerator
-        self.out_logs: str = ""
-        self.out_logs_element: DeltaGenerator
-
-    def update(self) -> None:
-        self.out_logs = get_logs(file=get_value("out_file", self.selected_application))
-        self.err_logs = get_logs(file=get_value("err_file", self.selected_application))
-        self.out_logs_element.code(self.out_logs)
-        self.err_logs_element.code(self.err_logs)
+class ExperimentView(EntityView):
+    ...
 
 
-class OrchestratorView(ViewBase):
-    def __init__(self) -> None:
-        self.selected_orchestrator: t.Optional[t.Dict[str, t.Any]] = None
-        self.selected_shard: t.Optional[t.Dict[str, t.Any]] = None
-        self.status: str = ""
-        self.err_logs: str = ""
-        self.err_logs_element: DeltaGenerator
-        self.out_logs: str = ""
-        self.out_logs_element: DeltaGenerator
-
-    def update(self) -> None:
-        self.out_logs = get_logs(file=get_value("out_file", self.selected_shard))
-        self.err_logs = get_logs(file=get_value("err_file", self.selected_shard))
-        self.out_logs_element.code(self.out_logs)
-        self.err_logs_element.code(self.err_logs)
+class ApplicationView(EntityView):
+    ...
 
 
-class EnsembleView(ViewBase):
-    def __init__(self) -> None:
-        self.selected_ensemble: t.Optional[t.Dict[str, t.Any]] = None
-        self.selected_member: t.Optional[t.Dict[str, t.Any]] = None
-        self.status: str = ""
-        self.err_logs: str = ""
-        self.err_logs_element: DeltaGenerator
-        self.out_logs: str = ""
-        self.out_logs_element: DeltaGenerator
+class OrchestratorView(EntityView):
+    ...
 
-    def update(self) -> None:
-        self.out_logs = get_logs(file=get_value("out_file", self.selected_member))
-        self.err_logs = get_logs(file=get_value("err_file", self.selected_member))
-        self.out_logs_element.code(self.out_logs)
-        self.err_logs_element.code(self.err_logs)
+
+class EnsembleView(EntityView):
+    ...
 
 
 class OverviewView:
@@ -95,5 +58,4 @@ class OverviewView:
 
 
 class ErrorView(ViewBase):
-    def update(self) -> None:
-        ...
+    ...

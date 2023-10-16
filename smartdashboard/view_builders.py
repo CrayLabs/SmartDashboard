@@ -61,10 +61,9 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     :return: An experiment view
     :rtype: ExperimentView
     """
-    view = ExperimentView()
+    view = ExperimentView(manifest.experiment)
     st.subheader("Experiment Configuration")
     st.write("")
-    view.experiment = manifest.experiment
     col1, col2 = st.columns([4, 4])
     with col1:
         st.write("Status: :green[Running]")
@@ -92,7 +91,6 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     :return: An application view
     :rtype: ApplicationView
     """
-    view = ApplicationView()
     st.subheader("Application Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
@@ -101,22 +99,22 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
         )
     if selected_app_name is not None:
-        view.selected_application = get_entity_from_name(
+        selected_application = get_entity_from_name(
             selected_app_name, manifest.applications
         )
     else:
-        view.selected_application = None
+        selected_application = None
 
     st.write("")
     st.write("Status: :green[Running]")
-    st.write("Path: " + get_value("path", view.selected_application))
+    st.write("Path: " + get_value("path", selected_application))
 
     st.write("")
     with st.expander(label="Executable Arguments"):
         st.dataframe(
             pd.DataFrame(
                 {
-                    "All Arguments": get_exe_args(view.selected_application),
+                    "All Arguments": get_exe_args(selected_application),
                 }
             ),
             hide_index=True,
@@ -131,7 +129,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 "Batch",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
-                        "batch_settings", view.selected_application
+                        "batch_settings", selected_application
                     ),
                     columns=["Name", "Value"],
                 ),
@@ -141,7 +139,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 "Run",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
-                        "run_settings", view.selected_application
+                        "run_settings", selected_application
                     ),
                     columns=["Name", "Value"],
                 ),
@@ -154,9 +152,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             render_dataframe_with_title(
                 "Parameters",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers(
-                        "params", view.selected_application
-                    ),
+                    flatten_nested_keyvalue_containers("params", selected_application),
                     columns=["Name", "Value"],
                 ),
             )
@@ -164,9 +160,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             render_dataframe_with_title(
                 "Files",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers(
-                        "files", view.selected_application
-                    ),
+                    flatten_nested_keyvalue_containers("files", selected_application),
                     columns=["Type", "File"],
                 ),
             )
@@ -176,8 +170,8 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             app_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                view.selected_application.get("colocated_db")
-                if view.selected_application is not None
+                selected_application.get("colocated_db")
+                if selected_application is not None
                 else {}
             )
             with col1:
@@ -195,6 +189,8 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                     "Loaded Entities",
                     pd.DataFrame(get_loaded_entities(app_colocated_db)),
                 )
+
+    view = ApplicationView(selected_application)
 
     st.write("")
     with st.expander(label="Logs"):
@@ -219,7 +215,6 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     :return: An orchestrator view
     :rtype: OrchestratorView
     """
-    view = OrchestratorView()
     st.subheader("Orchestrator Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
@@ -229,24 +224,24 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
         )
 
     if selected_orc_name is not None:
-        view.selected_orchestrator = get_entity_from_name(
+        selected_orchestrator = get_entity_from_name(
             selected_orc_name, manifest.orchestrators
         )
     else:
-        view.selected_orchestrator = None
+        selected_orchestrator = None
 
     st.write("")
     st.write("Status: :green[Running]")
-    st.write("Type: " + get_value("type", view.selected_orchestrator))
-    st.write("Port: " + get_port(view.selected_orchestrator))
-    st.write("Interface: " + get_interfaces(view.selected_orchestrator))
+    st.write("Type: " + get_value("type", selected_orchestrator))
+    st.write("Port: " + get_port(selected_orchestrator))
+    st.write("Interface: " + get_interfaces(selected_orchestrator))
 
     st.write("")
     with st.expander(label="Database Hosts"):
         st.dataframe(
             pd.DataFrame(
                 {
-                    "Hosts": get_db_hosts(view.selected_orchestrator),
+                    "Hosts": get_db_hosts(selected_orchestrator),
                 }
             ),
             hide_index=True,
@@ -256,17 +251,17 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])
         with col1:
-            shards = get_all_shards(view.selected_orchestrator)
+            shards = get_all_shards(selected_orchestrator)
             selected_shard_name: t.Optional[str] = st.selectbox(
                 "Select a shard:",
                 [shard["name"] for shard in shards if shard is not None],
             )
             if selected_shard_name is not None:
-                view.selected_shard = get_shard(
-                    selected_shard_name, view.selected_orchestrator
-                )
+                selected_shard = get_shard(selected_shard_name, selected_orchestrator)
             else:
-                view.selected_shard = None
+                selected_shard = None
+
+            view = OrchestratorView(selected_shard)
 
             st.write("")
             st.write("Output")
@@ -292,7 +287,6 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     :return: An ensemble view
     :rtype: EnsembleView
     """
-    view = EnsembleView()
     st.subheader("Ensemble Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
@@ -305,23 +299,21 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         )
 
     if selected_ensemble_name is not None:
-        view.selected_ensemble = get_entity_from_name(
+        selected_ensemble = get_entity_from_name(
             selected_ensemble_name, manifest.ensembles
         )
     else:
-        view.selected_ensemble = None
+        selected_ensemble = None
 
     st.write("")
     st.write("Status: :green[Running]")
-    st.write("Strategy: " + get_value("perm_strat", view.selected_ensemble))
+    st.write("Strategy: " + get_value("perm_strat", selected_ensemble))
 
     st.write("")
     with st.expander(label="Batch Settings"):
         st.dataframe(
             pd.DataFrame(
-                flatten_nested_keyvalue_containers(
-                    "batch_settings", view.selected_ensemble
-                ),
+                flatten_nested_keyvalue_containers("batch_settings", selected_ensemble),
                 columns=["Name", "Value"],
             ),
             hide_index=True,
@@ -332,7 +324,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with st.expander(label="Parameters"):
         st.dataframe(
             pd.DataFrame(
-                format_ensemble_params(view.selected_ensemble),
+                format_ensemble_params(selected_ensemble),
                 columns=["Name", "Value"],
             ),
             hide_index=True,
@@ -346,24 +338,24 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         st.subheader("Member Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        members = get_ensemble_members(view.selected_ensemble)
+        members = get_ensemble_members(selected_ensemble)
         selected_member_name: t.Optional[str] = st.selectbox(
             "Select a member:",
             [member["name"] for member in members if member],
         )
 
     if selected_member_name is not None:
-        view.selected_member = get_member(selected_member_name, view.selected_ensemble)
+        selected_member = get_member(selected_member_name, selected_ensemble)
     else:
-        view.selected_member = None
+        selected_member = None
 
     st.write("")
     st.write("Status: :green[Running]")
-    st.write("Path: " + get_value("path", view.selected_member))
+    st.write("Path: " + get_value("path", selected_member))
     st.write("")
     with st.expander(label="Executable Arguments"):
         st.dataframe(
-            pd.DataFrame({"All Arguments": get_exe_args(view.selected_member)}),
+            pd.DataFrame({"All Arguments": get_exe_args(selected_member)}),
             hide_index=True,
             use_container_width=True,
         )
@@ -376,7 +368,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
                 "Batch",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
-                        "batch_settings", view.selected_member
+                        "batch_settings", selected_member
                     ),
                     columns=["Name", "Value"],
                 ),
@@ -385,9 +377,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Run",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers(
-                        "run_settings", view.selected_member
-                    ),
+                    flatten_nested_keyvalue_containers("run_settings", selected_member),
                     columns=["Name", "Value"],
                 ),
             )
@@ -399,7 +389,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Parameters",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("params", view.selected_member),
+                    flatten_nested_keyvalue_containers("params", selected_member),
                     columns=["Name", "Value"],
                 ),
             )
@@ -407,7 +397,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Files",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("files", view.selected_member),
+                    flatten_nested_keyvalue_containers("files", selected_member),
                     columns=["Type", "File"],
                 ),
             )
@@ -417,8 +407,8 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             mem_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                view.selected_member.get("colocated_db")
-                if view.selected_member is not None
+                selected_member.get("colocated_db")
+                if selected_member is not None
                 else {}
             )
             with col1:
@@ -438,6 +428,8 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
                     pd.DataFrame(get_loaded_entities(mem_colocated_db)),
                 )
 
+    view = EnsembleView(selected_member)
+    
     st.write("")
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])
