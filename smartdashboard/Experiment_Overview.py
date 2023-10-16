@@ -53,8 +53,6 @@ def run_dash_app(exp_path: str, app_port: int) -> None:
         "streamlit",
         "run",
         os.path.abspath(__file__),
-        "--browser.serverPort",
-        str(app_port),
         "--server.port",
         str(app_port),
         "--server.enableStaticServing",
