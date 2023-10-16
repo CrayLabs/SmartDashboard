@@ -26,6 +26,7 @@ from smartdashboard.views import (
     ErrorView,
     ExperimentView,
     OrchestratorView,
+    OverviewView,
 )
 
 
@@ -426,3 +427,30 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             st.info("")
 
     return view
+
+
+def overview_builder(manifest: Manifest) -> OverviewView:
+    st.header("Experiment Overview: " + manifest.experiment.get("path", ""))
+    st.write("")
+
+    experiment, application, orchestrators, ensembles = st.tabs(
+        ["Experiment", "Applications", "Orchestrators", "Ensembles"]
+    )
+
+    ### Experiment ###
+    with experiment:
+        exp_view = exp_builder(manifest)
+
+    ### Applications ###
+    with application:
+        app_view = app_builder(manifest)
+
+    ### Orchestrator ###
+    with orchestrators:
+        orc_view = orc_builder(manifest)
+
+    ### Ensembles ###
+    with ensembles:
+        ens_view = ens_builder(manifest)
+
+    return OverviewView(exp_view, app_view, orc_view, ens_view)

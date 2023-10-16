@@ -78,7 +78,7 @@ mypy = [
 
 
 [project.scripts]
-smart-dash = "smartdashboard._cli.__main__:main"
+smart-dash = "smartdashboard.Experiment_Overview:cli"
 
 
 [tool.setuptools]
