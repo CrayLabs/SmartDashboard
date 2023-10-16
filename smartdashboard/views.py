@@ -1,35 +1,38 @@
 import typing as t
 
 
-class View:
-    """View base class for shared behaviors"""
+class ExperimentView:
     def __init__(self) -> None:
         self.status: t.Optional[str] = None
 
 
-class ExperimentView(View):
-    ...
+class ApplicationView:
+    def __init__(self) -> None:
+        self.status: t.Optional[str] = None
 
 
-class ApplicationView(View):
-    ...
+class OrchestratorView:
+    def __init__(self) -> None:
+        self.status: t.Optional[str] = None
 
 
-class OrchestratorView(View):
-    ...
-
-
-class EnsembleView(View):
-    ...
+class EnsembleView:
+    def __init__(self) -> None:
+        self.status: t.Optional[str] = None
 
 
 class ErrorView:
-    ...
+    def __init__(self) -> None:
+        self.status: t.Optional[str] = None
 
 
 class OverviewView:
     def __init__(
-        self, exp_view: View, app_view: View, orc_view: View, ens_view: View
+        self,
+        exp_view: ExperimentView,
+        app_view: ApplicationView,
+        orc_view: OrchestratorView,
+        ens_view: EnsembleView,
     ) -> None:
         self.exp_view = exp_view
         self.app_view = app_view
