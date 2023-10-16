@@ -78,11 +78,11 @@ mypy = [
 
 
 [project.scripts]
-smart-dash = "smartdashboard._cli.__main__:main"
+smart-dash = "smartdashboard.Experiment_Overview:cli"
 
 
 [tool.setuptools]
-packages = ["smartdashboard", "smartdashboard._cli", "smartdashboard.pages", "smartdashboard.utils"]
+packages = ["smartdashboard", "smartdashboard.pages", "smartdashboard.utils"]
 include-package-data = true
 
 
