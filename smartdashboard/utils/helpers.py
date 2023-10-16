@@ -272,9 +272,7 @@ def render_dataframe_with_title(title: str, dataframe: pd.DataFrame) -> None:
     )
 
 
-def get_all_shards(
-    orc: t.Optional[t.Dict[str, t.Any]]
-) -> t.List[t.Optional[t.Dict[str, t.Any]]]:
+def get_all_shards(orc: t.Optional[t.Dict[str, t.Any]]) -> t.List[t.Dict[str, t.Any]]:
     """Get all shards in an Orchestrator
 
     :param orc: Orchestrator represented by a dictionary
@@ -301,7 +299,7 @@ def get_shard(
     :rtype: List[Optional[Dict[str, Any]]]
     """
     for shard in get_all_shards(orc):
-        if shard and "name" in shard and shard["name"] == shard_name:
+        if shard.get("name", None) == shard_name:
             return shard
 
     return None
