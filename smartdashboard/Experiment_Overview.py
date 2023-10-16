@@ -96,5 +96,5 @@ def execute(args: t.List[str]) -> None:
 if __name__ == "__main__":
     # sample direct execution:
     # streamlit run ./smartdashboard/Experiment_Overview.py --
-    #       -d /Users/chris.mcbride/code/dash/tests/utils/manifest_files/fauxexp
+    #       -d <repo_path>/tests/utils/manifest_files/fauxexp
     execute(sys.argv[1:])
