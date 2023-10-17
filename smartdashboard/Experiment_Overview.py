@@ -7,7 +7,6 @@ import typing as t
 import time
 
 from subprocess import run
-import streamlit as st
 
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.ManifestReader import load_manifest
