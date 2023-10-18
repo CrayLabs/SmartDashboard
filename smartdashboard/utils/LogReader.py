@@ -3,7 +3,7 @@ def get_logs(file: str) -> str:
 
     :param file: Log file path of the entity
     :type file: str
-    :return: Logs o the entity
+    :return: Logs of the entity
     :rtype: str
     """
     try:

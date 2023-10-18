@@ -5,7 +5,8 @@ from smartdashboard.utils.LogReader import get_logs
 
 from ..utils.test_entities import *
 
-parameterize_creator = pytest.mark.parametrize(
+
+@pytest.mark.parametrize(
     "entity, expected_output_log, expected_error_log",
     [
         pytest.param(
@@ -25,9 +26,6 @@ parameterize_creator = pytest.mark.parametrize(
         ),
     ],
 )
-
-
-@parameterize_creator
 def test_load_log_data(entity, expected_output_log, expected_error_log):
     output_log_path = get_value("out_file", entity)
     error_log_path = get_value("err_file", entity)

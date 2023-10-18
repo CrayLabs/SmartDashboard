@@ -44,7 +44,7 @@ def get_interfaces(entity: t.Optional[t.Dict[str, t.Any]]) -> str:
     """
     if entity:
         value: str = entity.get("interface", "")
-        if isinstance(value, t.List):
+        if isinstance(value, list):
             return ", ".join(value)
         return value
 
@@ -158,11 +158,11 @@ def flatten_nested_keyvalue_containers(
     if entity:
         target_dict = entity.get(dict_name, {})
         for key, value in target_dict.items():
-            if isinstance(value, t.List):
+            if isinstance(value, list):
                 for val in value:
                     keys.append(key)
                     values.append(str(val))
-            elif isinstance(value, t.Dict):
+            elif isinstance(value, dict):
                 for k, v in value.items():
                     keys.append(k)
                     values.append(str(v))
