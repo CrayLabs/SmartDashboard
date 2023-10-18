@@ -186,7 +186,7 @@ orchestrator_1 = {
     "shards": [
         {
             "name": "shard 1",
-            "host": "shard1_host",
+            "hostname": "shard1_host",
             "port": "11111",
             "out_file": "tests/utils/log_files/model_1.out",
             "err_file": "tests/utils/log_files/model_1.err",
@@ -199,7 +199,7 @@ orchestrator_1 = {
         },
         {
             "name": "shard 2",
-            "host": "shard2_host",
+            "hostname": "shard2_host",
             "port": "11111",
             "out_file": "tests/utils/log_files/model_0.out",
             "err_file": "tests/utils/log_files/model_0.err",
@@ -215,7 +215,7 @@ orchestrator_1 = {
 
 orch_1_shard_1 = {
     "name": "shard 1",
-    "host": "shard1_host",
+    "hostname": "shard1_host",
     "port": "11111",
     "out_file": "tests/utils/log_files/model_1.out",
     "err_file": "tests/utils/log_files/model_1.err",
@@ -229,7 +229,7 @@ orch_1_shard_1 = {
 
 orch_1_shard_2 = {
     "name": "shard 2",
-    "host": "shard2_host",
+    "hostname": "shard2_host",
     "port": "11111",
     "out_file": "tests/utils/log_files/model_0.out",
     "err_file": "tests/utils/log_files/model_0.err",
@@ -249,7 +249,7 @@ orchestrator_2 = {
     "shards": [
         {
             "name": "orc 2 shard 1",
-            "host": "shard1_host",
+            "hostname": "shard1_host",
             "port": 22222,
             "out_file": "tests/utils/log_files/model_0.out",
             "err_file": "tests/utils/log_files/model_0.err",
@@ -262,7 +262,7 @@ orchestrator_2 = {
         },
         {
             "name": "orc 2 shard 2",
-            "host": "shard2_host",
+            "hostname": "shard2_host",
             "port": 22222,
             "out_file": "tests/utils/log_files/model_1.out",
             "err_file": "tests/utils/log_files/model_1.err",
@@ -284,7 +284,7 @@ orchestrator_3 = {
     "shards": [
         {
             "name": "orc 3 shard 1",
-            "host": "shard1_host",
+            "hostname": "shard1_host",
             "port": "12345",
             "out_file": "tests/utils/log_files/orchestrator_0.out",
             "err_file": "tests/utils/log_files/orchestrator_0.err",
@@ -305,7 +305,7 @@ mismatched_port_orchestrator = {
     "shards": [
         {
             "name": "shard 1",
-            "host": "shard1_host",
+            "hostname": "shard1_host",
             "port": "11211",
             "out_file": "tests/utils/log_files/orchestrator_0.out",
             "err_file": "tests/utils/log_files/orchestrator_0.err",
@@ -318,7 +318,7 @@ mismatched_port_orchestrator = {
         },
         {
             "name": "shard 2",
-            "host": "shard2_host",
+            "hostname": "shard2_host",
             "port": "11111",
             "out_file": "tests/utils/log_files/orchestrator_0.out",
             "err_file": "tests/utils/log_files/orchestrator_0.err",

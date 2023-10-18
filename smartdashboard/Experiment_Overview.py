@@ -30,7 +30,7 @@ def build_app(manifest_path: str) -> None:
             for v in [views.app_view, views.orc_view, views.ens_view]:
                 v.update()
 
-            time.sleep(3)
+            time.sleep(1)
 
 
 def get_parser() -> argparse.ArgumentParser:

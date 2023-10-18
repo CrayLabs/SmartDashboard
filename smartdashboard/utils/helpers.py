@@ -129,7 +129,7 @@ def get_db_hosts(orc: t.Optional[t.Dict[str, t.Any]]) -> t.List[str]:
 
     if orc:
         for shard in orc.get("shards", []):
-            host = shard.get("host")
+            host = shard.get("hostname")
             if host:
                 hosts.append(host)
 
