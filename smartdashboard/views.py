@@ -30,7 +30,7 @@ class EntityView(ViewBase):
         self.err_logs_element.code(self.err_logs)
 
 
-class ExperimentView(EntityView):
+class ExperimentView(ViewBase):
     ...
 
 
@@ -53,12 +53,10 @@ class ErrorView(ViewBase):
 class OverviewView:
     def __init__(
         self,
-        exp_view: ExperimentView,
         app_view: ApplicationView,
         orc_view: OrchestratorView,
         ens_view: EnsembleView,
     ) -> None:
-        self.exp_view = exp_view
         self.app_view = app_view
         self.ens_view = ens_view
         self.orc_view = orc_view

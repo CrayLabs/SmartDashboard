@@ -26,7 +26,6 @@ from smartdashboard.views import (
     ApplicationView,
     EnsembleView,
     ErrorView,
-    ExperimentView,
     OrchestratorView,
     OverviewView,
 )
@@ -53,7 +52,7 @@ def error_builder(error: SSDashboardError) -> ErrorView:
     return view
 
 
-def exp_builder(manifest: Manifest) -> ExperimentView:
+def exp_builder(manifest: Manifest) -> None:
     """Experiment view to be rendered
 
     :param manifest: Manifest to get dashboard info from
@@ -61,26 +60,11 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     :return: An experiment view
     :rtype: ExperimentView
     """
-    view = ExperimentView(manifest.experiment)
     st.subheader("Experiment Configuration")
     st.write("")
-    col1, col2 = st.columns([4, 4])
-    with col1:
-        st.write("Status: ")
-        st.write("Path: " + manifest.experiment.get("path", ""))
-        st.write("Launcher: " + manifest.experiment.get("launcher", ""))
-
-    st.write("")
-    with st.expander(label="Logs"):
-        col1, col2 = st.columns([6, 6])
-        with col1:
-            st.write("Output")
-            view.out_logs_element = st.code(view.out_logs)
-
-        with col2:
-            st.write("Error")
-            view.err_logs_element = st.code(view.err_logs)
-    return view
+    st.write("Status: ")
+    st.write("Path: " + manifest.experiment.get("path", ""))
+    st.write("Launcher: " + manifest.experiment.get("launcher", ""))
 
 
 def app_builder(manifest: Manifest) -> ApplicationView:
@@ -453,7 +437,7 @@ def overview_builder(manifest: Manifest) -> OverviewView:
 
     ### Experiment ###
     with experiment:
-        exp_view = exp_builder(manifest)
+        exp_builder(manifest)
 
     ### Applications ###
     with application:
@@ -467,4 +451,4 @@ def overview_builder(manifest: Manifest) -> OverviewView:
     with ensembles:
         ens_view = ens_builder(manifest)
 
-    return OverviewView(exp_view, app_view, orc_view, ens_view)
+    return OverviewView(app_view, orc_view, ens_view)
