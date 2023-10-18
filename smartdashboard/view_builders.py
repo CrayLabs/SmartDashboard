@@ -66,7 +66,7 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     st.write("")
     col1, col2 = st.columns([4, 4])
     with col1:
-        st.write("Status: :green[Running]")
+        st.write("Status: ")
         st.write("Path: " + manifest.experiment.get("path", ""))
         st.write("Launcher: " + manifest.experiment.get("launcher", ""))
 
@@ -106,7 +106,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         selected_application = None
 
     st.write("")
-    st.write("Status: :green[Running]")
+    st.write("Status: ")
     st.write("Path: " + get_value("path", selected_application))
 
     st.write("")
@@ -231,7 +231,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
         selected_orchestrator = None
 
     st.write("")
-    st.write("Status: :green[Running]")
+    st.write("Status: ")
     st.write("Type: " + get_value("type", selected_orchestrator))
     st.write("Port: " + get_port(selected_orchestrator))
     st.write("Interface: " + get_interfaces(selected_orchestrator))
@@ -306,8 +306,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         selected_ensemble = None
 
     st.write("")
-    st.write("Status: :green[Running]")
-    st.write("Strategy: " + get_value("perm_strat", selected_ensemble))
+    st.write("Status: ")
 
     st.write("")
     with st.expander(label="Batch Settings"):
@@ -350,7 +349,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         selected_member = None
 
     st.write("")
-    st.write("Status: :green[Running]")
+    st.write("Status: ")
     st.write("Path: " + get_value("path", selected_member))
     st.write("")
     with st.expander(label="Executable Arguments"):
