@@ -29,7 +29,7 @@ def build_app(manifest_path: str) -> None:
         views = overview_builder(manifest)
 
         while True:
-            for v in [views.app_view, views.orc_view, views.ens_view]:
+            for v in [views.exp_view, views.app_view, views.orc_view, views.ens_view]:
                 v.update()
 
             time.sleep(1)

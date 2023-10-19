@@ -26,6 +26,7 @@ from smartdashboard.views import (
     ApplicationView,
     EnsembleView,
     ErrorView,
+    ExperimentView,
     OrchestratorView,
     OverviewView,
 )
@@ -40,7 +41,7 @@ def error_builder(error: SSDashboardError) -> ErrorView:
     :rtype: ErrorView
     """
     view = ErrorView()
-    st.header(str(error))
+    st.header(error.title)
     st.error(
         f"""Error found in file: {error.file}  
              Error Message: {error.exception}"""
@@ -52,7 +53,7 @@ def error_builder(error: SSDashboardError) -> ErrorView:
     return view
 
 
-def exp_builder(manifest: Manifest) -> None:
+def exp_builder(manifest: Manifest) -> ExperimentView:
     """Experiment view to be rendered
 
     :param manifest: Manifest to get dashboard info from
@@ -60,11 +61,14 @@ def exp_builder(manifest: Manifest) -> None:
     :return: An experiment view
     :rtype: ExperimentView
     """
+    view = ExperimentView(manifest.experiment)
+    view.runs = manifest.runs
     st.subheader("Experiment Configuration")
     st.write("")
-    st.write("Status: ")
-    st.write("Path: " + manifest.experiment.get("path", ""))
-    st.write("Launcher: " + manifest.experiment.get("launcher", ""))
+    view.status_element = st.text(view.status)
+    st.write("Path: " + get_value("path", view.experiment))
+    st.write("Launcher: " + get_value("launcher", view.experiment))
+    return view
 
 
 def app_builder(manifest: Manifest) -> ApplicationView:
@@ -80,7 +84,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     with col1:
         selected_app_name: t.Optional[str] = st.selectbox(
             "Select an application:",
-            [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
+            [app["name"] for app in manifest.applications],
         )
     if selected_app_name is not None:
         selected_application = get_entity_from_name(
@@ -89,8 +93,9 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     else:
         selected_application = None
 
+    view = ApplicationView(selected_application)
     st.write("")
-    st.write("Status: ")
+    view.status_element = st.text(view.status)
     st.write("Path: " + get_value("path", selected_application))
 
     st.write("")
@@ -174,8 +179,6 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                     pd.DataFrame(get_loaded_entities(app_colocated_db)),
                 )
 
-    view = ApplicationView(selected_application)
-
     st.write("")
     with st.expander(label="Logs"):
         with st.container():
@@ -204,7 +207,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     with col1:
         selected_orc_name: t.Optional[str] = st.selectbox(
             "Select an orchestrator:",
-            [f'{orc["name"]}: Run {orc["run_id"]}' for orc in manifest.orchestrators],
+            [orc["name"] for orc in manifest.orchestrators],
         )
 
     if selected_orc_name is not None:
@@ -214,8 +217,10 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     else:
         selected_orchestrator = None
 
+    shards = get_all_shards(selected_orchestrator)
+    view = OrchestratorView(selected_orchestrator, shards[0] if shards else None)
     st.write("")
-    st.write("Status: ")
+    view.status_element = st.text(view.status)
     st.write("Type: " + get_value("type", selected_orchestrator))
     st.write("Port: " + get_port(selected_orchestrator))
     st.write("Interface: " + get_interfaces(selected_orchestrator))
@@ -235,17 +240,14 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])
         with col1:
-            shards = get_all_shards(selected_orchestrator)
             selected_shard_name: t.Optional[str] = st.selectbox(
                 "Select a shard:",
                 [shard["name"] for shard in shards if shard is not None],
             )
             if selected_shard_name is not None:
-                selected_shard = get_shard(selected_shard_name, selected_orchestrator)
+                view.shard = get_shard(selected_shard_name, selected_orchestrator)
             else:
-                selected_shard = None
-
-            view = OrchestratorView(selected_shard)
+                view.shard = None
 
             st.write("")
             st.write("Output")
@@ -276,10 +278,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with col1:
         selected_ensemble_name: t.Optional[str] = st.selectbox(
             "Select an ensemble:",
-            [
-                f'{ensemble["name"]}: Run {ensemble["run_id"]}'
-                for ensemble in manifest.ensembles
-            ],
+            [ensemble["name"] for ensemble in manifest.ensembles],
         )
 
     if selected_ensemble_name is not None:
@@ -289,8 +288,11 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     else:
         selected_ensemble = None
 
+    members = get_ensemble_members(selected_ensemble)
+    view = EnsembleView(selected_ensemble, members[0] if members else None)
+
     st.write("")
-    st.write("Status: ")
+    view.status_element = st.text(view.status)
 
     st.write("")
     with st.expander(label="Batch Settings"):
@@ -321,24 +323,23 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         st.subheader("Member Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        members = get_ensemble_members(selected_ensemble)
         selected_member_name: t.Optional[str] = st.selectbox(
             "Select a member:",
             [member["name"] for member in members if member],
         )
 
     if selected_member_name is not None:
-        selected_member = get_member(selected_member_name, selected_ensemble)
+        view.member = get_member(selected_member_name, selected_ensemble)
     else:
-        selected_member = None
+        view.member = None
 
     st.write("")
-    st.write("Status: ")
-    st.write("Path: " + get_value("path", selected_member))
+    view.member_status_element = st.text(view.member_status)
+    st.write("Path: " + get_value("path", view.member))
     st.write("")
     with st.expander(label="Executable Arguments"):
         st.dataframe(
-            pd.DataFrame({"All Arguments": get_exe_args(selected_member)}),
+            pd.DataFrame({"All Arguments": get_exe_args(view.member)}),
             hide_index=True,
             use_container_width=True,
         )
@@ -350,9 +351,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Batch Settings",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers(
-                        "batch_settings", selected_member
-                    ),
+                    flatten_nested_keyvalue_containers("batch_settings", view.member),
                     columns=["Name", "Value"],
                 ),
             )
@@ -360,7 +359,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Run Settings",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("run_settings", selected_member),
+                    flatten_nested_keyvalue_containers("run_settings", view.member),
                     columns=["Name", "Value"],
                 ),
             )
@@ -372,7 +371,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Parameters",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("params", selected_member),
+                    flatten_nested_keyvalue_containers("params", view.member),
                     columns=["Name", "Value"],
                 ),
             )
@@ -380,7 +379,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Files",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("files", selected_member),
+                    flatten_nested_keyvalue_containers("files", view.member),
                     columns=["Type", "File"],
                 ),
             )
@@ -390,9 +389,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             mem_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                selected_member.get("colocated_db")
-                if selected_member is not None
-                else {}
+                view.member.get("colocated_db") if view.member is not None else {}
             )
             with col1:
                 render_dataframe_with_title(
@@ -436,7 +433,7 @@ def overview_builder(manifest: Manifest) -> OverviewView:
 
     ### Experiment ###
     with experiment:
-        exp_builder(manifest)
+        exp_view = exp_builder(manifest)
 
     ### Applications ###
     with application:
@@ -450,4 +447,4 @@ def overview_builder(manifest: Manifest) -> OverviewView:
     with ensembles:
         ens_view = ens_builder(manifest)
 
-    return OverviewView(app_view, orc_view, ens_view)
+    return OverviewView(exp_view, app_view, orc_view, ens_view)
