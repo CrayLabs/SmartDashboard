@@ -33,9 +33,9 @@ footer {visibility: hidden;}
 
 /* remove "Running" status widget */
 div[data-testid="stStatusWidget"] {
-visibility: hidden;
-height: 0%;
-position: fixed;
+    visibility: hidden;
+    height: 0%;
+    position: fixed;
 }
 
 /* remove "Deploy" button */
