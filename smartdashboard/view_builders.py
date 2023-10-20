@@ -110,7 +110,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         col1, col2 = st.columns([4, 4])
         with col1:
             render_dataframe_with_title(
-                "Batch",
+                "Batch Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
                         "batch_settings", selected_application
@@ -120,7 +120,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             )
         with col2:
             render_dataframe_with_title(
-                "Run",
+                "Run Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
                         "run_settings", selected_application
@@ -170,7 +170,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 )
             with col2:
                 render_dataframe_with_title(
-                    "Loaded Entities",
+                    "Loaded Scripts and Models",
                     pd.DataFrame(get_loaded_entities(app_colocated_db)),
                 )
 
@@ -348,7 +348,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         col1, col2 = st.columns([4, 4])
         with col1:
             render_dataframe_with_title(
-                "Batch",
+                "Batch Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
                         "batch_settings", selected_member
@@ -358,7 +358,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             )
         with col2:
             render_dataframe_with_title(
-                "Run",
+                "Run Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers("run_settings", selected_member),
                     columns=["Name", "Value"],
@@ -407,7 +407,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
 
             with col2:
                 render_dataframe_with_title(
-                    "Loaded Entities",
+                    "Loaded Scripts and Models",
                     pd.DataFrame(get_loaded_entities(mem_colocated_db)),
                 )
 
