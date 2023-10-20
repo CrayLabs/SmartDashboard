@@ -182,11 +182,11 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             col1, col2 = st.columns([6, 6])
             with col1:
                 st.write("Output")
-                view.out_logs_element = st.code(view.out_logs)
+                view.out_logs_element = st.code(view.out_logs, language=None)
 
             with col2:
                 st.write("Error")
-                view.err_logs_element = st.code(view.err_logs)
+                view.err_logs_element = st.code(view.err_logs, language=None)
 
     return view
 
@@ -249,7 +249,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
 
             st.write("")
             st.write("Output")
-            view.out_logs_element = st.code(view.out_logs)
+            view.out_logs_element = st.code(view.out_logs, language=None)
 
         with col2:
             st.write("#")
@@ -258,7 +258,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
             st.write("")
             st.write("")
             st.write("Error")
-            view.err_logs_element = st.code(view.err_logs)
+            view.err_logs_element = st.code(view.err_logs, language=None)
 
     return view
 
@@ -418,11 +418,11 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         col1, col2 = st.columns([6, 6])
         with col1:
             st.write("Output")
-            view.out_logs_element = st.code(view.out_logs)
+            view.out_logs_element = st.code(view.out_logs, language=None)
 
         with col2:
             st.write("Error")
-            view.err_logs_element = st.code(view.err_logs)
+            view.err_logs_element = st.code(view.err_logs, language=None)
 
     return view
 

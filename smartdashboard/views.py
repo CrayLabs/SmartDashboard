@@ -26,8 +26,8 @@ class EntityView(ViewBase):
         return get_logs(file=get_value("out_file", self.view_model))
 
     def update(self) -> None:
-        self.out_logs_element.code(self.out_logs)
-        self.err_logs_element.code(self.err_logs)
+        self.out_logs_element.code(self.out_logs, language=None)
+        self.err_logs_element.code(self.err_logs, language=None)
 
 
 class ExperimentView(ViewBase):
