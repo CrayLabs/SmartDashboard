@@ -19,5 +19,27 @@ div[data-testid="stExpander"] div[role="button"] p {
     background-size: 300px;
 }
 
+/* add height and scrolling capabilities to logs */
+div[data-testid="stCodeBlock"] {
+    max-height: 350px !important;
+    overflow-y: auto !important;
+}
+
+/* wrap code lines */
+code {white-space: pre-wrap !important;}
+
 /* remove "Made by Streamlit" footer */
 footer {visibility: hidden;}
+
+/* remove "Running" status widget */
+div[data-testid="stStatusWidget"] {
+    visibility: hidden;
+    height: 0%;
+    position: fixed;
+}
+
+/* remove "Deploy" button */
+div[class="stDeployButton"]{
+    visibility: hidden;
+}
+

@@ -1,10 +1,10 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+import typing as t
 
 import pandas as pd
 import streamlit as st
 
 
-def get_value(key: str, entity: Optional[Dict[str, Any]]) -> str:
+def get_value(key: str, entity: t.Optional[t.Dict[str, t.Any]]) -> str:
     """Get the value of a key-value pair
 
     :param key: Key of the dictionary
@@ -20,7 +20,7 @@ def get_value(key: str, entity: Optional[Dict[str, Any]]) -> str:
     return ""
 
 
-def get_exe_args(entity: Optional[Dict[str, Any]]) -> List[str]:
+def get_exe_args(entity: t.Optional[t.Dict[str, t.Any]]) -> t.List[str]:
     """Get the exe_args of an entity
 
     :param entity: Entity represented by a dictionary
@@ -34,7 +34,7 @@ def get_exe_args(entity: Optional[Dict[str, Any]]) -> List[str]:
     return []
 
 
-def get_interfaces(entity: Optional[Dict[str, Any]]) -> str:
+def get_interfaces(entity: t.Optional[t.Dict[str, t.Any]]) -> str:
     """Get and format the interfaces of an entity
 
     :param entity: Entity represented by a dictionary
@@ -44,14 +44,16 @@ def get_interfaces(entity: Optional[Dict[str, Any]]) -> str:
     """
     if entity:
         value: str = entity.get("interface", "")
-        if isinstance(value, List):
+        if isinstance(value, list):
             return ", ".join(value)
         return value
 
     return ""
 
 
-def get_ensemble_members(ensemble: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def get_ensemble_members(
+    ensemble: t.Optional[t.Dict[str, t.Any]]
+) -> t.List[t.Dict[str, t.Any]]:
     """Get the members of an ensemble
 
     :param ensemble: Ensemble represented by a dictionary
@@ -66,8 +68,8 @@ def get_ensemble_members(ensemble: Optional[Dict[str, Any]]) -> List[Dict[str, A
 
 
 def get_member(
-    member_name: str, ensemble: Optional[Dict[str, Any]]
-) -> Optional[Dict[str, Any]]:
+    member_name: str, ensemble: t.Optional[t.Dict[str, t.Any]]
+) -> t.Optional[t.Dict[str, t.Any]]:
     """Get a specific member of an ensemble
 
     :param member_name: Name of the selected member
@@ -84,7 +86,7 @@ def get_member(
     return None
 
 
-def get_port(orc: Optional[Dict[str, Any]]) -> str:
+def get_port(orc: t.Optional[t.Dict[str, t.Any]]) -> str:
     """Get the port of an orchestrator
 
     The ports in all of the shards should be the same.
@@ -113,7 +115,7 @@ def get_port(orc: Optional[Dict[str, Any]]) -> str:
     return ""
 
 
-def get_db_hosts(orc: Optional[Dict[str, Any]]) -> List[str]:
+def get_db_hosts(orc: t.Optional[t.Dict[str, t.Any]]) -> t.List[str]:
     """Get the db_hosts of an orchestrator
 
     The hosts of all of the shards are displayed.
@@ -127,7 +129,7 @@ def get_db_hosts(orc: Optional[Dict[str, Any]]) -> List[str]:
 
     if orc:
         for shard in orc.get("shards", []):
-            host = shard.get("host")
+            host = shard.get("hostname")
             if host:
                 hosts.append(host)
 
@@ -135,8 +137,8 @@ def get_db_hosts(orc: Optional[Dict[str, Any]]) -> List[str]:
 
 
 def flatten_nested_keyvalue_containers(
-    dict_name: str, entity: Optional[Dict[str, Any]]
-) -> List[Tuple[str, str]]:
+    dict_name: str, entity: t.Optional[t.Dict[str, t.Any]]
+) -> t.List[t.Tuple[str, str]]:
     """Format dicts of all types to be displayed
 
     The dictionaries can have a combination of types attached, so
@@ -156,11 +158,11 @@ def flatten_nested_keyvalue_containers(
     if entity:
         target_dict = entity.get(dict_name, {})
         for key, value in target_dict.items():
-            if isinstance(value, List):
+            if isinstance(value, list):
                 for val in value:
                     keys.append(key)
                     values.append(str(val))
-            elif isinstance(value, Dict):
+            elif isinstance(value, dict):
                 for k, v in value.items():
                     keys.append(k)
                     values.append(str(v))
@@ -171,7 +173,9 @@ def flatten_nested_keyvalue_containers(
     return list(zip(keys, values))
 
 
-def format_ensemble_params(entity: Optional[Dict[str, Any]]) -> List[Tuple[str, str]]:
+def format_ensemble_params(
+    entity: t.Optional[t.Dict[str, t.Any]]
+) -> t.List[t.Tuple[str, str]]:
     """Format ensemble params to be displayed
 
     :param entity: Entity represented by a dictionary
@@ -193,8 +197,8 @@ def format_ensemble_params(entity: Optional[Dict[str, Any]]) -> List[Tuple[str, 
 
 
 def get_loaded_entities(
-    entity: Optional[Dict[str, Any]]
-) -> Union[List[Dict[str, str]], Dict[str, List[Any]]]:
+    entity: t.Optional[t.Dict[str, t.Any]]
+) -> t.Union[t.List[t.Dict[str, str]], t.Dict[str, t.List[t.Any]]]:
     """Combine and format loaded entities
 
     DB Models and DB Scripts are combined so they can be displayed as
@@ -235,8 +239,8 @@ def get_loaded_entities(
 
 
 def get_entity_from_name(
-    entity_name: str, entity_list: List[Dict[str, Any]]
-) -> Optional[Dict[str, Any]]:
+    entity_name: str, entity_list: t.List[t.Dict[str, t.Any]]
+) -> t.Optional[t.Dict[str, t.Any]]:
     """Get a specific entity from a list of entities
 
     :param entity_name: Name of the entity
@@ -266,3 +270,36 @@ def render_dataframe_with_title(title: str, dataframe: pd.DataFrame) -> None:
         hide_index=True,
         use_container_width=True,
     )
+
+
+def get_all_shards(orc: t.Optional[t.Dict[str, t.Any]]) -> t.List[t.Dict[str, t.Any]]:
+    """Get all shards in an Orchestrator
+
+    :param orc: Orchestrator represented by a dictionary
+    :type orc: Optional[Dict[str, Any]]
+    :return: List of shards
+    :rtype: List[Optional[Dict[str, Any]]]
+    """
+    if orc:
+        return list(orc.get("shards", []))
+
+    return []
+
+
+def get_shard(
+    shard_name: str, orc: t.Optional[t.Dict[str, t.Any]]
+) -> t.Optional[t.Dict[str, t.Any]]:
+    """Get a specific shard from an Orchestrator
+
+    :param shard_name: Name of shard selected
+    :type shard_name: str
+    :param orc: Orchestrator represented by a dictionary
+    :type orc: Optional[Dict[str, Any]]
+    :return: List of shards
+    :rtype: List[Optional[Dict[str, Any]]]
+    """
+    for shard in get_all_shards(orc):
+        if shard.get("name", None) == shard_name:
+            return shard
+
+    return None

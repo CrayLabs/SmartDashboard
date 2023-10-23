@@ -2,13 +2,12 @@ import pytest
 
 from smartdashboard.utils.ManifestReader import ManifestFileReader
 from smartdashboard.view_builders import exp_builder
-from smartdashboard.views import ExperimentView
 
 
 @pytest.mark.parametrize(
     "json_file, return_type",
     [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", ExperimentView),
+        pytest.param("tests/utils/manifest_files/manifesttest.json", type(None)),
     ],
 )
 def test_exp_builder(json_file, return_type):

@@ -37,12 +37,12 @@ application_1 = {
         ],
     },
     "telemetry_metadata": {
-        "status_dir": "/path/to/status dir",
+        "status_dir": "tests/utils/status_files/model_0",
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_0.out",
-    "err_file": "test_dashboard/log_files/model_0.err",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
 }
 
 application_2 = {
@@ -84,12 +84,12 @@ application_2 = {
         ],
     },
     "telemetry_metadata": {
-        "status_dir": "/path/to/status dir",
+        "status_dir": "tests/utils/status_files/model_1",
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_1.out",
-    "err_file": "test_dashboard/log_files/model_1.err",
+    "out_file": "tests/utils/log_files/model_1.out",
+    "err_file": "tests/utils/log_files/model_1.err",
 }
 
 application_3 = {
@@ -128,12 +128,12 @@ application_3 = {
         ],
     },
     "telemetry_metadata": {
-        "status_dir": "/path/to/status dir",
+        "status_dir": "tests/utils/status_files/model_3",
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_0.out",
-    "err_file": "test_dashboard/log_files/model_0.err",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
 }
 application_4 = {
     "name": "app3",
@@ -170,12 +170,12 @@ application_4 = {
         "models": [],
     },
     "telemetry_metadata": {
-        "status_dir": "/path/to/status dir",
+        "status_dir": "tests/utils/status_files/model_0",
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_0.out",
-    "err_file": "test_dashboard/log_files/model_0.err",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
 }
 
 orchestrator_1 = {
@@ -186,31 +186,59 @@ orchestrator_1 = {
     "shards": [
         {
             "name": "shard 1",
-            "host": "shard1_host",
+            "hostname": "shard1_host",
             "port": "11111",
-            "out_file": "/path/to/shard/output/logs",
-            "err_file": "/path/to/shard/error/logs",
+            "out_file": "tests/utils/log_files/model_1.out",
+            "err_file": "tests/utils/log_files/model_1.err",
             "conf_file": "/path/to/conf_file",
             "telemetry_metadata": {
-                "status_dir": "/path/to/status/dir",
+                "status_dir": "tests/utils/status_files/model_3",
                 "job_id": "111",
                 "step_id": 111,
             },
         },
         {
             "name": "shard 2",
-            "host": "shard2_host",
+            "hostname": "shard2_host",
             "port": "11111",
-            "out_file": "/path/to/shard/output/logs",
-            "err_file": "/path/to/shard/error/logs",
+            "out_file": "tests/utils/log_files/model_0.out",
+            "err_file": "tests/utils/log_files/model_0.err",
             "conf_file": "/path/to/conf_file",
             "telemetry_metadata": {
-                "status_dir": "/path/to/status/dir",
+                "status_dir": "tests/utils/status_files/model_1",
                 "job_id": "111",
                 "step_id": 111,
             },
         },
     ],
+}
+
+orch_1_shard_1 = {
+    "name": "shard 1",
+    "hostname": "shard1_host",
+    "port": "11111",
+    "out_file": "tests/utils/log_files/model_1.out",
+    "err_file": "tests/utils/log_files/model_1.err",
+    "conf_file": "/path/to/conf_file",
+    "telemetry_metadata": {
+        "status_dir": "tests/utils/status_files/model_3",
+        "job_id": "111",
+        "step_id": 111,
+    },
+}
+
+orch_1_shard_2 = {
+    "name": "shard 2",
+    "hostname": "shard2_host",
+    "port": "11111",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
+    "conf_file": "/path/to/conf_file",
+    "telemetry_metadata": {
+        "status_dir": "tests/utils/status_files/model_1",
+        "job_id": "111",
+        "step_id": 111,
+    },
 }
 
 orchestrator_2 = {
@@ -221,26 +249,26 @@ orchestrator_2 = {
     "shards": [
         {
             "name": "orc 2 shard 1",
-            "host": "shard1_host",
+            "hostname": "shard1_host",
             "port": 22222,
-            "out_file": "/path/to/shard/output/logs",
-            "err_file": "/path/to/shard/error/logs",
+            "out_file": "tests/utils/log_files/model_0.out",
+            "err_file": "tests/utils/log_files/model_0.err",
             "conf_file": "/path/to/conf_file",
             "telemetry_metadata": {
-                "status_dir": "/path/to/status/dir",
+                "status_dir": "tests/utils/status_files/model_0",
                 "job_id": "111",
                 "step_id": 111,
             },
         },
         {
             "name": "orc 2 shard 2",
-            "host": "shard2_host",
+            "hostname": "shard2_host",
             "port": 22222,
-            "out_file": "/path/to/shard/output/logs",
-            "err_file": "/path/to/shard/error/logs",
+            "out_file": "tests/utils/log_files/model_1.out",
+            "err_file": "tests/utils/log_files/model_1.err",
             "conf_file": "/path/to/conf_file",
             "telemetry_metadata": {
-                "status_dir": "/path/to/status/dir",
+                "status_dir": "tests/utils/status_files/model_1",
                 "job_id": "111",
                 "step_id": 111,
             },
@@ -256,13 +284,13 @@ orchestrator_3 = {
     "shards": [
         {
             "name": "orc 3 shard 1",
-            "host": "shard1_host",
+            "hostname": "shard1_host",
             "port": "12345",
-            "out_file": "/path/to/shard/output/logs",
-            "err_file": "/path/to/shard/error/logs",
+            "out_file": "tests/utils/log_files/orchestrator_0.out",
+            "err_file": "tests/utils/log_files/orchestrator_0.err",
             "conf_file": "/path/to/conf_file",
             "telemetry_metadata": {
-                "status_dir": "/path/to/status/dir",
+                "status_dir": "tests/utils/status_files/model_3",
                 "job_id": "111",
                 "step_id": 111,
             },
@@ -277,26 +305,26 @@ mismatched_port_orchestrator = {
     "shards": [
         {
             "name": "shard 1",
-            "host": "shard1_host",
+            "hostname": "shard1_host",
             "port": "11211",
-            "out_file": "/path/to/shard/output/logs",
-            "err_file": "/path/to/shard/error/logs",
+            "out_file": "tests/utils/log_files/orchestrator_0.out",
+            "err_file": "tests/utils/log_files/orchestrator_0.err",
             "conf_file": "/path/to/conf_file",
             "telemetry_metadata": {
-                "status_dir": "/path/to/status/dir",
+                "status_dir": "tests/utils/status_files/model_1",
                 "job_id": "111",
                 "step_id": 111,
             },
         },
         {
             "name": "shard 2",
-            "host": "shard2_host",
+            "hostname": "shard2_host",
             "port": "11111",
-            "out_file": "/path/to/shard/output/logs",
-            "err_file": "/path/to/shard/error/logs",
+            "out_file": "tests/utils/log_files/orchestrator_0.out",
+            "err_file": "tests/utils/log_files/orchestrator_0.err",
             "conf_file": "/path/to/conf_file",
             "telemetry_metadata": {
-                "status_dir": "/path/to/status/dir",
+                "status_dir": "tests/utils/status_files/model_1us/dir",
                 "job_id": "111",
                 "step_id": 111,
             },
@@ -356,12 +384,12 @@ ensemble_1 = {
                 ],
             },
             "telemetry_metadata": {
-                "status_dir": "/path/to/status dir",
+                "status_dir": "tests/utils/status_files/model_0",
                 "job_id": "111",
                 "step_id": 111,
             },
-            "out_file": "test_dashboard/log_files/model_0.out",
-            "err_file": "test_dashboard/log_files/model_0.err",
+            "out_file": "tests/utils/log_files/model_0.out",
+            "err_file": "tests/utils/log_files/model_0.err",
         }
     ],
 }
@@ -405,12 +433,12 @@ ensemble_1_member_1 = {
         ],
     },
     "telemetry_metadata": {
-        "status_dir": "/path/to/status dir",
+        "status_dir": "tests/utils/status_files/model_0",
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_0.out",
-    "err_file": "test_dashboard/log_files/model_0.err",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
 }
 
 ensemble_2 = {
@@ -466,12 +494,12 @@ ensemble_3 = {
                 ],
             },
             "telemetry_metadata": {
-                "status_dir": "/path/to/status dir",
+                "status_dir": "tests/utils/status_files/model_3",
                 "job_id": "111",
                 "step_id": 111,
             },
-            "out_file": "test_dashboard/log_files/model_0.out",
-            "err_file": "test_dashboard/log_files/model_0.err",
+            "out_file": "tests/utils/log_files/model_0.out",
+            "err_file": "tests/utils/log_files/model_0.err",
         },
         {
             "name": "ensemble_3_member_2",
@@ -511,12 +539,12 @@ ensemble_3 = {
                 ],
             },
             "telemetry_metadata": {
-                "status_dir": "/path/to/status dir",
+                "status_dir": "tests/utils/status_files/model_1",
                 "job_id": "111",
                 "step_id": 111,
             },
-            "out_file": "test_dashboard/log_files/model_1.out",
-            "err_file": "test_dashboard/log_files/model_1.err",
+            "out_file": "tests/utils/log_files/model_1.out",
+            "err_file": "tests/utils/log_files/model_1.err",
         },
     ],
 }
@@ -559,12 +587,12 @@ ensemble_3_member_1 = {
         ],
     },
     "telemetry_metadata": {
-        "status_dir": "/path/to/status dir",
+        "status_dir": "tests/utils/status_files/model_3",
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_0.out",
-    "err_file": "test_dashboard/log_files/model_0.err",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
 }
 
 ensemble_3_member_2 = {
@@ -602,12 +630,12 @@ ensemble_3_member_2 = {
         ],
     },
     "telemetry_metadata": {
-        "status_dir": "/path/to/status dir",
+        "status_dir": "tests/utils/status_files/model_1",
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_1.out",
-    "err_file": "test_dashboard/log_files/model_1.err",
+    "out_file": "tests/utils/log_files/model_1.out",
+    "err_file": "tests/utils/log_files/model_1.err",
 }
 
 
@@ -640,10 +668,37 @@ no_db_scripts_or_models = {
         "models": [],
     },
     "telemetry_metadata": {
-        "status_dir": "/path/to/status dir",
+        "status_dir": "tests/utils/status_files/model_1",
         "job_id": "111",
         "step_id": 111,
     },
-    "out_file": "test_dashboard/log_files/model_1.out",
-    "err_file": "test_dashboard/log_files/model_1.err",
+    "out_file": "tests/utils/log_files/model_1.out",
+    "err_file": "tests/utils/log_files/model_1.err",
 }
+
+model0_out_logs = """SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_FILE is not set. Defaulting to stdout
+SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_LEVEL is not set. Defaulting to INFO
+Freq (hz) = 0.1
+Sleep time = 10.0
+Number of messages = 10
+"""
+
+model0_err_logs = """Traceback (most recent call last):
+  File "/lus/cls01029/mellis/cray_labs/SmartSim/tests/test_configs/bad.py", line 42, in <module>
+    divide_by_zero(args.time)
+  File "/lus/cls01029/mellis/cray_labs/SmartSim/tests/test_configs/bad.py", line 34, in divide_by_zero
+    print(1 / 0)
+ZeroDivisionError: division by zero"""
+
+model1_out_logs = """SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_FILE is not set. Defaulting to stdout
+SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_LEVEL is not set. Defaulting to INFO
+Freq (hz) = 1.0
+Sleep time = 1.0
+Number of messages = 100"""
+
+model1_err_logs = """Traceback (most recent call last):
+  File "/lus/cls01029/alyssacote/cray_labs/SmartSim/tests/test_configs/bad.py", line 42, in <module>
+    divide_by_zero(args.time)
+  File "/lus/cls01029/alyssacote/cray_labs/SmartSim/tests/test_configs/bad.py", line 34, in divide_by_zero
+    print(1 / 0)
+ZeroDivisionError: division by zero"""

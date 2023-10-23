@@ -8,6 +8,7 @@ from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import (
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
+    get_all_shards,
     get_db_hosts,
     get_ensemble_members,
     get_entity_from_name,
@@ -16,6 +17,7 @@ from smartdashboard.utils.helpers import (
     get_loaded_entities,
     get_member,
     get_port,
+    get_shard,
     get_value,
     render_dataframe_with_title,
 )
@@ -24,7 +26,6 @@ from smartdashboard.views import (
     ApplicationView,
     EnsembleView,
     ErrorView,
-    ExperimentView,
     OrchestratorView,
     OverviewView,
 )
@@ -51,7 +52,7 @@ def error_builder(error: SSDashboardError) -> ErrorView:
     return view
 
 
-def exp_builder(manifest: Manifest) -> ExperimentView:
+def exp_builder(manifest: Manifest) -> None:
     """Experiment view to be rendered
 
     :param manifest: Manifest to get dashboard info from
@@ -59,26 +60,11 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     :return: An experiment view
     :rtype: ExperimentView
     """
-    view = ExperimentView()
     st.subheader("Experiment Configuration")
     st.write("")
-    col1, col2 = st.columns([4, 4])
-    with col1:
-        st.write("Status: :green[Running]")
-        st.write("Path: " + manifest.experiment.get("path", ""))
-        st.write("Launcher: " + manifest.experiment.get("launcher", ""))
-
-    st.write("")
-    with st.expander(label="Logs"):
-        col1, col2 = st.columns([6, 6])
-        with col1:
-            st.write("Output")
-            st.info("")
-
-        with col2:
-            st.write("Error")
-            st.info("")
-    return view
+    st.write("Status: ")
+    st.write("Path: " + manifest.experiment.get("path", ""))
+    st.write("Launcher: " + manifest.experiment.get("launcher", ""))
 
 
 def app_builder(manifest: Manifest) -> ApplicationView:
@@ -89,7 +75,6 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     :return: An application view
     :rtype: ApplicationView
     """
-    view = ApplicationView()
     st.subheader("Application Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
@@ -105,7 +90,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         selected_application = None
 
     st.write("")
-    st.write("Status: :green[Running]")
+    st.write("Status: ")
     st.write("Path: " + get_value("path", selected_application))
 
     st.write("")
@@ -125,7 +110,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         col1, col2 = st.columns([4, 4])
         with col1:
             render_dataframe_with_title(
-                "Batch",
+                "Batch Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
                         "batch_settings", selected_application
@@ -135,7 +120,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             )
         with col2:
             render_dataframe_with_title(
-                "Run",
+                "Run Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
                         "run_settings", selected_application
@@ -185,9 +170,11 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 )
             with col2:
                 render_dataframe_with_title(
-                    "Loaded Entities",
+                    "Loaded Scripts and Models",
                     pd.DataFrame(get_loaded_entities(app_colocated_db)),
                 )
+
+    view = ApplicationView(selected_application)
 
     st.write("")
     with st.expander(label="Logs"):
@@ -195,11 +182,11 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             col1, col2 = st.columns([6, 6])
             with col1:
                 st.write("Output")
-                st.info("")
+                view.out_logs_element = st.code(view.out_logs, language=None)
 
             with col2:
                 st.write("Error")
-                st.info("")
+                view.err_logs_element = st.code(view.err_logs, language=None)
 
     return view
 
@@ -212,7 +199,6 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     :return: An orchestrator view
     :rtype: OrchestratorView
     """
-    view = OrchestratorView()
     st.subheader("Orchestrator Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
@@ -222,22 +208,24 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
         )
 
     if selected_orc_name is not None:
-        selected_orc = get_entity_from_name(selected_orc_name, manifest.orchestrators)
+        selected_orchestrator = get_entity_from_name(
+            selected_orc_name, manifest.orchestrators
+        )
     else:
-        selected_orc = None
+        selected_orchestrator = None
 
     st.write("")
-    st.write("Status: :green[Running]")
-    st.write("Type: " + get_value("type", selected_orc))
-    st.write("Port: " + get_port(selected_orc))
-    st.write("Interface: " + get_interfaces(selected_orc))
+    st.write("Status: ")
+    st.write("Type: " + get_value("type", selected_orchestrator))
+    st.write("Port: " + get_port(selected_orchestrator))
+    st.write("Interface: " + get_interfaces(selected_orchestrator))
 
     st.write("")
     with st.expander(label="Database Hosts"):
         st.dataframe(
             pd.DataFrame(
                 {
-                    "Hosts": get_db_hosts(selected_orc),
+                    "Hosts": get_db_hosts(selected_orchestrator),
                 }
             ),
             hide_index=True,
@@ -247,12 +235,21 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])
         with col1:
-            st.session_state["shard_name"] = st.selectbox(
-                label="Shard", options=("Shard 1", "Shard 2", "Shard 3", "Shard 4")
+            shards = get_all_shards(selected_orchestrator)
+            selected_shard_name: t.Optional[str] = st.selectbox(
+                "Select a shard:",
+                [shard["name"] for shard in shards if shard is not None],
             )
+            if selected_shard_name is not None:
+                selected_shard = get_shard(selected_shard_name, selected_orchestrator)
+            else:
+                selected_shard = None
+
+            view = OrchestratorView(selected_shard)
+
             st.write("")
             st.write("Output")
-            st.info("")
+            view.out_logs_element = st.code(view.out_logs, language=None)
 
         with col2:
             st.write("#")
@@ -261,7 +258,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
             st.write("")
             st.write("")
             st.write("Error")
-            st.info("")
+            view.err_logs_element = st.code(view.err_logs, language=None)
 
     return view
 
@@ -274,7 +271,6 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     :return: An ensemble view
     :rtype: EnsembleView
     """
-    view = EnsembleView()
     st.subheader("Ensemble Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
@@ -294,8 +290,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         selected_ensemble = None
 
     st.write("")
-    st.write("Status: :green[Running]")
-    st.write("Strategy: " + get_value("perm_strat", selected_ensemble))
+    st.write("Status: ")
 
     st.write("")
     with st.expander(label="Batch Settings"):
@@ -312,7 +307,8 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with st.expander(label="Parameters"):
         st.dataframe(
             pd.DataFrame(
-                format_ensemble_params(selected_ensemble), columns=["Name", "Value"]
+                format_ensemble_params(selected_ensemble),
+                columns=["Name", "Value"],
             ),
             hide_index=True,
             use_container_width=True,
@@ -337,7 +333,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         selected_member = None
 
     st.write("")
-    st.write("Status: :green[Running]")
+    st.write("Status: ")
     st.write("Path: " + get_value("path", selected_member))
     st.write("")
     with st.expander(label="Executable Arguments"):
@@ -352,7 +348,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         col1, col2 = st.columns([4, 4])
         with col1:
             render_dataframe_with_title(
-                "Batch",
+                "Batch Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers(
                         "batch_settings", selected_member
@@ -362,7 +358,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             )
         with col2:
             render_dataframe_with_title(
-                "Run",
+                "Run Settings",
                 pd.DataFrame(
                     flatten_nested_keyvalue_containers("run_settings", selected_member),
                     columns=["Name", "Value"],
@@ -411,20 +407,22 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
 
             with col2:
                 render_dataframe_with_title(
-                    "Loaded Entities",
+                    "Loaded Scripts and Models",
                     pd.DataFrame(get_loaded_entities(mem_colocated_db)),
                 )
+
+    view = EnsembleView(selected_member)
 
     st.write("")
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])
         with col1:
             st.write("Output")
-            st.info("")
+            view.out_logs_element = st.code(view.out_logs, language=None)
 
         with col2:
             st.write("Error")
-            st.info("")
+            view.err_logs_element = st.code(view.err_logs, language=None)
 
     return view
 
@@ -439,7 +437,7 @@ def overview_builder(manifest: Manifest) -> OverviewView:
 
     ### Experiment ###
     with experiment:
-        exp_view = exp_builder(manifest)
+        exp_builder(manifest)
 
     ### Applications ###
     with application:
@@ -453,4 +451,4 @@ def overview_builder(manifest: Manifest) -> OverviewView:
     with ensembles:
         ens_view = ens_builder(manifest)
 
-    return OverviewView(exp_view, app_view, orc_view, ens_view)
+    return OverviewView(app_view, orc_view, ens_view)

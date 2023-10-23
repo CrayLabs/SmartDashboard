@@ -5,3 +5,5 @@ __pycache__
 .coverage
 coverage.xml
 dist/
+**/*.swp
+**/*.egg-info

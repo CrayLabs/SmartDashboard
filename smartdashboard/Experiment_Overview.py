@@ -2,14 +2,14 @@ import argparse
 import os
 import pathlib
 import sys
+import time
 import typing as t
-
 from subprocess import run
 
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.ManifestReader import load_manifest
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
-from smartdashboard.view_builders import overview_builder, error_builder
+from smartdashboard.view_builders import error_builder, overview_builder
 
 
 def build_app(manifest_path: str) -> None:
@@ -24,7 +24,13 @@ def build_app(manifest_path: str) -> None:
     except SSDashboardError as ex:
         error_builder(ex)
     else:
-        overview_builder(manifest)
+        views = overview_builder(manifest)
+
+        while True:
+            for v in [views.app_view, views.orc_view, views.ens_view]:
+                v.update()
+
+            time.sleep(1)
 
 
 def get_parser() -> argparse.ArgumentParser:
