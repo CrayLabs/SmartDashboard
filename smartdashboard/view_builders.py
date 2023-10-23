@@ -414,7 +414,6 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
                     pd.DataFrame(get_loaded_entities(mem_colocated_db)),
                 )
 
-    view = EnsembleView(selected_member)
     st.write("")
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])

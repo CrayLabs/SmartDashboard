@@ -4,8 +4,6 @@ import pathlib
 import sys
 import time
 import typing as t
-import time
-
 from subprocess import run
 
 from smartdashboard.utils.errors import SSDashboardError
@@ -21,7 +19,6 @@ def build_app(manifest_path: str) -> None:
     curr_path = pathlib.Path(os.path.abspath(__file__)).parent
     local_css(str(curr_path / "static/style.css"))
 
-    manifest_path = "/Users/alyssacote/smartsim/SmartDashboard/tests/utils/manifest_files/no_apps_manifest.json"
     try:
         manifest = load_manifest(manifest_path)
     except SSDashboardError as ex:

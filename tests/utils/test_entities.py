@@ -243,7 +243,7 @@ orch_1_shard_2 = {
 
 orch_1_shard_2 = {
     "name": "shard 2",
-    "host": "shard2_host",
+    "hostname": "shard2_host",
     "port": "11111",
     "out_file": "tests/utils/log_files/model_0.out",
     "err_file": "tests/utils/log_files/model_0.err",
