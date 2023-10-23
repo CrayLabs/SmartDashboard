@@ -144,6 +144,13 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
 
 
 def format_status(status: t.Tuple[str, t.Optional[int]]) -> str:
+    """Format a status tuple
+
+    :param status: Status tuple
+    :type status: t.Tuple[str, t.Optional[int]]
+    :return: Formatted status
+    :rtype: str
+    """
     if status[0] == "Running":
         return "Status: :green[Running]"
     if status[0] == "Completed":
