@@ -1,6 +1,7 @@
 import json
 import os
 import typing as t
+from dataclasses import dataclass
 
 from .status import (
     GREEN_COMPLETED,
@@ -16,7 +17,13 @@ from .status import (
 )
 
 
-def get_status(dir_path: str) -> t.Tuple[str, t.Optional[int]]:
+@dataclass
+class StatusData:
+    status: str
+    return_code: t.Optional[int]
+
+
+def get_status(dir_path: str) -> StatusData:
     """Get the status of an application or shard
 
     This function is used to get the status of
@@ -38,14 +45,14 @@ def get_status(dir_path: str) -> t.Tuple[str, t.Optional[int]]:
                 stop_data = json.load(stop_json_file)
 
             return (
-                (STATUS_FAILED, stop_data["return_code"])
+                StatusData(STATUS_FAILED, stop_data["return_code"])
                 if stop_data["return_code"] != 0
-                else (STATUS_COMPLETED, stop_data["return_code"])
+                else StatusData(STATUS_COMPLETED, stop_data["return_code"])
             )
 
-        return (STATUS_RUNNING, None)
+        return StatusData(STATUS_RUNNING, None)
 
-    return (STATUS_PENDING, None)
+    return StatusData(STATUS_PENDING, None)
 
 
 def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str:
@@ -73,13 +80,13 @@ def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str
 
         for mem in members:
             mem_status = get_status(mem["telemetry_metadata"]["status_dir"])
-            status_counts[mem_status[0]] += 1
+            status_counts[mem_status.status] += 1
 
         formatted_counts = [
             f"{count} {status}" for status, count in status_counts.items()
         ]
 
-        status_description = status_str + ", ".join(formatted_counts)
+        status_description = f"{status_str}{', '.join(formatted_counts)}"
 
         return status_description
 
@@ -115,21 +122,21 @@ def get_orchestrator_status_summary(
         for shard in shards:
             shard_status = get_status(shard["telemetry_metadata"]["status_dir"])
             statuses.append(shard_status)
-            status_counts[shard_status[0]] += 1
+            status_counts[shard_status.status] += 1
 
         if status_counts[STATUS_COMPLETED] == len(statuses):
-            return status_str + f"{STATUS_INACTIVE} (all shards completed)"
+            return f"{status_str}{STATUS_INACTIVE} (all shards completed)"
 
         if status_counts[STATUS_PENDING] == len(statuses):
-            return status_str + f"{STATUS_PENDING}"
+            return f"{status_str}{STATUS_PENDING}"
 
         if status_counts[STATUS_FAILED] > 0:
             return (
-                status_str
-                + f"{RED_UNSTABLE} ({status_counts[STATUS_FAILED]} shard(s) failed)"
+                f"{status_str}{RED_UNSTABLE} "
+                f"({status_counts[STATUS_FAILED]} shard(s) failed)"
             )
 
-        return status_str + f"{GREEN_RUNNING}"
+        return f"{status_str}{GREEN_RUNNING}"
 
     return status_str
 
@@ -151,31 +158,40 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
         apps = [app for run in runs for app in run.get("model", [])]
         for app in apps:
             app_status = get_status(app["telemetry_metadata"]["status_dir"])
-            if app_status in ((STATUS_RUNNING, None), (STATUS_PENDING, None)):
-                return status_str + f"{GREEN_RUNNING}"
+            if app_status in (
+                StatusData(STATUS_RUNNING, None),
+                StatusData(STATUS_PENDING, None),
+            ):
+                return f"{status_str}{GREEN_RUNNING}"
 
         orcs = [orch for run in runs for orch in run.get("orchestrator", [])]
         for orc in orcs:
             shards = orc.get("shards", [])
             for shard in shards:
                 shard_status = get_status(shard["telemetry_metadata"]["status_dir"])
-                if shard_status in ((STATUS_RUNNING, None), (STATUS_PENDING, None)):
-                    return status_str + f"{GREEN_RUNNING}"
+                if shard_status in (
+                    StatusData(STATUS_RUNNING, None),
+                    StatusData(STATUS_PENDING, None),
+                ):
+                    return f"{status_str}{GREEN_RUNNING}"
 
         ensembles = [ensemble for run in runs for ensemble in run.get("ensemble", [])]
         for e in ensembles:
             members = e.get("models", [])
             for member in members:
                 member_status = get_status(member["telemetry_metadata"]["status_dir"])
-                if member_status in ((STATUS_RUNNING, None), (STATUS_PENDING, None)):
-                    return status_str + f"{GREEN_RUNNING}"
+                if member_status in (
+                    StatusData(STATUS_RUNNING, None),
+                    StatusData(STATUS_PENDING, None),
+                ):
+                    return f"{status_str}{GREEN_RUNNING}"
 
-        return status_str + f"{RED_INACTIVE}"
+        return f"{status_str}{RED_INACTIVE}"
 
     return status_str
 
 
-def format_status(status: t.Tuple[str, t.Optional[int]]) -> str:
+def format_status(status: StatusData) -> str:
     """Format a status tuple
 
     :param status: Status tuple
@@ -185,11 +201,11 @@ def format_status(status: t.Tuple[str, t.Optional[int]]) -> str:
     """
     status_str = "Status: "
 
-    if status[0] == STATUS_RUNNING:
-        return status_str + f"{GREEN_RUNNING}"
-    if status[0] == STATUS_COMPLETED:
-        return status_str + f"{GREEN_COMPLETED}"
-    if status[0] == STATUS_PENDING:
-        return status_str + f"{STATUS_PENDING}"
+    if status.status == STATUS_RUNNING:
+        return f"{status_str}{GREEN_RUNNING}"
+    if status.status == STATUS_COMPLETED:
+        return f"{status_str}{GREEN_COMPLETED}"
+    if status.status == STATUS_PENDING:
+        return f"{status_str}{STATUS_PENDING}"
 
-    return status_str + f"{RED_FAILED} with exit code {status[1]}"
+    return f"{status_str}{RED_FAILED} with exit code {status.return_code}"
