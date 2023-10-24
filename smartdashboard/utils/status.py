@@ -1,14 +1,18 @@
-# Statuses that are applied to entities
-STATUS_RUNNING = "Running"
-STATUS_COMPLETED = "Completed"
-STATUS_FAILED = "Failed"
-STATUS_PENDING = "Pending"
-STATUS_INACTIVE = "Inactive"
-STATUS_UNSTABLE = "Unstable"
+from enum import Enum
 
-# Color applied to statuses
-GREEN_RUNNING = f":green[{STATUS_RUNNING}]"
-GREEN_COMPLETED = f":green[{STATUS_COMPLETED}]"
-RED_INACTIVE = f":red[{STATUS_INACTIVE}]"
-RED_UNSTABLE = f":red[{STATUS_UNSTABLE}]"
-RED_FAILED = f":red[{STATUS_FAILED}]"
+
+class StatusEnum(Enum):
+    RUNNING = "Running"
+    COMPLETED = "Completed"
+    FAILED = "Failed"
+    PENDING = "Pending"
+    INACTIVE = "Inactive"
+    UNSTABLE = "Unstable"
+
+
+class StatusColors(Enum):
+    GREEN_RUNNING = f":green[{StatusEnum.RUNNING}]"
+    GREEN_COMPLETED = f":green[{StatusEnum.COMPLETED}]"
+    RED_INACTIVE = f":red[{StatusEnum.INACTIVE}]"
+    RED_UNSTABLE = f":red[{StatusEnum.UNSTABLE}]"
+    RED_FAILED = f":red[{StatusEnum.FAILED}]"

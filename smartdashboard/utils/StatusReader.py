@@ -3,23 +3,12 @@ import os
 import typing as t
 from dataclasses import dataclass
 
-from .status import (
-    GREEN_COMPLETED,
-    GREEN_RUNNING,
-    RED_FAILED,
-    RED_INACTIVE,
-    RED_UNSTABLE,
-    STATUS_COMPLETED,
-    STATUS_FAILED,
-    STATUS_INACTIVE,
-    STATUS_PENDING,
-    STATUS_RUNNING,
-)
+from .status import StatusColors, StatusEnum
 
 
 @dataclass
 class StatusData:
-    status: str
+    status: StatusEnum
     return_code: t.Optional[int]
 
 
@@ -33,8 +22,8 @@ def get_status(dir_path: str) -> StatusData:
 
     :param dir_path: Directory of the entity
     :type dir_path: str
-    :return: Status tuple (status category, return code)
-    :rtype: t.Tuple[str, t.Optional[int]]
+    :return: Status enum and return code
+    :rtype: StatusData
     """
     start_json_path = os.path.join(dir_path, "start.json")
     stop_json_path = os.path.join(dir_path, "stop.json")
@@ -45,14 +34,14 @@ def get_status(dir_path: str) -> StatusData:
                 stop_data = json.load(stop_json_file)
 
             return (
-                StatusData(STATUS_FAILED, stop_data["return_code"])
+                StatusData(StatusEnum.FAILED, stop_data["return_code"])
                 if stop_data["return_code"] != 0
-                else StatusData(STATUS_COMPLETED, stop_data["return_code"])
+                else StatusData(StatusEnum.COMPLETED, stop_data["return_code"])
             )
 
-        return StatusData(STATUS_RUNNING, None)
+        return StatusData(StatusEnum.RUNNING, None)
 
-    return StatusData(STATUS_PENDING, None)
+    return StatusData(StatusEnum.PENDING, None)
 
 
 def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str:
@@ -72,10 +61,10 @@ def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str
         members = ensemble.get("models", [])
 
         status_counts = {
-            STATUS_RUNNING: 0,
-            STATUS_COMPLETED: 0,
-            STATUS_FAILED: 0,
-            STATUS_PENDING: 0,
+            StatusEnum.RUNNING: 0,
+            StatusEnum.COMPLETED: 0,
+            StatusEnum.FAILED: 0,
+            StatusEnum.PENDING: 0,
         }
 
         for mem in members:
@@ -83,7 +72,7 @@ def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str
             status_counts[mem_status.status] += 1
 
         formatted_counts = [
-            f"{count} {status}" for status, count in status_counts.items()
+            f"{count} {status.value}" for status, count in status_counts.items()
         ]
 
         status_description = f"{status_str}{', '.join(formatted_counts)}"
@@ -113,10 +102,10 @@ def get_orchestrator_status_summary(
         shards = orchestrator.get("shards", [])
 
         status_counts = {
-            STATUS_RUNNING: 0,
-            STATUS_COMPLETED: 0,
-            STATUS_FAILED: 0,
-            STATUS_PENDING: 0,
+            StatusEnum.RUNNING: 0,
+            StatusEnum.COMPLETED: 0,
+            StatusEnum.FAILED: 0,
+            StatusEnum.PENDING: 0,
         }
 
         for shard in shards:
@@ -124,19 +113,19 @@ def get_orchestrator_status_summary(
             statuses.append(shard_status)
             status_counts[shard_status.status] += 1
 
-        if status_counts[STATUS_COMPLETED] == len(statuses):
-            return f"{status_str}{STATUS_INACTIVE} (all shards completed)"
+        if status_counts[StatusEnum.COMPLETED] == len(statuses):
+            return f"{status_str}{StatusEnum.INACTIVE} (all shards completed)"
 
-        if status_counts[STATUS_PENDING] == len(statuses):
-            return f"{status_str}{STATUS_PENDING}"
+        if status_counts[StatusEnum.PENDING] == len(statuses):
+            return f"{status_str}{StatusEnum.PENDING}"
 
-        if status_counts[STATUS_FAILED] > 0:
+        if status_counts[StatusEnum.FAILED] > 0:
             return (
-                f"{status_str}{RED_UNSTABLE} "
-                f"({status_counts[STATUS_FAILED]} shard(s) failed)"
+                f"{status_str}{StatusColors.RED_UNSTABLE} "
+                f"({status_counts[StatusEnum.FAILED]} shard(s) failed)"
             )
 
-        return f"{status_str}{GREEN_RUNNING}"
+        return f"{status_str}{StatusColors.GREEN_RUNNING}"
 
     return status_str
 
@@ -159,10 +148,10 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
         for app in apps:
             app_status = get_status(app["telemetry_metadata"]["status_dir"])
             if app_status in (
-                StatusData(STATUS_RUNNING, None),
-                StatusData(STATUS_PENDING, None),
+                StatusData(StatusEnum.RUNNING, None),
+                StatusData(StatusEnum.PENDING, None),
             ):
-                return f"{status_str}{GREEN_RUNNING}"
+                return f"{status_str}{StatusColors.GREEN_RUNNING}"
 
         orcs = [orch for run in runs for orch in run.get("orchestrator", [])]
         for orc in orcs:
@@ -170,10 +159,10 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
             for shard in shards:
                 shard_status = get_status(shard["telemetry_metadata"]["status_dir"])
                 if shard_status in (
-                    StatusData(STATUS_RUNNING, None),
-                    StatusData(STATUS_PENDING, None),
+                    StatusData(StatusEnum.RUNNING, None),
+                    StatusData(StatusEnum.PENDING, None),
                 ):
-                    return f"{status_str}{GREEN_RUNNING}"
+                    return f"{status_str}{StatusColors.GREEN_RUNNING}"
 
         ensembles = [ensemble for run in runs for ensemble in run.get("ensemble", [])]
         for e in ensembles:
@@ -181,12 +170,12 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
             for member in members:
                 member_status = get_status(member["telemetry_metadata"]["status_dir"])
                 if member_status in (
-                    StatusData(STATUS_RUNNING, None),
-                    StatusData(STATUS_PENDING, None),
+                    StatusData(StatusEnum.RUNNING, None),
+                    StatusData(StatusEnum.PENDING, None),
                 ):
-                    return f"{status_str}{GREEN_RUNNING}"
+                    return f"{status_str}{StatusColors.GREEN_RUNNING}"
 
-        return f"{status_str}{RED_INACTIVE}"
+        return f"{status_str}{StatusColors.RED_INACTIVE}"
 
     return status_str
 
@@ -194,18 +183,18 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
 def format_status(status: StatusData) -> str:
     """Format a status tuple
 
-    :param status: Status tuple
-    :type status: t.Tuple[str, t.Optional[int]]
+    :param status: Status enum and return code
+    :type status: StatusData
     :return: Formatted status
     :rtype: str
     """
     status_str = "Status: "
 
-    if status.status == STATUS_RUNNING:
-        return f"{status_str}{GREEN_RUNNING}"
-    if status.status == STATUS_COMPLETED:
-        return f"{status_str}{GREEN_COMPLETED}"
-    if status.status == STATUS_PENDING:
-        return f"{status_str}{STATUS_PENDING}"
+    if status.status == StatusEnum.RUNNING:
+        return f"{status_str}{StatusColors.GREEN_RUNNING}"
+    if status.status == StatusEnum.COMPLETED:
+        return f"{status_str}{StatusColors.GREEN_COMPLETED}"
+    if status.status == StatusEnum.PENDING:
+        return f"{status_str}{StatusEnum.PENDING}"
 
-    return f"{status_str}{RED_FAILED} with exit code {status.return_code}"
+    return f"{status_str}{StatusColors.RED_FAILED} with exit code {status.return_code}"

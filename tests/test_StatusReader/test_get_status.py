@@ -3,6 +3,7 @@ import typing as t
 import pytest
 
 from smartdashboard.utils.errors import MalformedManifestError
+from smartdashboard.utils.status import StatusEnum
 from smartdashboard.utils.StatusReader import StatusData, get_status
 
 from ..utils.test_entities import *
@@ -11,13 +12,13 @@ from ..utils.test_entities import *
 @pytest.mark.parametrize(
     "entity, expected_status",
     [
-        pytest.param(application_1, StatusData("Completed", 0)),
-        pytest.param(application_2, StatusData("Failed", 1)),
-        pytest.param(application_3, StatusData("Running", None)),
-        pytest.param(application_4, StatusData("Completed", 0)),
-        pytest.param(orch_1_shard_1, StatusData("Running", None)),
-        pytest.param(orch_1_shard_2, StatusData("Failed", 1)),
-        pytest.param(pending_shard, StatusData("Pending", None)),
+        pytest.param(application_1, StatusData(StatusEnum.COMPLETED, 0)),
+        pytest.param(application_2, StatusData(StatusEnum.FAILED, 1)),
+        pytest.param(application_3, StatusData(StatusEnum.RUNNING, None)),
+        pytest.param(application_4, StatusData(StatusEnum.COMPLETED, 0)),
+        pytest.param(orch_1_shard_1, StatusData(StatusEnum.RUNNING, None)),
+        pytest.param(orch_1_shard_2, StatusData(StatusEnum.FAILED, 1)),
+        pytest.param(pending_shard, StatusData(StatusEnum.PENDING, None)),
     ],
 )
 def test_get_status(entity: t.Dict[str, t.Any], expected_status):

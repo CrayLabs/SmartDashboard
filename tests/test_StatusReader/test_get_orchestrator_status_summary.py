@@ -2,6 +2,7 @@ import typing as t
 
 import pytest
 
+from smartdashboard.utils.status import StatusColors, StatusEnum
 from smartdashboard.utils.StatusReader import get_orchestrator_status_summary
 
 from ..utils.test_entities import *
@@ -10,11 +11,17 @@ from ..utils.test_entities import *
 @pytest.mark.parametrize(
     "orchestrator, expected_status",
     [
-        pytest.param(orchestrator_1, "Status: :red[Unstable] (1 shard(s) failed)"),
-        pytest.param(orchestrator_2, "Status: :red[Unstable] (1 shard(s) failed)"),
-        pytest.param(orchestrator_3, "Status: :green[Running]"),
-        pytest.param(orchestrator_4, "Status: Inactive (all shards completed)"),
-        pytest.param(no_shards_started, "Status: Pending"),
+        pytest.param(
+            orchestrator_1, f"Status: {StatusColors.RED_UNSTABLE} (1 shard(s) failed)"
+        ),
+        pytest.param(
+            orchestrator_2, f"Status: {StatusColors.RED_UNSTABLE} (1 shard(s) failed)"
+        ),
+        pytest.param(orchestrator_3, f"Status: {StatusColors.GREEN_RUNNING}"),
+        pytest.param(
+            orchestrator_4, f"Status: {StatusEnum.INACTIVE} (all shards completed)"
+        ),
+        pytest.param(no_shards_started, f"Status: {StatusEnum.PENDING}"),
         pytest.param(None, "Status: "),
     ],
 )

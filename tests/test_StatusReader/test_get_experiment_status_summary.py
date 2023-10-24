@@ -3,6 +3,7 @@ import typing as t
 import pytest
 
 from smartdashboard.utils.ManifestReader import ManifestFileReader
+from smartdashboard.utils.status import StatusColors
 from smartdashboard.utils.StatusReader import get_experiment_status_summary
 
 
@@ -10,10 +11,12 @@ from smartdashboard.utils.StatusReader import get_experiment_status_summary
     "json_file, expected_status",
     [
         pytest.param(
-            "tests/utils/manifest_files/manifesttest.json", "Status: :green[Running]"
+            "tests/utils/manifest_files/manifesttest.json",
+            f"Status: {StatusColors.GREEN_RUNNING}",
         ),
         pytest.param(
-            "tests/utils/manifest_files/no_running.json", "Status: :red[Inactive]"
+            "tests/utils/manifest_files/no_running.json",
+            f"Status: {StatusColors.RED_INACTIVE}",
         ),
         pytest.param(
             "tests/utils/manifest_files/no_experiment_manifest.json", "Status: "
