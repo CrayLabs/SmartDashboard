@@ -2,6 +2,19 @@ import json
 import os
 import typing as t
 
+from .status import (
+    GREEN_COMPLETED,
+    GREEN_RUNNING,
+    RED_FAILED,
+    RED_INACTIVE,
+    RED_UNSTABLE,
+    STATUS_COMPLETED,
+    STATUS_FAILED,
+    STATUS_INACTIVE,
+    STATUS_PENDING,
+    STATUS_RUNNING,
+)
+
 
 def get_status(dir_path: str) -> t.Tuple[str, t.Optional[int]]:
     """Get the status of an application or shard
@@ -25,14 +38,14 @@ def get_status(dir_path: str) -> t.Tuple[str, t.Optional[int]]:
                 stop_data = json.load(stop_json_file)
 
             return (
-                ("Failed", stop_data["return_code"])
+                (STATUS_FAILED, stop_data["return_code"])
                 if stop_data["return_code"] != 0
-                else ("Completed", stop_data["return_code"])
+                else (STATUS_COMPLETED, stop_data["return_code"])
             )
 
-        return ("Running", None)
+        return (STATUS_RUNNING, None)
 
-    return ("Pending", None)
+    return (STATUS_PENDING, None)
 
 
 def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str:
@@ -46,10 +59,17 @@ def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str
     :return: Status summary
     :rtype: str
     """
+    status_str = "Status: "
+
     if ensemble:
         members = ensemble.get("models", [])
 
-        status_counts = {"Running": 0, "Completed": 0, "Failed": 0, "Pending": 0}
+        status_counts = {
+            STATUS_RUNNING: 0,
+            STATUS_COMPLETED: 0,
+            STATUS_FAILED: 0,
+            STATUS_PENDING: 0,
+        }
 
         for mem in members:
             mem_status = get_status(mem["telemetry_metadata"]["status_dir"])
@@ -59,11 +79,11 @@ def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str
             f"{count} {status}" for status, count in status_counts.items()
         ]
 
-        status_description = "Status: " + ", ".join(formatted_counts)
+        status_description = status_str + ", ".join(formatted_counts)
 
         return status_description
 
-    return "Status: "
+    return status_str
 
 
 def get_orchestrator_status_summary(
@@ -79,29 +99,39 @@ def get_orchestrator_status_summary(
     :return: Status summary
     :rtype: str
     """
+    status_str = "Status: "
+
     if orchestrator:
         statuses = []
         shards = orchestrator.get("shards", [])
 
-        status_counts = {"Failed": 0, "Completed": 0, "Running": 0, "Pending": 0}
+        status_counts = {
+            STATUS_RUNNING: 0,
+            STATUS_COMPLETED: 0,
+            STATUS_FAILED: 0,
+            STATUS_PENDING: 0,
+        }
 
         for shard in shards:
             shard_status = get_status(shard["telemetry_metadata"]["status_dir"])
             statuses.append(shard_status)
             status_counts[shard_status[0]] += 1
 
-        if status_counts["Completed"] == len(statuses):
-            return "Status: Inactive (all shards completed)"
+        if status_counts[STATUS_COMPLETED] == len(statuses):
+            return status_str + f"{STATUS_INACTIVE} (all shards completed)"
 
-        if status_counts["Pending"] == len(statuses):
-            return "Status: Pending"
+        if status_counts[STATUS_PENDING] == len(statuses):
+            return status_str + f"{STATUS_PENDING}"
 
-        if status_counts["Failed"] > 0:
-            return f'Status: :red[Unstable ({status_counts["Failed"]} shard(s) failed)]'
+        if status_counts[STATUS_FAILED] > 0:
+            return (
+                status_str
+                + f"{RED_UNSTABLE} ({status_counts[STATUS_FAILED]} shard(s) failed)"
+            )
 
-        return "Status: :green[Running]"
+        return status_str + f"{GREEN_RUNNING}"
 
-    return "Status: "
+    return status_str
 
 
 def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) -> str:
@@ -115,32 +145,34 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
     :return: Status summary
     :rtype: str
     """
+    status_str = "Status: "
+
     if runs:
         apps = [app for run in runs for app in run.get("model", [])]
         for app in apps:
             app_status = get_status(app["telemetry_metadata"]["status_dir"])
-            if app_status in (("Running", None), ("Pending", None)):
-                return "Status: :green[Running]"
+            if app_status in ((STATUS_RUNNING, None), (STATUS_PENDING, None)):
+                return status_str + f"{GREEN_RUNNING}"
 
         orcs = [orch for run in runs for orch in run.get("orchestrator", [])]
         for orc in orcs:
             shards = orc.get("shards", [])
             for shard in shards:
                 shard_status = get_status(shard["telemetry_metadata"]["status_dir"])
-                if shard_status in (("Running", None), ("Pending", None)):
-                    return "Status: :green[Running]"
+                if shard_status in ((STATUS_RUNNING, None), (STATUS_PENDING, None)):
+                    return status_str + f"{GREEN_RUNNING}"
 
         ensembles = [ensemble for run in runs for ensemble in run.get("ensemble", [])]
         for e in ensembles:
             members = e.get("models", [])
             for member in members:
                 member_status = get_status(member["telemetry_metadata"]["status_dir"])
-                if member_status in (("Running", None), ("Pending", None)):
-                    return "Status: :green[Running]"
+                if member_status in ((STATUS_RUNNING, None), (STATUS_PENDING, None)):
+                    return status_str + f"{GREEN_RUNNING}"
 
-        return "Status: :red[Inactive]"
+        return status_str + f"{RED_INACTIVE}"
 
-    return "Status: "
+    return status_str
 
 
 def format_status(status: t.Tuple[str, t.Optional[int]]) -> str:
@@ -151,11 +183,13 @@ def format_status(status: t.Tuple[str, t.Optional[int]]) -> str:
     :return: Formatted status
     :rtype: str
     """
-    if status[0] == "Running":
-        return "Status: :green[Running]"
-    if status[0] == "Completed":
-        return "Status: :green[Completed]"
-    if status[0] == "Pending":
-        return "Status: Pending"
+    status_str = "Status: "
 
-    return f"Status: :red[Failed with exit code {status[1]}]"
+    if status[0] == STATUS_RUNNING:
+        return status_str + f"{GREEN_RUNNING}"
+    if status[0] == STATUS_COMPLETED:
+        return status_str + f"{GREEN_COMPLETED}"
+    if status[0] == STATUS_PENDING:
+        return status_str + f"{STATUS_PENDING}"
+
+    return status_str + f"{RED_FAILED} with exit code {status[1]}"

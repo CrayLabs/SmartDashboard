@@ -10,8 +10,8 @@ from ..utils.test_entities import *
 @pytest.mark.parametrize(
     "orchestrator, expected_status",
     [
-        pytest.param(orchestrator_1, "Status: :red[Unstable (1 shard(s) failed)]"),
-        pytest.param(orchestrator_2, "Status: :red[Unstable (1 shard(s) failed)]"),
+        pytest.param(orchestrator_1, "Status: :red[Unstable] (1 shard(s) failed)"),
+        pytest.param(orchestrator_2, "Status: :red[Unstable] (1 shard(s) failed)"),
         pytest.param(orchestrator_3, "Status: :green[Running]"),
         pytest.param(orchestrator_4, "Status: Inactive (all shards completed)"),
         pytest.param(no_shards_started, "Status: Pending"),
