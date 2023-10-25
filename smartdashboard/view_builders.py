@@ -248,9 +248,11 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
                 [shard["name"] for shard in shards if shard is not None],
             )
             if selected_shard_name is not None:
-                view.shard = get_shard(selected_shard_name, selected_orchestrator)
+                shard = get_shard(selected_shard_name, selected_orchestrator)
             else:
-                view.shard = None
+                shard = None
+
+            view.update_view_model(shard)
 
             st.write("")
             st.write("Output")
@@ -335,17 +337,19 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         )
 
     if selected_member_name is not None:
-        view.member = get_member(selected_member_name, selected_ensemble)
+        member = get_member(selected_member_name, selected_ensemble)
     else:
-        view.member = None
+        member = None
+
+    view.update_view_model(member)
 
     st.write("")
     view.member_status_element = st.text(view.member_status)
-    st.write("Path: " + get_value("path", view.member))
+    st.write("Path: " + get_value("path", member))
     st.write("")
     with st.expander(label="Executable Arguments"):
         st.dataframe(
-            pd.DataFrame({"All Arguments": get_exe_args(view.member)}),
+            pd.DataFrame({"All Arguments": get_exe_args(member)}),
             hide_index=True,
             use_container_width=True,
         )
@@ -357,7 +361,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Batch Settings",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("batch_settings", view.member),
+                    flatten_nested_keyvalue_containers("batch_settings", member),
                     columns=["Name", "Value"],
                 ),
             )
@@ -365,7 +369,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Run Settings",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("run_settings", view.member),
+                    flatten_nested_keyvalue_containers("run_settings", member),
                     columns=["Name", "Value"],
                 ),
             )
@@ -377,7 +381,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Parameters",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("params", view.member),
+                    flatten_nested_keyvalue_containers("params", member),
                     columns=["Name", "Value"],
                 ),
             )
@@ -385,7 +389,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             render_dataframe_with_title(
                 "Files",
                 pd.DataFrame(
-                    flatten_nested_keyvalue_containers("files", view.member),
+                    flatten_nested_keyvalue_containers("files", member),
                     columns=["Type", "File"],
                 ),
             )
@@ -395,7 +399,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             mem_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                view.member.get("colocated_db") if view.member is not None else {}
+                member.get("colocated_db") if member is not None else {}
             )
             with col1:
                 render_dataframe_with_title(

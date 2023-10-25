@@ -4,7 +4,14 @@ import os
 import typing as t
 from dataclasses import dataclass
 
-from .status import StatusColors, StatusEnum
+from .status import (
+    GREEN_COMPLETED,
+    GREEN_RUNNING,
+    RED_FAILED,
+    RED_INACTIVE,
+    RED_UNSTABLE,
+    StatusEnum,
+)
 
 
 @dataclass
@@ -98,11 +105,11 @@ def get_orchestrator_status_summary(
 
         if status_counts[StatusEnum.FAILED] > 0:
             return (
-                f"{status_str}{StatusColors.RED_UNSTABLE} "
+                f"{status_str}{RED_UNSTABLE} "
                 f"({status_counts[StatusEnum.FAILED]} shard(s) failed)"
             )
 
-        return f"{status_str}{StatusColors.GREEN_RUNNING}"
+        return f"{status_str}{GREEN_RUNNING}"
 
     return status_str
 
@@ -135,9 +142,9 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
                 StatusData(StatusEnum.RUNNING, None),
                 StatusData(StatusEnum.PENDING, None),
             ):
-                return f"{status_str}{StatusColors.GREEN_RUNNING}"
+                return f"{status_str}{GREEN_RUNNING}"
 
-        return f"{status_str}{StatusColors.RED_INACTIVE}"
+        return f"{status_str}{RED_INACTIVE}"
 
     return status_str
 
@@ -153,13 +160,13 @@ def format_status(status: StatusData) -> str:
     status_str = "Status: "
 
     if status.status == StatusEnum.RUNNING:
-        return f"{status_str}{StatusColors.GREEN_RUNNING}"
+        return f"{status_str}{GREEN_RUNNING}"
     if status.status == StatusEnum.COMPLETED:
-        return f"{status_str}{StatusColors.GREEN_COMPLETED}"
+        return f"{status_str}{GREEN_COMPLETED}"
     if status.status == StatusEnum.PENDING:
         return f"{status_str}{StatusEnum.PENDING}"
 
-    return f"{status_str}{StatusColors.RED_FAILED} with exit code {status.return_code}"
+    return f"{status_str}{RED_FAILED} with exit code {status.return_code}"
 
 
 def status_mapping(entities: t.List[t.Dict[str, t.Any]]) -> t.Dict[StatusEnum, int]:

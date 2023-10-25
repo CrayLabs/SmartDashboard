@@ -2,7 +2,12 @@ import typing as t
 
 import pytest
 
-from smartdashboard.utils.status import StatusColors, StatusEnum
+from smartdashboard.utils.status import (
+    GREEN_COMPLETED,
+    GREEN_RUNNING,
+    RED_FAILED,
+    StatusEnum,
+)
 from smartdashboard.utils.StatusReader import format_status, get_status
 
 from ..utils.test_entities import *
@@ -11,16 +16,12 @@ from ..utils.test_entities import *
 @pytest.mark.parametrize(
     "entity, expected_status",
     [
-        pytest.param(application_1, f"Status: {StatusColors.GREEN_COMPLETED}"),
-        pytest.param(
-            application_2, f"Status: {StatusColors.RED_FAILED} with exit code 1"
-        ),
-        pytest.param(application_3, f"Status: {StatusColors.GREEN_RUNNING}"),
-        pytest.param(application_4, f"Status: {StatusColors.GREEN_COMPLETED}"),
-        pytest.param(orch_1_shard_1, f"Status: {StatusColors.GREEN_RUNNING}"),
-        pytest.param(
-            orch_1_shard_2, f"Status: {StatusColors.RED_FAILED} with exit code 1"
-        ),
+        pytest.param(application_1, f"Status: {GREEN_COMPLETED}"),
+        pytest.param(application_2, f"Status: {RED_FAILED} with exit code 1"),
+        pytest.param(application_3, f"Status: {GREEN_RUNNING}"),
+        pytest.param(application_4, f"Status: {GREEN_COMPLETED}"),
+        pytest.param(orch_1_shard_1, f"Status: {GREEN_RUNNING}"),
+        pytest.param(orch_1_shard_2, f"Status: {RED_FAILED} with exit code 1"),
         pytest.param(pending_shard, f"Status: {StatusEnum.PENDING}"),
     ],
 )

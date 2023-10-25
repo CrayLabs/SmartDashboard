@@ -1,4 +1,5 @@
 import typing as t
+from abc import ABC, abstractmethod
 
 from streamlit.delta_generator import DeltaGenerator
 
@@ -13,7 +14,8 @@ from smartdashboard.utils.StatusReader import (
 )
 
 
-class ViewBase:
+class ViewBase(ABC):
+    @abstractmethod
     def update(self) -> None:
         pass
 
@@ -40,8 +42,13 @@ class EntityView(ViewBase):
         self.out_logs_element.code(self.out_logs, language=None)
         self.err_logs_element.code(self.err_logs, language=None)
 
+    @abstractmethod
     def update_status(self) -> None:
         pass
+
+    def update_view_model(self, new_view_model: t.Optional[t.Dict[str, t.Any]]) -> None:
+        if new_view_model is not None:
+            self.view_model = new_view_model
 
 
 class ExperimentView(ViewBase):
@@ -58,18 +65,22 @@ class ExperimentView(ViewBase):
 
 class ApplicationView(EntityView):
     def __init__(self, application: t.Optional[t.Dict[str, t.Any]]) -> None:
-        self.status: str = ""
         self.status_element = DeltaGenerator()
-        self.application = application
         super().__init__(view_model=application)
 
-    def update_status(self) -> None:
+    @property
+    def application(self) -> t.Optional[t.Dict[str, t.Any]]:
+        return self.view_model
+
+    @property
+    def status(self) -> str:
         if self.application is not None:
-            self.status = format_status(
+            return format_status(
                 get_status(self.application["telemetry_metadata"]["status_dir"])
             )
-        else:
-            self.status = "Status: "
+        return "Status: "
+
+    def update_status(self) -> None:
         self.status_element.write(self.status)
 
 
@@ -79,14 +90,19 @@ class OrchestratorView(EntityView):
         orchestrator: t.Optional[t.Dict[str, t.Any]],
         shard: t.Optional[t.Dict[str, t.Any]],
     ) -> None:
-        self.status: str = ""
-        self.status_element = DeltaGenerator()
         self.orchestrator = orchestrator
-        self.shard = shard
+        self.status_element = DeltaGenerator()
         super().__init__(view_model=shard)
 
+    @property
+    def shard(self) -> t.Optional[t.Dict[str, t.Any]]:
+        return self.view_model
+
+    @property
+    def status(self) -> str:
+        return get_orchestrator_status_summary(self.orchestrator)
+
     def update_status(self) -> None:
-        self.status = get_orchestrator_status_summary(self.orchestrator)
         self.status_element.write(self.status)
 
 
@@ -97,27 +113,34 @@ class EnsembleView(EntityView):
         member: t.Optional[t.Dict[str, t.Any]],
     ) -> None:
         self.ensemble = ensemble
-        self.member = member
-        self.status: str = ""
         self.status_element = DeltaGenerator()
-        self.member_status: str = ""
         self.member_status_element = DeltaGenerator()
         super().__init__(view_model=member)
 
-    def update_status(self) -> None:
-        self.status = get_ensemble_status_summary(self.ensemble)
+    @property
+    def member(self) -> t.Optional[t.Dict[str, t.Any]]:
+        return self.view_model
+
+    @property
+    def status(self) -> str:
+        return get_ensemble_status_summary(self.ensemble)
+
+    @property
+    def member_status(self) -> str:
         if self.member is not None:
-            self.member_status = format_status(
+            return format_status(
                 get_status(self.member["telemetry_metadata"]["status_dir"])
             )
-        else:
-            self.member_status = "Status: "
+        return "Status: "
+
+    def update_status(self) -> None:
         self.status_element.write(self.status)
         self.member_status_element.write(self.member_status)
 
 
 class ErrorView(ViewBase):
-    ...
+    def update(self) -> None:
+        ...
 
 
 class OverviewView:
