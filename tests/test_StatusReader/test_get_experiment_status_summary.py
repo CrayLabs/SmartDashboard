@@ -23,7 +23,7 @@ from smartdashboard.utils.StatusReader import get_experiment_status_summary
         ),
     ],
 )
-def test_get_orchestrator_status_summary(json_file, expected_status):
+def test_get_experiment_status_summary(json_file, expected_status):
     manifest_file_reader = ManifestFileReader(json_file)
     manifest = manifest_file_reader.get_manifest()
     status = get_experiment_status_summary(manifest.runs)

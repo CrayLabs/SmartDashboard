@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 import typing as t
@@ -58,18 +59,7 @@ def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str
     status_str = "Status: "
 
     if ensemble:
-        members = ensemble.get("models", [])
-
-        status_counts = {
-            StatusEnum.RUNNING: 0,
-            StatusEnum.COMPLETED: 0,
-            StatusEnum.FAILED: 0,
-            StatusEnum.PENDING: 0,
-        }
-
-        for mem in members:
-            mem_status = get_status(mem["telemetry_metadata"]["status_dir"])
-            status_counts[mem_status.status] += 1
+        status_counts = status_mapping(ensemble.get("models", []))
 
         formatted_counts = [
             f"{count} {status.value}" for status, count in status_counts.items()
@@ -98,25 +88,12 @@ def get_orchestrator_status_summary(
     status_str = "Status: "
 
     if orchestrator:
-        statuses = []
-        shards = orchestrator.get("shards", [])
+        status_counts = status_mapping(orchestrator.get("shards", []))
 
-        status_counts = {
-            StatusEnum.RUNNING: 0,
-            StatusEnum.COMPLETED: 0,
-            StatusEnum.FAILED: 0,
-            StatusEnum.PENDING: 0,
-        }
-
-        for shard in shards:
-            shard_status = get_status(shard["telemetry_metadata"]["status_dir"])
-            statuses.append(shard_status)
-            status_counts[shard_status.status] += 1
-
-        if status_counts[StatusEnum.COMPLETED] == len(statuses):
+        if status_counts[StatusEnum.COMPLETED] == sum(status_counts.values()):
             return f"{status_str}{StatusEnum.INACTIVE} (all shards completed)"
 
-        if status_counts[StatusEnum.PENDING] == len(statuses):
+        if status_counts[StatusEnum.PENDING] == sum(status_counts.values()):
             return f"{status_str}{StatusEnum.PENDING}"
 
         if status_counts[StatusEnum.FAILED] > 0:
@@ -145,35 +122,20 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
 
     if runs:
         apps = [app for run in runs for app in run.get("model", [])]
-        for app in apps:
-            app_status = get_status(app["telemetry_metadata"]["status_dir"])
-            if app_status in (
+        ensembles = [ensemble for run in runs for ensemble in run.get("ensemble", [])]
+        ens_members = [
+            member for ensemble in ensembles for member in ensemble.get("models", [])
+        ]
+        orcs = [orch for run in runs for orch in run.get("orchestrator", [])]
+        shards = [shard for orc in orcs for shard in orc.get("shards", [])]
+
+        for entity in itertools.chain(apps, ens_members, shards):
+            entity_status = get_status(entity["telemetry_metadata"]["status_dir"])
+            if entity_status in (
                 StatusData(StatusEnum.RUNNING, None),
                 StatusData(StatusEnum.PENDING, None),
             ):
                 return f"{status_str}{StatusColors.GREEN_RUNNING}"
-
-        orcs = [orch for run in runs for orch in run.get("orchestrator", [])]
-        for orc in orcs:
-            shards = orc.get("shards", [])
-            for shard in shards:
-                shard_status = get_status(shard["telemetry_metadata"]["status_dir"])
-                if shard_status in (
-                    StatusData(StatusEnum.RUNNING, None),
-                    StatusData(StatusEnum.PENDING, None),
-                ):
-                    return f"{status_str}{StatusColors.GREEN_RUNNING}"
-
-        ensembles = [ensemble for run in runs for ensemble in run.get("ensemble", [])]
-        for e in ensembles:
-            members = e.get("models", [])
-            for member in members:
-                member_status = get_status(member["telemetry_metadata"]["status_dir"])
-                if member_status in (
-                    StatusData(StatusEnum.RUNNING, None),
-                    StatusData(StatusEnum.PENDING, None),
-                ):
-                    return f"{status_str}{StatusColors.GREEN_RUNNING}"
 
         return f"{status_str}{StatusColors.RED_INACTIVE}"
 
@@ -198,3 +160,25 @@ def format_status(status: StatusData) -> str:
         return f"{status_str}{StatusEnum.PENDING}"
 
     return f"{status_str}{StatusColors.RED_FAILED} with exit code {status.return_code}"
+
+
+def status_mapping(entities: t.List) -> t.Dict[StatusEnum, int]:
+    """Map statuses for formatting
+
+    :param entities: List of entities to map
+    :type entities: t.List
+    :return: The status map
+    :rtype: t.Dict[StatusEnum, int]
+    """
+    status_counts = {
+        StatusEnum.RUNNING: 0,
+        StatusEnum.COMPLETED: 0,
+        StatusEnum.FAILED: 0,
+        StatusEnum.PENDING: 0,
+    }
+
+    for e in entities:
+        entity_status = get_status(e["telemetry_metadata"]["status_dir"])
+        status_counts[entity_status.status] += 1
+
+    return status_counts
