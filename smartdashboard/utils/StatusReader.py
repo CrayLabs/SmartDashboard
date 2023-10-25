@@ -162,7 +162,7 @@ def format_status(status: StatusData) -> str:
     return f"{status_str}{StatusColors.RED_FAILED} with exit code {status.return_code}"
 
 
-def status_mapping(entities: t.List) -> t.Dict[StatusEnum, int]:
+def status_mapping(entities: t.List[t.Dict[str, t.Any]]) -> t.Dict[StatusEnum, int]:
     """Map statuses for formatting
 
     :param entities: List of entities to map
