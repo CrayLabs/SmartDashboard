@@ -53,13 +53,15 @@ class EntityView(ViewBase):
 
 class ExperimentView(ViewBase):
     def __init__(self, experiment: t.Optional[t.Dict[str, t.Any]]) -> None:
-        self.status: str = ""
         self.status_element = DeltaGenerator()
         self.experiment = experiment
         self.runs: t.List[t.Dict[str, t.Any]] = []
 
+    @property
+    def status(self) -> str:
+        return get_experiment_status_summary(self.runs)
+
     def update(self) -> None:
-        self.status = get_experiment_status_summary(self.runs)
         self.status_element.write(self.status)
 
 
