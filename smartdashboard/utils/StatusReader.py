@@ -154,7 +154,7 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
 
         if unknown_counter > 0:
             return f"{status_str}{StatusEnum.UNKNOWN.value}. Malformed status found."
-        
+
         return f"{status_str}{StatusEnum.INACTIVE.value}"
 
     return status_str
