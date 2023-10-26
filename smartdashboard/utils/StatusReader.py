@@ -139,10 +139,12 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
         shards = [shard for orc in orcs for shard in orc.get("shards", [])]
 
         for entity in itertools.chain(apps, ens_members, shards):
+            unknown_counter = 0
             try:
                 entity_status = get_status(entity["telemetry_metadata"]["status_dir"])
             except KeyError:
                 entity_status = StatusData(StatusEnum.UNKNOWN, None)
+                unknown_counter += 1
 
             if entity_status in (
                 StatusData(StatusEnum.RUNNING, None),
@@ -150,11 +152,9 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
             ):
                 return f"{status_str}{GREEN_RUNNING}"
 
-            if entity_status == StatusData(StatusEnum.UNKNOWN, None):
-                return (
-                    f"{status_str}{StatusEnum.UNKNOWN.value}. Malformed status found."
-                )
-
+        if unknown_counter > 0:
+            return f"{status_str}{StatusEnum.UNKNOWN.value}. Malformed status found."
+        
         return f"{status_str}{StatusEnum.INACTIVE.value}"
 
     return status_str
