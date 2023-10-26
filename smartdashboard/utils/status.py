@@ -12,6 +12,5 @@ class StatusEnum(Enum):
 
 GREEN_RUNNING = f":green[{StatusEnum.RUNNING.value}]"
 GREEN_COMPLETED = f":green[{StatusEnum.COMPLETED.value}]"
-RED_INACTIVE = f":red[{StatusEnum.INACTIVE.value}]"
 RED_UNSTABLE = f":red[{StatusEnum.UNSTABLE.value}]"
 RED_FAILED = f":red[{StatusEnum.FAILED.value}]"

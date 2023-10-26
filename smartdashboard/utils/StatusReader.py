@@ -4,14 +4,7 @@ import os
 import typing as t
 from dataclasses import dataclass
 
-from .status import (
-    GREEN_COMPLETED,
-    GREEN_RUNNING,
-    RED_FAILED,
-    RED_INACTIVE,
-    RED_UNSTABLE,
-    StatusEnum,
-)
+from .status import GREEN_COMPLETED, GREEN_RUNNING, RED_FAILED, RED_UNSTABLE, StatusEnum
 
 
 @dataclass
@@ -144,7 +137,7 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
             ):
                 return f"{status_str}{GREEN_RUNNING}"
 
-        return f"{status_str}{RED_INACTIVE}"
+        return f"{status_str}{StatusEnum.INACTIVE.value}"
 
     return status_str
 
@@ -164,9 +157,9 @@ def format_status(status: StatusData) -> str:
     if status.status == StatusEnum.COMPLETED:
         return f"{status_str}{GREEN_COMPLETED}"
     if status.status == StatusEnum.PENDING:
-        return f"{status_str}{StatusEnum.PENDING}"
+        return f"{status_str}{StatusEnum.PENDING.value}"
 
-    return f"{status_str}{RED_FAILED} with exit code {status.return_code}"
+    return f"{status_str}{RED_FAILED}"
 
 
 def status_mapping(entities: t.List[t.Dict[str, t.Any]]) -> t.Dict[StatusEnum, int]:

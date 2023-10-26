@@ -3,7 +3,7 @@ import typing as t
 import pytest
 
 from smartdashboard.utils.ManifestReader import ManifestFileReader
-from smartdashboard.utils.status import GREEN_RUNNING, RED_INACTIVE
+from smartdashboard.utils.status import GREEN_RUNNING, StatusEnum
 from smartdashboard.utils.StatusReader import get_experiment_status_summary
 
 
@@ -16,7 +16,7 @@ from smartdashboard.utils.StatusReader import get_experiment_status_summary
         ),
         pytest.param(
             "tests/utils/manifest_files/no_running.json",
-            f"Status: {RED_INACTIVE}",
+            f"Status: {StatusEnum.INACTIVE.value}",
         ),
         pytest.param(
             "tests/utils/manifest_files/no_experiment_manifest.json", "Status: "
