@@ -61,8 +61,7 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     :return: An experiment view
     :rtype: ExperimentView
     """
-    view = ExperimentView(manifest.experiment)
-    view.runs = manifest.runs
+    view = ExperimentView(manifest.experiment, manifest.runs)
     st.subheader("Experiment Configuration")
     st.write("")
     view.status_element = st.empty()

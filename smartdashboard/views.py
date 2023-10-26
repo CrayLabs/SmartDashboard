@@ -52,10 +52,14 @@ class EntityView(ViewBase):
 
 
 class ExperimentView(ViewBase):
-    def __init__(self, experiment: t.Optional[t.Dict[str, t.Any]]) -> None:
+    def __init__(
+        self,
+        experiment: t.Optional[t.Dict[str, t.Any]],
+        runs: t.List[t.Dict[str, t.Any]],
+    ) -> None:
         self.status_element = DeltaGenerator()
         self.experiment = experiment
-        self.runs: t.List[t.Dict[str, t.Any]] = []
+        self.runs = runs
 
     @property
     def status(self) -> str:
