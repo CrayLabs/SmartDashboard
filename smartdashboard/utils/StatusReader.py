@@ -91,10 +91,10 @@ def get_orchestrator_status_summary(
         status_counts = status_mapping(orchestrator.get("shards", []))
 
         if status_counts[StatusEnum.COMPLETED] == sum(status_counts.values()):
-            return f"{status_str}{StatusEnum.INACTIVE} (all shards completed)"
+            return f"{status_str}{StatusEnum.INACTIVE.value} (all shards completed)"
 
         if status_counts[StatusEnum.PENDING] == sum(status_counts.values()):
-            return f"{status_str}{StatusEnum.PENDING}"
+            return f"{status_str}{StatusEnum.PENDING.value}"
 
         if status_counts[StatusEnum.FAILED] > 0:
             return (

@@ -15,9 +15,10 @@ from ..utils.test_entities import *
         pytest.param(orchestrator_2, f"Status: {RED_UNSTABLE} (1 shard(s) failed)"),
         pytest.param(orchestrator_3, f"Status: {GREEN_RUNNING}"),
         pytest.param(
-            orchestrator_4, f"Status: {StatusEnum.INACTIVE} (all shards completed)"
+            orchestrator_4,
+            f"Status: {StatusEnum.INACTIVE.value} (all shards completed)",
         ),
-        pytest.param(no_shards_started, f"Status: {StatusEnum.PENDING}"),
+        pytest.param(no_shards_started, f"Status: {StatusEnum.PENDING.value}"),
         pytest.param(None, "Status: "),
     ],
 )
