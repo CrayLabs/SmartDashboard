@@ -65,7 +65,7 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     view.runs = manifest.runs
     st.subheader("Experiment Configuration")
     st.write("")
-    view.status_element = st.text(view.status)
+    view.status_element = st.empty()
     st.write("Path: " + manifest.experiment.get("path", ""))
     st.write("Launcher: " + manifest.experiment.get("launcher", ""))
 
@@ -97,7 +97,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     view = ApplicationView(selected_application)
 
     st.write("")
-    view.status_element = st.text(view.status)
+    view.status_element = st.empty()
     st.write("Path: " + get_value("path", view.application))
 
     st.write("")
@@ -223,7 +223,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     view = OrchestratorView(selected_orchestrator, shards[0] if shards else None)
 
     st.write("")
-    view.status_element = st.text(view.status)
+    view.status_element = st.empty()
     st.write("Type: " + get_value("type", selected_orchestrator))
     st.write("Port: " + get_port(selected_orchestrator))
     st.write("Interface: " + get_interfaces(selected_orchestrator))
@@ -300,7 +300,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     view = EnsembleView(selected_ensemble, members[0] if members else None)
 
     st.write("")
-    view.status_element = st.text(view.status)
+    view.status_element = st.empty()
 
     st.write("")
     with st.expander(label="Batch Settings"):
@@ -344,7 +344,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     view.update_view_model(member)
 
     st.write("")
-    view.member_status_element = st.text(view.member_status)
+    view.member_status_element = st.empty()
     st.write("Path: " + get_value("path", member))
     st.write("")
     with st.expander(label="Executable Arguments"):
