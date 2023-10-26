@@ -5,7 +5,9 @@ from streamlit.delta_generator import DeltaGenerator
 
 from smartdashboard.utils.helpers import get_value
 from smartdashboard.utils.LogReader import get_logs
+from smartdashboard.utils.status import StatusEnum
 from smartdashboard.utils.StatusReader import (
+    StatusData,
     format_status,
     get_ensemble_status_summary,
     get_experiment_status_summary,
@@ -81,9 +83,13 @@ class ApplicationView(EntityView):
     @property
     def status(self) -> str:
         if self.application is not None:
-            return format_status(
-                get_status(self.application["telemetry_metadata"]["status_dir"])
-            )
+            try:
+                status = get_status(
+                    self.application["telemetry_metadata"]["status_dir"]
+                )
+            except KeyError:
+                status = StatusData(StatusEnum.UNKNOWN, None)
+            return format_status(status)
         return "Status: "
 
     def update_status(self) -> None:
@@ -134,9 +140,11 @@ class EnsembleView(EntityView):
     @property
     def member_status(self) -> str:
         if self.member is not None:
-            return format_status(
-                get_status(self.member["telemetry_metadata"]["status_dir"])
-            )
+            try:
+                status = get_status(self.member["telemetry_metadata"]["status_dir"])
+            except KeyError:
+                status = StatusData(StatusEnum.UNKNOWN, None)
+            return format_status(status)
         return "Status: "
 
     def update_status(self) -> None:

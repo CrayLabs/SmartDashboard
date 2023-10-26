@@ -416,7 +416,35 @@ pending_shard = {
     "err_file": "tests/utils/log_files/model_0.err",
     "conf_file": "/path/to/conf_file",
     "telemetry_metadata": {
-        "status_dir": "model_2",
+        "status_dir": "tests/utils/status_files/model_2",
+        "job_id": "111",
+        "step_id": 111,
+    },
+}
+
+no_return_code_shard = {
+    "name": "shard 2",
+    "host": "shard2_host",
+    "port": "11111",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
+    "conf_file": "/path/to/conf_file",
+    "telemetry_metadata": {
+        "status_dir": "tests/utils/status_files/model_4",
+        "job_id": "111",
+        "step_id": 111,
+    },
+}
+
+malformed_status_dir_shard = {
+    "name": "shard 2",
+    "host": "shard2_host",
+    "port": "11111",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
+    "conf_file": "/path/to/conf_file",
+    "teldata": {
+        "status_dir": "tests/utils/status_files/model_3",
         "job_id": "111",
         "step_id": 111,
     },

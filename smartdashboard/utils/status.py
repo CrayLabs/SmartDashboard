@@ -8,6 +8,7 @@ class StatusEnum(Enum):
     PENDING = "Pending"
     INACTIVE = "Inactive"
     UNSTABLE = "Unstable"
+    UNKNOWN = "Unknown"
 
 
 GREEN_RUNNING = f":green[{StatusEnum.RUNNING.value}]"

@@ -19,6 +19,8 @@ from ..utils.test_entities import *
         pytest.param(orch_1_shard_1, StatusData(StatusEnum.RUNNING, None)),
         pytest.param(orch_1_shard_2, StatusData(StatusEnum.FAILED, 1)),
         pytest.param(pending_shard, StatusData(StatusEnum.PENDING, None)),
+        pytest.param(malformed_status_dir_shard, StatusData(StatusEnum.UNKNOWN, None)),
+        pytest.param(no_return_code_shard, StatusData(StatusEnum.UNKNOWN, None)),
     ],
 )
 def test_get_status(entity: t.Dict[str, t.Any], expected_status):
@@ -27,5 +29,8 @@ def test_get_status(entity: t.Dict[str, t.Any], expected_status):
         status = get_status(status_dir)
     except MalformedManifestError:
         assert expected_status == MalformedManifestError
+        return
+    except KeyError:
+        assert expected_status == StatusData(StatusEnum.UNKNOWN, None)
         return
     assert status == expected_status

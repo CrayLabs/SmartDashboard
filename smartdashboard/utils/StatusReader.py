@@ -34,11 +34,17 @@ def get_status(dir_path: str) -> StatusData:
             with open(stop_json_path, "r", encoding="utf-8") as stop_json_file:
                 stop_data = json.load(stop_json_file)
 
-            return (
-                StatusData(StatusEnum.FAILED, stop_data["return_code"])
-                if stop_data["return_code"] != 0
-                else StatusData(StatusEnum.COMPLETED, stop_data["return_code"])
-            )
+            try:
+                status = (
+                    StatusData(StatusEnum.FAILED, stop_data["return_code"])
+                    if stop_data["return_code"] != 0
+                    else StatusData(StatusEnum.COMPLETED, stop_data["return_code"])
+                )
+
+            except KeyError:
+                status = StatusData(StatusEnum.UNKNOWN, None)
+
+            return status
 
         return StatusData(StatusEnum.RUNNING, None)
 
@@ -96,6 +102,9 @@ def get_orchestrator_status_summary(
         if status_counts[StatusEnum.PENDING] == sum(status_counts.values()):
             return f"{status_str}{StatusEnum.PENDING.value}"
 
+        if status_counts[StatusEnum.UNKNOWN] > 0:
+            return f"{status_str}{StatusEnum.UNKNOWN.value}. Malformed status found."
+
         if status_counts[StatusEnum.FAILED] > 0:
             return (
                 f"{status_str}{RED_UNSTABLE} "
@@ -130,12 +139,21 @@ def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) 
         shards = [shard for orc in orcs for shard in orc.get("shards", [])]
 
         for entity in itertools.chain(apps, ens_members, shards):
-            entity_status = get_status(entity["telemetry_metadata"]["status_dir"])
+            try:
+                entity_status = get_status(entity["telemetry_metadata"]["status_dir"])
+            except KeyError:
+                entity_status = StatusData(StatusEnum.UNKNOWN, None)
+
             if entity_status in (
                 StatusData(StatusEnum.RUNNING, None),
                 StatusData(StatusEnum.PENDING, None),
             ):
                 return f"{status_str}{GREEN_RUNNING}"
+
+            if entity_status == StatusData(StatusEnum.UNKNOWN, None):
+                return (
+                    f"{status_str}{StatusEnum.UNKNOWN.value}. Malformed status found."
+                )
 
         return f"{status_str}{StatusEnum.INACTIVE.value}"
 
@@ -158,8 +176,10 @@ def format_status(status: StatusData) -> str:
         return f"{status_str}{GREEN_COMPLETED}"
     if status.status == StatusEnum.PENDING:
         return f"{status_str}{StatusEnum.PENDING.value}"
+    if status.status == StatusEnum.FAILED:
+        return f"{status_str}{RED_FAILED}"
 
-    return f"{status_str}{RED_FAILED}"
+    return f"{status_str}{StatusEnum.UNKNOWN.value}"
 
 
 def status_mapping(entities: t.List[t.Dict[str, t.Any]]) -> t.Dict[StatusEnum, int]:
@@ -175,10 +195,15 @@ def status_mapping(entities: t.List[t.Dict[str, t.Any]]) -> t.Dict[StatusEnum, i
         StatusEnum.COMPLETED: 0,
         StatusEnum.FAILED: 0,
         StatusEnum.PENDING: 0,
+        StatusEnum.UNKNOWN: 0,
     }
 
     for e in entities:
-        entity_status = get_status(e["telemetry_metadata"]["status_dir"])
+        try:
+            entity_status = get_status(e["telemetry_metadata"]["status_dir"])
+        except KeyError:
+            entity_status = StatusData(StatusEnum.UNKNOWN, None)
+
         status_counts[entity_status.status] += 1
 
     return status_counts
