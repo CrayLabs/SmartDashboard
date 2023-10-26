@@ -450,6 +450,20 @@ malformed_status_dir_shard = {
     },
 }
 
+JSONDecoderError_status_shard = {
+    "name": "shard 2",
+    "host": "shard2_host",
+    "port": "11111",
+    "out_file": "tests/utils/log_files/model_0.out",
+    "err_file": "tests/utils/log_files/model_0.err",
+    "conf_file": "/path/to/conf_file",
+    "teldata": {
+        "status_dir": "tests/utils/manifest_files/JSONDecodererror.json",
+        "job_id": "111",
+        "step_id": 111,
+    },
+}
+
 ensemble_1 = {
     "name": "ensemble_1",
     "run_id": 1,

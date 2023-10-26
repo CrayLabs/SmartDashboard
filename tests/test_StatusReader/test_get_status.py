@@ -21,6 +21,9 @@ from ..utils.test_entities import *
         pytest.param(pending_shard, StatusData(StatusEnum.PENDING, None)),
         pytest.param(malformed_status_dir_shard, StatusData(StatusEnum.UNKNOWN, None)),
         pytest.param(no_return_code_shard, StatusData(StatusEnum.UNKNOWN, None)),
+        pytest.param(
+            JSONDecoderError_status_shard, StatusData(StatusEnum.UNKNOWN, None)
+        ),
     ],
 )
 def test_get_status(entity: t.Dict[str, t.Any], expected_status):

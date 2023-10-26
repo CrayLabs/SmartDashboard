@@ -31,8 +31,11 @@ def get_status(dir_path: str) -> StatusData:
 
     if os.path.exists(start_json_path):
         if os.path.exists(stop_json_path):
-            with open(stop_json_path, "r", encoding="utf-8") as stop_json_file:
-                stop_data = json.load(stop_json_file)
+            try:
+                with open(stop_json_path, "r", encoding="utf-8") as stop_json_file:
+                    stop_data = json.load(stop_json_file)
+            except json.JSONDecodeError:
+                status = StatusData(StatusEnum.UNKNOWN, None)
 
             try:
                 status = (
