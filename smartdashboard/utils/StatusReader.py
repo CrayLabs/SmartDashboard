@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from .status import GREEN_COMPLETED, GREEN_RUNNING, RED_FAILED, RED_UNSTABLE, StatusEnum
 
 
-@dataclass
+@dataclass(frozen=True)
 class StatusData:
     status: StatusEnum
     return_code: t.Optional[int]
