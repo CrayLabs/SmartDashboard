@@ -1,2 +1,48 @@
 # SmartDashboard
-SmartSim Dashboard Package.
+SmartDashboard is a SmartSim Dashboard package designed to help users visualize and debug their SmartSim experiments. Configuration, status, and logs are available for all launched entities within an experiment for easy inspection.
+
+## Installation
+To install SmartDashboard, first clone the `SmartDashboard` repository at https://github.com/CrayLabs/SmartDashboard.git  
+  
+  Once cloned, `cd` into the repository and run:  
+
+```pip install -e .```
+
+It's important to note that SmartDashboard only works while using SmartSim, so SmartSim will need to be installed as well.
+
+## Running SmartDashboard
+After launching a SmartSim experiment, there are two ways to launch the dashboard. The first way is through the SmartSim CLI.  
+```smart dashboard --port <port number> --directory <experiment directory>```  
+The port can optionally be specified, otherwise the dashboard port will default to `8501`. The experiment directory must be specified.  
+The second way to launch the dashboard is through the SmartDashboard CLI.  
+```smart-dash -p <port number> -d <experiment directory>```  
+
+Example workflow:  
+```
+# hello_world.py
+from smartsim import Experiment
+
+exp = Experiment("hello_world_exp", launcher="auto")
+run = exp.create_run_settings(exe="echo", exe_args="Hello World!")
+run.set_tasks(60)
+run.set_tasks_per_node(20)
+
+model = exp.create_model("hello_world", run)
+exp.start(model, block=True, summary=True)
+```  
+```
+# in interactive terminal
+python hello_world.py
+```  
+```
+# in a different interactive terminal
+smart dashboard --port 8888 --directory hello_world_exp
+```  
+The dashboard will automatically open in a browser at port 8888. The dashboard is also persistent, meaning that a user can still launch and use the dashboard even after the experiment has completed.
+
+## Using SmartDashboard
+Once the dashboard is launched, a browser will open to `http://localhost:<port>`. SmartDashboard currently has two tabs on the left hand side.  
+  
+`Experiment Overview:` This tab is where configuration information, statuses, and logs are located for each launched entity of the experiment. The `Experiment` section displays configuaration information for the overall experiment. In the `Applications` section, also known as SmartSim `Models`, select a launched application to see its status, what it was configured with, and its logs. The `Orchestrators` section also provides configuration and status information, as well as logs per shard for a selected orchestrator. Finally, in the `Ensembles` section, select an ensemble to see its status and configuration. Then select any of its members to see its status, configuration, and logs.  
+  
+`Help:` This tab links to SmartSim documentation and provides a SmartSim contact for support.
