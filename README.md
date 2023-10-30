@@ -1,23 +1,41 @@
 # SmartDashboard
-SmartDashboard is a SmartSim Dashboard package designed to help users visualize and debug their SmartSim experiments. Configuration, status, and logs are available for all launched entities within an experiment for easy inspection.
+SmartDashboard is an add-on to SmartSim that provides a dashboard to help users understand and monitor their SmartSim experiments in a visual way. Configuration, status, and logs are available for all launched entities within an experiment for easy inspection.
 
-## Installation
-To install SmartDashboard, first clone the `SmartDashboard` repository at https://github.com/CrayLabs/SmartDashboard.git  
+## Installation  
+  It's important to note that SmartDashboard only works while using SmartSim, so SmartSim will need to be installed as well.  
+  
+  
+### User Install:  
+Run `pip install git+https://github.com/CrayLabs/SmartDashboard.git` to install SmartDashboard without cloning the repository.
+
+### Developer Install:
+Clone the `SmartDashboard` repository at https://github.com/CrayLabs/SmartDashboard.git  
   
   Once cloned, `cd` into the repository and run:  
 
 ```pip install -e .```
 
-It's important to note that SmartDashboard only works while using SmartSim, so SmartSim will need to be installed as well.
 
-## Running SmartDashboard
-After launching a SmartSim experiment, there are two ways to launch the dashboard. The first way is through the SmartSim CLI.  
+## Running SmartDashboard  
+After launching a SmartSim experiment, there are two ways to launch the dashboard.  
+  
+The first way is through the SmartSim CLI.  
 ```smart dashboard --port <port number> --directory <experiment directory>```  
-The port can optionally be specified, otherwise the dashboard port will default to `8501`. The experiment directory must be specified.  
+The port can optionally be specified, otherwise the dashboard port will default to `8501`. The experiment directory must also be specified. If the experiment directory is in the current working directory, the full path is not necessary. Otherwise, supply a full path to the experiment directory.  
+
 The second way to launch the dashboard is through the SmartDashboard CLI.  
-```smart-dash -p <port number> -d <experiment directory>```  
+You can use the same port and directory arguments as you would with the SmartSim CLI. They function in the same way.  
+```smart-dash --port <port number> --directory <experiment directory>```  
 
 Example workflow:  
+
+
+```
+# directory before running experiment
+├── hello_world.py
+```  
+
+
 ```
 # hello_world.py
 from smartsim import Experiment
@@ -30,14 +48,26 @@ run.set_tasks_per_node(20)
 model = exp.create_model("hello_world", run)
 exp.start(model, block=True, summary=True)
 ```  
+ 
 ```
 # in interactive terminal
 python hello_world.py
 ```  
+
+```
+# directory after running experiment
+├── hello_world.py
+└── hello_world_exp
+```  
+
+By default, `hello_world_exp` is created in the directory of the driver script.
+
+
 ```
 # in a different interactive terminal
 smart dashboard --port 8888 --directory hello_world_exp
 ```  
+
 The dashboard will automatically open in a browser at port 8888. The dashboard is also persistent, meaning that a user can still launch and use the dashboard even after the experiment has completed.
 
 ## Using SmartDashboard
