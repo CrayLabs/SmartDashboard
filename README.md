@@ -2,8 +2,8 @@
 SmartDashboard is an add-on to SmartSim that provides a dashboard to help users understand and monitor their SmartSim experiments in a visual way. Configuration, status, and logs are available for all launched entities within an experiment for easy inspection.
 
 ## Installation
-  It's important to note that SmartDashboard only works while using SmartSim, so SmartSim will need to be installed as well.
-  SmartSim installation docs can be found [here](https://www.craylabs.org/docs/installation_instructions/basic.html).
+It's important to note that SmartDashboard only works while using SmartSim, so SmartSim will need to be installed as well.
+SmartSim installation docs can be found [here](https://www.craylabs.org/docs/installation_instructions/basic.html).
   
   
 ### User Install:
