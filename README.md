@@ -17,15 +17,12 @@ Clone the `SmartDashboard` repository at https://github.com/CrayLabs/SmartDashbo
 
 
 ## Running SmartDashboard  
-After launching a SmartSim experiment, there are two ways to launch the dashboard.  
+After launching a SmartSim experiment, the dashboard can be launched using SmartSim's CLI.  
   
-The first way is through the SmartSim CLI.  
 ```smart dashboard --port <port number> --directory <experiment directory>```  
-The port can optionally be specified, otherwise the dashboard port will default to `8501`. The experiment directory must also be specified. If the experiment directory is in the current working directory, the full path is not necessary. Otherwise, supply a full path to the experiment directory.  
+  
+The port can optionally be specified, otherwise the dashboard port will default to `8501`. The experiment directory must also be specified. If the experiment directory is in the current working directory, the full path is not necessary. Otherwise, supply a full path to the experiment directory.   
 
-The second way to launch the dashboard is through the SmartDashboard CLI.  
-You can use the same port and directory arguments as you would with the SmartSim CLI. They function in the same way.  
-```smart-dash --port <port number> --directory <experiment directory>```  
 
 Example workflow:  
 
