@@ -69,7 +69,7 @@ def error_builder(error: SSDashboardError) -> ErrorView:
     view = ErrorView()
     st.header(str(error))
     st.error(
-        f"""Error found in file: {error.file}
+        f"""Error found in file: {error.file}  
              Error Message: {error.exception}"""
     )
 
