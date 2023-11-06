@@ -32,6 +32,7 @@ import streamlit as st
 
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import (
+    build_dataframe,
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
     get_all_shards,
@@ -45,7 +46,7 @@ from smartdashboard.utils.helpers import (
     get_port,
     get_shard,
     get_value,
-    render_dataframe_with_title,
+    render_dataframe,
 )
 from smartdashboard.utils.ManifestReader import Manifest
 from smartdashboard.views import (
@@ -127,59 +128,49 @@ def app_builder(manifest: Manifest) -> ApplicationView:
 
     st.write("")
     with st.expander(label="Executable Arguments"):
-        st.dataframe(
+        render_dataframe(
             pd.DataFrame(
                 {
                     "All Arguments": get_exe_args(selected_application),
                 }
-            ),
-            hide_index=True,
-            use_container_width=True,
+            )
         )
 
     st.write("")
     with st.expander(label="Batch and Run Settings"):
         col1, col2 = st.columns([4, 4])
-        with col1:
-            render_dataframe_with_title(
-                "Batch Settings",
-                pd.DataFrame(
-                    flatten_nested_keyvalue_containers(
-                        "batch_settings", selected_application
-                    ),
-                    columns=["Name", "Value"],
-                ),
-            )
-        with col2:
-            render_dataframe_with_title(
-                "Run Settings",
-                pd.DataFrame(
-                    flatten_nested_keyvalue_containers(
-                        "run_settings", selected_application
-                    ),
-                    columns=["Name", "Value"],
-                ),
-            )
+        build_dataframe(
+            column=col1,
+            title="Batch Settings",
+            dict_name="batch_settings",
+            entity=selected_application,
+            df_columns=["Name", "Value"],
+        )
+        build_dataframe(
+            column=col2,
+            title="Run Settings",
+            dict_name="run_settings",
+            entity=selected_application,
+            df_columns=["Name", "Value"],
+        )
 
     st.write("")
     with st.expander(label="Parameters and Generator Files"):
         col1, col2 = st.columns([4, 4])
-        with col1:
-            render_dataframe_with_title(
-                "Parameters",
-                pd.DataFrame(
-                    flatten_nested_keyvalue_containers("params", selected_application),
-                    columns=["Name", "Value"],
-                ),
-            )
-        with col2:
-            render_dataframe_with_title(
-                "Files",
-                pd.DataFrame(
-                    flatten_nested_keyvalue_containers("files", selected_application),
-                    columns=["Type", "File"],
-                ),
-            )
+        build_dataframe(
+            column=col1,
+            title="Parameters",
+            dict_name="params",
+            entity=selected_application,
+            df_columns=["Name", "Value"],
+        )
+        build_dataframe(
+            column=col2,
+            title="Files",
+            dict_name="files",
+            entity=selected_application,
+            df_columns=["Type", "File"],
+        )
 
     st.write("")
     with st.expander(label="Colocated Database"):

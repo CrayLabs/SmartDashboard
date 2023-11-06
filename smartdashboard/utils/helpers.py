@@ -282,15 +282,27 @@ def get_entity_from_name(
     )
 
 
-def render_dataframe_with_title(title: str, dataframe: pd.DataFrame) -> None:
-    """Renders dataframe with titles
+def build_dataframe(column, title, dict_name, entity, df_columns) -> None:
+    with column:
+        render_dataframe(
+            title=title,
+            dataframe=pd.DataFrame(
+                flatten_nested_keyvalue_containers(dict_name, entity),
+                columns=df_columns,
+            ),
+        )
+
+
+def render_dataframe(dataframe: pd.DataFrame, title: t.Optional[str] = None) -> None:
+    """Renders dataframe with optional titles
 
     :param title: Title of the dataframe
-    :type title: str
+    :type title: Optional[str]
     :param dataframe: Dataframe to be rendered
     :type dataframe: pandas.Dataframe
     """
-    st.write(title)
+    if title:
+        st.write(title)
     st.dataframe(
         dataframe,
         hide_index=True,
