@@ -37,6 +37,7 @@ from smartdashboard.utils.ManifestReader import Manifest, load_manifest
         pytest.param("tests/utils/manifest_files/no_apps_manifest.json", Manifest),
         pytest.param("file_doesn't_exist.json", ManifestError),
         pytest.param("tests/utils/manifest_files/JSONDecodererror.json", ManifestError),
+        pytest.param("tests/utils/manifest_files/invalid_version.json", ManifestError),
     ],
 )
 def test_load_manifest(json_file, result_type):

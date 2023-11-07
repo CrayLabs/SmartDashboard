@@ -1,0 +1,14 @@
+{
+    "schema info" : {
+        "schema_name" : "entity manifest",
+        "version" : "5.5.5"
+    },
+    "experiment": {
+        "name": "my-experiment",
+        "path": "experiment/path",
+        "launcher": "local",
+        "out_file": "tests/utils/log_files/model_0.out",
+        "err_file": "tests/utils/log_files/model_0.err"
+    },
+    "runs": []
+}

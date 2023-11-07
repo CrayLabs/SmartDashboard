@@ -144,6 +144,17 @@ def load_manifest(path: str) -> Manifest:
     """
     try:
         manifest_file_reader = ManifestFileReader(path)
+        # pylint: disable=protected-access
+        version = manifest_file_reader._data["schema info"]["version"]
+        if version != "0.0.1":
+            version_exception = Exception(
+                f"SmartDashboard does not support version {version}. "
+                f"Please update SmartDashboard to version 0.0.1"
+            )
+            raise MalformedManifestError(
+                title="Invalid Version", file=path, exception=version_exception
+            )
+
         manifest = manifest_file_reader.get_manifest()
     except FileNotFoundError as fnf:
         raise ManifestError(
