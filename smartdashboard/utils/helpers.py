@@ -282,7 +282,7 @@ def get_entity_from_name(
     )
 
 
-def build_dataframe(column, title, dict_name, entity, df_columns) -> None:
+def build_dataframe_generic(column, title, dict_name, entity, df_columns) -> None:
     with column:
         render_dataframe(
             title=title,
@@ -290,6 +290,14 @@ def build_dataframe(column, title, dict_name, entity, df_columns) -> None:
                 flatten_nested_keyvalue_containers(dict_name, entity),
                 columns=df_columns,
             ),
+        )
+
+
+def build_dataframe_loaded_entities(column, title, entity) -> None:
+    with column:
+        render_dataframe(
+            title=title,
+            dataframe=pd.DataFrame(get_loaded_entities(entity)),
         )
 
 

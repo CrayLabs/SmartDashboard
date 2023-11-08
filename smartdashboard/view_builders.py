@@ -32,7 +32,8 @@ import streamlit as st
 
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import (
-    build_dataframe,
+    build_dataframe_generic,
+    build_dataframe_loaded_entities,
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
     get_all_shards,
@@ -41,7 +42,6 @@ from smartdashboard.utils.helpers import (
     get_entity_from_name,
     get_exe_args,
     get_interfaces,
-    get_loaded_entities,
     get_member,
     get_port,
     get_shard,
@@ -139,14 +139,14 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     st.write("")
     with st.expander(label="Batch and Run Settings"):
         col1, col2 = st.columns([4, 4])
-        build_dataframe(
+        build_dataframe_generic(
             column=col1,
             title="Batch Settings",
             dict_name="batch_settings",
             entity=selected_application,
             df_columns=["Name", "Value"],
         )
-        build_dataframe(
+        build_dataframe_generic(
             column=col2,
             title="Run Settings",
             dict_name="run_settings",
@@ -157,14 +157,14 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     st.write("")
     with st.expander(label="Parameters and Generator Files"):
         col1, col2 = st.columns([4, 4])
-        build_dataframe(
+        build_dataframe_generic(
             column=col1,
             title="Parameters",
             dict_name="params",
             entity=selected_application,
             df_columns=["Name", "Value"],
         )
-        build_dataframe(
+        build_dataframe_generic(
             column=col2,
             title="Files",
             dict_name="files",
@@ -181,21 +181,16 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 if selected_application is not None
                 else {}
             )
-            with col1:
-                render_dataframe_with_title(
-                    "Summary",
-                    pd.DataFrame(
-                        flatten_nested_keyvalue_containers(
-                            "settings", app_colocated_db
-                        ),
-                        columns=["Name", "Value"],
-                    ),
-                )
-            with col2:
-                render_dataframe_with_title(
-                    "Loaded Scripts and Models",
-                    pd.DataFrame(get_loaded_entities(app_colocated_db)),
-                )
+            build_dataframe_generic(
+                column=col1,
+                title="Summary",
+                dict_name="settings",
+                entity=app_colocated_db,
+                df_columns=["Name", "Value"],
+            )
+            build_dataframe_loaded_entities(
+                column=col2, title="Loaded Scripts and Models", entity=app_colocated_db
+            )
 
     st.write("")
     with st.expander(label="Logs"):
@@ -246,14 +241,12 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
 
     st.write("")
     with st.expander(label="Database Hosts"):
-        st.dataframe(
+        render_dataframe(
             pd.DataFrame(
                 {
                     "Hosts": get_db_hosts(selected_orchestrator),
                 }
-            ),
-            hide_index=True,
-            use_container_width=True,
+            )
         )
     st.write("")
     with st.expander(label="Logs"):
@@ -320,24 +313,20 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
 
     st.write("")
     with st.expander(label="Batch Settings"):
-        st.dataframe(
+        render_dataframe(
             pd.DataFrame(
                 flatten_nested_keyvalue_containers("batch_settings", selected_ensemble),
                 columns=["Name", "Value"],
-            ),
-            hide_index=True,
-            use_container_width=True,
+            )
         )
 
     st.write("")
     with st.expander(label="Parameters"):
-        st.dataframe(
+        render_dataframe(
             pd.DataFrame(
                 format_ensemble_params(selected_ensemble),
                 columns=["Name", "Value"],
-            ),
-            hide_index=True,
-            use_container_width=True,
+            )
         )
 
     st.write("#")
@@ -345,6 +334,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         st.subheader(selected_ensemble_name + " Member Configuration")
     else:
         st.subheader("Member Configuration")
+
     col1, col2 = st.columns([4, 4])
     with col1:
         selected_member_name: t.Optional[str] = st.selectbox(
@@ -364,51 +354,45 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     st.write("Path: " + get_value("path", member))
     st.write("")
     with st.expander(label="Executable Arguments"):
-        st.dataframe(
+        render_dataframe(
             pd.DataFrame({"All Arguments": get_exe_args(member)}),
-            hide_index=True,
-            use_container_width=True,
         )
 
     st.write("")
     with st.expander(label="Batch and Run Settings"):
         col1, col2 = st.columns([4, 4])
-        with col1:
-            render_dataframe_with_title(
-                "Batch Settings",
-                pd.DataFrame(
-                    flatten_nested_keyvalue_containers("batch_settings", member),
-                    columns=["Name", "Value"],
-                ),
-            )
-        with col2:
-            render_dataframe_with_title(
-                "Run Settings",
-                pd.DataFrame(
-                    flatten_nested_keyvalue_containers("run_settings", member),
-                    columns=["Name", "Value"],
-                ),
-            )
+        build_dataframe_generic(
+            column=col1,
+            title="Batch Settings",
+            dict_name="batch_settings",
+            entity=member,
+            df_columns=["Name", "Value"],
+        )
+        build_dataframe_generic(
+            column=col2,
+            title="Run Settings",
+            dict_name="run_settings",
+            entity=member,
+            df_columns=["Name", "Value"],
+        )
 
     st.write("")
     with st.expander(label="Parameters and Generator Files"):
         col1, col2 = st.columns([4, 4])
-        with col1:
-            render_dataframe_with_title(
-                "Parameters",
-                pd.DataFrame(
-                    flatten_nested_keyvalue_containers("params", member),
-                    columns=["Name", "Value"],
-                ),
-            )
-        with col2:
-            render_dataframe_with_title(
-                "Files",
-                pd.DataFrame(
-                    flatten_nested_keyvalue_containers("files", member),
-                    columns=["Type", "File"],
-                ),
-            )
+        build_dataframe_generic(
+            column=col1,
+            title="Parameters",
+            dict_name="params",
+            entity=member,
+            df_columns=["Name", "Value"],
+        )
+        build_dataframe_generic(
+            column=col2,
+            title="Files",
+            dict_name="files",
+            entity=member,
+            df_columns=["Type", "File"],
+        )
 
     st.write("")
     with st.expander(label="Colocated Database"):
@@ -417,22 +401,16 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             mem_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
                 member.get("colocated_db") if member is not None else {}
             )
-            with col1:
-                render_dataframe_with_title(
-                    "Summary",
-                    pd.DataFrame(
-                        flatten_nested_keyvalue_containers(
-                            "settings", mem_colocated_db
-                        ),
-                        columns=["Name", "Value"],
-                    ),
-                )
-
-            with col2:
-                render_dataframe_with_title(
-                    "Loaded Scripts and Models",
-                    pd.DataFrame(get_loaded_entities(mem_colocated_db)),
-                )
+            build_dataframe_generic(
+                column=col1,
+                title="Summary",
+                dict_name="settings",
+                entity=mem_colocated_db,
+                df_columns=["Name", "Value"],
+            )
+            build_dataframe_loaded_entities(
+                column=col2, title="Loaded Scripts and Models", entity=mem_colocated_db
+            )
 
     st.write("")
     with st.expander(label="Logs"):
