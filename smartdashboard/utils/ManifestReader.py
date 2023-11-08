@@ -30,7 +30,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
-from smartdashboard.utils.errors import MalformedManifestError, ManifestError
+from smartdashboard.utils.errors import (
+    MalformedManifestError,
+    ManifestError,
+    VersionIncompatibilityError,
+)
 
 
 @dataclass
@@ -52,6 +56,18 @@ class ManifestFileReader(ManifestReader):
     def __init__(self, file_path: str) -> None:
         self._file_path = file_path
         self._data = self.from_file(self._file_path)
+
+        version = self._data["schema info"]["version"]
+        if version != "0.0.1":
+            version_exception = Exception(
+                f"""SmartDashboard version 0.0.1 is unable to parse manifest
+                file at version {version}."""
+            )
+            raise VersionIncompatibilityError(
+                title="Invalid Version Number",
+                file=file_path,
+                exception=version_exception,
+            )
 
     def get_manifest(self) -> Manifest:
         """Get the Manifest from self._data
@@ -144,17 +160,6 @@ def load_manifest(path: str) -> Manifest:
     """
     try:
         manifest_file_reader = ManifestFileReader(path)
-        # pylint: disable=protected-access
-        version = manifest_file_reader._data["schema info"]["version"]
-        if version != "0.0.1":
-            version_exception = Exception(
-                f"SmartDashboard does not support version {version}. "
-                f"Please update SmartDashboard to version 0.0.1"
-            )
-            raise MalformedManifestError(
-                title="Invalid Version", file=path, exception=version_exception
-            )
-
         manifest = manifest_file_reader.get_manifest()
     except FileNotFoundError as fnf:
         raise ManifestError(
