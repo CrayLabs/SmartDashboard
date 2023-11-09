@@ -47,6 +47,7 @@ from smartdashboard.utils.helpers import (
     get_shard,
     get_value,
     render_dataframe,
+    shard_log_spacing,
 )
 from smartdashboard.utils.ManifestReader import Manifest
 from smartdashboard.views import (
@@ -268,11 +269,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
             view.out_logs_element = st.code(view.out_logs, language=None)
 
         with col2:
-            st.write("#")
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
+            shard_log_spacing()
             st.write("Error")
             view.err_logs_element = st.code(view.err_logs, language=None)
 

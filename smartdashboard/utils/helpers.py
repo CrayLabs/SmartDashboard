@@ -384,3 +384,15 @@ def get_shard(
             return shard
 
     return None
+
+
+def shard_log_spacing() -> None:
+    """Adds the necessary spacing to the
+    error logs so they are even with the
+    output logs for shards.
+    """
+    st.write("#")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
