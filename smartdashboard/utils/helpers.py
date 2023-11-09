@@ -28,6 +28,7 @@ import typing as t
 
 import pandas as pd
 import streamlit as st
+from streamlit.delta_generator import DeltaGenerator
 
 
 def get_value(key: str, entity: t.Optional[t.Dict[str, t.Any]]) -> str:
@@ -282,7 +283,26 @@ def get_entity_from_name(
     )
 
 
-def build_dataframe_generic(column, title, dict_name, entity, df_columns) -> None:
+def build_dataframe_generic(
+    column: DeltaGenerator,
+    title: str,
+    dict_name: str,
+    entity: t.Optional[t.Dict[str, t.Any]],
+    df_columns: t.List[str],
+) -> None:
+    """Renders dataframe within a column
+
+    :param column: Column the dataframe will be rendered in
+    :type column: DeltaGenerator
+    :param title: Title of the dataframe
+    :type title: str
+    :param dict_name: Name of the dictionary
+    :type dict_name: str
+    :param entity: Entity represented by a dictionary
+    :type entity: Optional[Dict[str, Any]]
+    :param df_columns: Dataframe column names
+    :type df_columns: t.List[str]
+    """
     with column:
         render_dataframe(
             title=title,
@@ -293,7 +313,22 @@ def build_dataframe_generic(column, title, dict_name, entity, df_columns) -> Non
         )
 
 
-def build_dataframe_loaded_entities(column, title, entity) -> None:
+def build_dataframe_loaded_entities(
+    column: DeltaGenerator, title: str, entity: t.Optional[t.Dict[str, t.Any]]
+) -> None:
+    """Renders dataframe within a column
+
+    Loaded entity information is collected
+    differently, which is why there are two
+    building functions.
+
+    :param column: Column the dataframe will be rendered in
+    :type column: DeltaGenerator
+    :param title: Title of the dataframe
+    :type title: str
+    :param entity: Entity represented by a dictionary
+    :type entity: Optional[Dict[str, Any]]
+    """
     with column:
         render_dataframe(
             title=title,
