@@ -57,7 +57,13 @@ class ManifestFileReader(ManifestReader):
         self._file_path = file_path
         self._data = self.from_file(self._file_path)
 
-        version = self._data["schema info"]["version"]
+        try:
+            version = self._data["schema info"]["version"]
+        except KeyError as key:
+            raise MalformedManifestError(
+                "Version data is malformed.", file=self._file_path, exception=key
+            ) from key
+
         if version != "0.0.1":
             version_exception = Exception(
                 f"""SmartDashboard version 0.0.1 is unable to parse manifest
