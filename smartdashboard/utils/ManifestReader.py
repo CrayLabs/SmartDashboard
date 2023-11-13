@@ -66,8 +66,8 @@ class ManifestFileReader(ManifestReader):
 
         if version != "0.0.1":
             version_exception = Exception(
-                f"""SmartDashboard version 0.0.1 is unable to parse manifest
-                file at version {version}."""
+                "SmartDashboard version 0.0.1 is unable to parse manifest "
+                f"file at version {version}."
             )
             raise VersionIncompatibilityError(
                 title="Invalid Version Number",
