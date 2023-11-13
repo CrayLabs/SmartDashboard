@@ -42,3 +42,7 @@ class ManifestError(SSDashboardError):
 
 class MalformedManifestError(ManifestError):
     ...
+
+
+class VersionIncompatibilityError(SSDashboardError):
+    ...

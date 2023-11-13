@@ -26,7 +26,7 @@
 
 import pytest
 
-from smartdashboard.utils.errors import ManifestError
+from smartdashboard.utils.errors import ManifestError, VersionIncompatibilityError
 from smartdashboard.utils.ManifestReader import Manifest, load_manifest
 
 
@@ -37,13 +37,20 @@ from smartdashboard.utils.ManifestReader import Manifest, load_manifest
         pytest.param("tests/utils/manifest_files/no_apps_manifest.json", Manifest),
         pytest.param("file_doesn't_exist.json", ManifestError),
         pytest.param("tests/utils/manifest_files/JSONDecodererror.json", ManifestError),
+        pytest.param(
+            "tests/utils/manifest_files/invalid_version.json",
+            VersionIncompatibilityError,
+        ),
     ],
 )
 def test_load_manifest(json_file, result_type):
     try:
         manifest = load_manifest(json_file)
-    except ManifestError as m:
+    except ManifestError:
         assert result_type == ManifestError
+        return
+    except VersionIncompatibilityError:
+        assert result_type == VersionIncompatibilityError
         return
 
     assert type(manifest) == result_type

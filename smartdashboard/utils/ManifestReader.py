@@ -30,7 +30,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
-from smartdashboard.utils.errors import MalformedManifestError, ManifestError
+from smartdashboard.utils.errors import (
+    MalformedManifestError,
+    ManifestError,
+    VersionIncompatibilityError,
+)
 
 
 @dataclass
@@ -52,6 +56,24 @@ class ManifestFileReader(ManifestReader):
     def __init__(self, file_path: str) -> None:
         self._file_path = file_path
         self._data = self.from_file(self._file_path)
+
+        try:
+            version = self._data["schema info"]["version"]
+        except KeyError as key:
+            raise MalformedManifestError(
+                "Version data is malformed.", file=self._file_path, exception=key
+            ) from key
+
+        if version != "0.0.1":
+            version_exception = Exception(
+                "SmartDashboard version 0.0.1 is unable to parse manifest "
+                f"file at version {version}."
+            )
+            raise VersionIncompatibilityError(
+                title="Invalid Version Number",
+                file=file_path,
+                exception=version_exception,
+            )
 
     def get_manifest(self) -> Manifest:
         """Get the Manifest from self._data
