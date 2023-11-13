@@ -40,7 +40,7 @@ from smartdashboard.view_builders import error_builder, overview_builder
 
 def build_app(manifest_path: str) -> None:
     """Build the application components with streamlit
-    
+
     :param manifest_path: Path to build Manifest with
     :type manifest_path: str
     """
@@ -65,7 +65,7 @@ def build_app(manifest_path: str) -> None:
 
 def get_parser() -> argparse.ArgumentParser:
     """Build an argument parser to handle the expected CLI arguments
-    
+
     :return: Argument parser that handles CLI arguments
     :rtype: argparse.ArgumentParser
     """
@@ -89,10 +89,10 @@ def get_parser() -> argparse.ArgumentParser:
 
 def run_dash_app(exp_path: str, app_port: int) -> None:
     """Execute the dashboard app by invoking streamlit
-    
+
     :param exp_path: Path to experiment directory
     :type exp_path: str
-    :param app_port: Port that the application is launched on 
+    :param app_port: Port that the application is launched on
     :type app_port: int
     """
     app_cmd = [
@@ -132,7 +132,7 @@ def cli() -> None:
 
 def execute(args: t.List[str]) -> None:
     """Build the dashboard application
-    
+
     :param args: Passed in arguments
     :type args: List[str]
     """
