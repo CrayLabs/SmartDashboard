@@ -39,7 +39,11 @@ from smartdashboard.view_builders import error_builder, overview_builder
 
 
 def build_app(manifest_path: str) -> None:
-    """Build the application components with streamlit"""
+    """Build the application components with streamlit
+    
+    :param manifest_path: Path to build Manifest with
+    :type manifest_path: str
+    """
     set_streamlit_page_config()
 
     curr_path = pathlib.Path(os.path.abspath(__file__)).parent
@@ -60,7 +64,11 @@ def build_app(manifest_path: str) -> None:
 
 
 def get_parser() -> argparse.ArgumentParser:
-    """Build an argument parser to handle the expected CLI arguments"""
+    """Build an argument parser to handle the expected CLI arguments
+    
+    :return: Argument parser that handles CLI arguments
+    :rtype: argparse.ArgumentParser
+    """
     parser = argparse.ArgumentParser("smart-dash", prefix_chars="-")
     parser.add_argument(
         "-d",
@@ -80,7 +88,13 @@ def get_parser() -> argparse.ArgumentParser:
 
 
 def run_dash_app(exp_path: str, app_port: int) -> None:
-    """Execute the dashboard app by invoking streamlit"""
+    """Execute the dashboard app by invoking streamlit
+    
+    :param exp_path: Path to experiment directory
+    :type exp_path: str
+    :param app_port: Port that the application is launched on 
+    :type app_port: int
+    """
     app_cmd = [
         "streamlit",
         "run",
@@ -117,7 +131,11 @@ def cli() -> None:
 
 
 def execute(args: t.List[str]) -> None:
-    """Build the dashboard application"""
+    """Build the dashboard application
+    
+    :param args: Passed in arguments
+    :type args: List[str]
+    """
     arg_parser = get_parser()
     parsed_args: argparse.Namespace = arg_parser.parse_args(args)
 
