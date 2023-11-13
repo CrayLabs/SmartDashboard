@@ -424,6 +424,16 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
 
 
 def overview_builder(manifest: Manifest) -> OverviewView:
+    """Experiment Overview page to be rendered
+
+    This function organizes all of the above views
+    into their respective tabs inside the dashboard.
+
+    :param manifest: Manifest to get dashboard info from
+    :type manifest: Manifest
+    :return: View of the entire Overview page
+    :rtype: OverviewView
+    """
     st.header("Experiment Overview: " + manifest.experiment.get("name", ""))
     st.write("")
 
