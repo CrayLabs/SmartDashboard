@@ -43,7 +43,9 @@ from smartdashboard.utils.StatusReader import (
 
 
 class ViewBase(ABC):
-    """Base class for Views"""
+    """Base class for Views. Views are groupings of UI elements
+    that are displayed in the dashboard.
+    """
 
     @abstractmethod
     def update(self) -> None:
@@ -51,7 +53,12 @@ class ViewBase(ABC):
 
 
 class EntityView(ViewBase):
-    """View class for entities"""
+    """View class for entities. Entities include
+    Applications, Orchestrators, Shards, Ensembles, and Members.
+
+    EntityViews are a collection of UI elements and have logs and
+    statuses that update.
+    """
 
     def __init__(self, view_model: t.Optional[t.Dict[str, t.Any]]) -> None:
         """Initialize an EntityView
@@ -109,11 +116,7 @@ class EntityView(ViewBase):
 
 
 class ExperimentView(ViewBase):
-    """View class for experiments
-
-    This does not currently inherit from EntityView
-    because ExperimentViews do not have logs yet.
-    """
+    """View class for experiments"""
 
     def __init__(
         self,
@@ -292,8 +295,8 @@ class EnsembleView(EntityView):
 class ErrorView(ViewBase):
     """View class for errors
 
-    This class is included with the idea that error
-    views may need to update at some point.
+    Contains UI elements for static display of unexpected exception
+    information.
     """
 
     def update(self) -> None:
