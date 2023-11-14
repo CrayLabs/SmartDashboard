@@ -114,6 +114,8 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             "Select an application:",
             [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
         )
+
+    selected_application: t.Optional[t.Dict[str, t.Any]]
     if selected_app_name is not None:
         selected_application = get_entity_from_name(
             selected_app_name, manifest.applications
@@ -224,6 +226,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
             [f'{orc["name"]}: Run {orc["run_id"]}' for orc in manifest.orchestrators],
         )
 
+    selected_orchestrator: t.Optional[t.Dict[str, t.Any]]
     if selected_orc_name is not None:
         selected_orchestrator = get_entity_from_name(
             selected_orc_name, manifest.orchestrators
@@ -231,7 +234,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     else:
         selected_orchestrator = None
 
-    shards = get_all_shards(selected_orchestrator)
+    shards: t.List[t.Dict[str, t.Any]] = get_all_shards(selected_orchestrator)
     view = OrchestratorView(selected_orchestrator, shards[0] if shards else None)
 
     st.write("")
@@ -257,6 +260,8 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
                 "Select a shard:",
                 [shard["name"] for shard in shards if shard is not None],
             )
+
+            shard: t.Optional[t.Dict[str, t.Any]]
             if selected_shard_name is not None:
                 shard = get_shard(selected_shard_name, selected_orchestrator)
             else:
@@ -295,6 +300,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             ],
         )
 
+    selected_ensemble: t.Optional[t.Dict[str, t.Any]]
     if selected_ensemble_name is not None:
         selected_ensemble = get_entity_from_name(
             selected_ensemble_name, manifest.ensembles
@@ -302,7 +308,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     else:
         selected_ensemble = None
 
-    members = get_ensemble_members(selected_ensemble)
+    members: t.List[t.Dict[str, t.Any]] = get_ensemble_members(selected_ensemble)
     view = EnsembleView(selected_ensemble, members[0] if members else None)
 
     st.write("")
@@ -339,6 +345,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             [member["name"] for member in members if member],
         )
 
+    member: t.Optional[t.Dict[str, t.Any]]
     if selected_member_name is not None:
         member = get_member(selected_member_name, selected_ensemble)
     else:
