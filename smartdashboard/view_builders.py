@@ -115,7 +115,6 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
         )
 
-    selected_application: t.Optional[t.Dict[str, t.Any]]
     if selected_app_name is not None:
         selected_application = get_entity_from_name(
             selected_app_name, manifest.applications
@@ -226,7 +225,6 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
             [f'{orc["name"]}: Run {orc["run_id"]}' for orc in manifest.orchestrators],
         )
 
-    selected_orchestrator: t.Optional[t.Dict[str, t.Any]]
     if selected_orc_name is not None:
         selected_orchestrator = get_entity_from_name(
             selected_orc_name, manifest.orchestrators
@@ -261,7 +259,6 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
                 [shard["name"] for shard in shards if shard is not None],
             )
 
-            shard: t.Optional[t.Dict[str, t.Any]]
             if selected_shard_name is not None:
                 shard = get_shard(selected_shard_name, selected_orchestrator)
             else:
@@ -300,7 +297,6 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             ],
         )
 
-    selected_ensemble: t.Optional[t.Dict[str, t.Any]]
     if selected_ensemble_name is not None:
         selected_ensemble = get_entity_from_name(
             selected_ensemble_name, manifest.ensembles
@@ -345,7 +341,6 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             [member["name"] for member in members if member],
         )
 
-    member: t.Optional[t.Dict[str, t.Any]]
     if selected_member_name is not None:
         member = get_member(selected_member_name, selected_ensemble)
     else:
