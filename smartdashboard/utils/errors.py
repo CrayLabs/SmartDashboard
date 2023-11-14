@@ -26,23 +26,40 @@
 
 
 class SSDashboardError(Exception):
+    """Exception base class for displaying SmartDashboard exceptions"""
+
     def __init__(self, title: str, file: str, exception: Exception) -> None:
+        """Initialize an SSDashboardError
+
+        :param title: Title of the exception displayed in the dashboard
+        :type title: str
+        :param file: File associated with the exception to be displayed in the dashboard
+        :type file: str
+        :param exception: Exception caught to be displayed in the dashboard
+        :type exception: Exception
+        """
         super().__init__(title)
         self.title = title
         self.file = file
         self.exception = exception
 
     def __str__(self) -> str:
+        """Return string representation of the exception
+
+        :return: String representation of the exception
+        :rtype: str
+        """
         return f"{type(self).__name__}: {self.title}"
 
 
 class ManifestError(SSDashboardError):
-    ...
+    """Exception raised for errors related to the manifest"""
 
 
 class MalformedManifestError(ManifestError):
-    ...
+    """Exception raised for errors related to malformations of the manifest"""
 
 
 class VersionIncompatibilityError(SSDashboardError):
-    ...
+    """Exception raised for errors related to version
+    incompatibilities of the manifest"""

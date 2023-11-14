@@ -39,6 +39,20 @@ from smartdashboard.utils.errors import (
 
 @dataclass
 class Manifest:
+    """Data class representing a manifest
+
+    :param experiment: Experiment
+    :type experiment: Dict[str, Any]
+    :param runs: Runs of an experiment
+    :type runs: List[Dict[str, Any]]
+    :param applications: All applications across all runs
+    :type applications: List[Dict[str, Any]]
+    :param orchestrators: All orchestrators across all runs
+    :type orchestrators: List[Dict[str, Any]]
+    :param ensembles: All ensembles across all runs
+    :type ensembles: List[Dict[str, Any]]
+    """
+
     experiment: Dict[str, Any]
     runs: List[Dict[str, Any]]
     applications: List[Dict[str, Any]]
@@ -47,13 +61,22 @@ class Manifest:
 
 
 class ManifestReader(ABC):
+    """Base class for a ManifestReader"""
+
     @abstractmethod
     def get_manifest(self) -> Manifest:
-        ...
+        """Abstract method to get the manifest from a ManifestReader subclass"""
 
 
 class ManifestFileReader(ManifestReader):
+    """ManifestReader class for file-based manifests"""
+
     def __init__(self, file_path: str) -> None:
+        """Initialize a ManifestFileReader
+
+        :param file_path: Path to the manifest file
+        :type file_path: str
+        """
         self._file_path = file_path
         self._data = self.from_file(self._file_path)
 

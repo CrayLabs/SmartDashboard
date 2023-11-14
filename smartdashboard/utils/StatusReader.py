@@ -35,6 +35,14 @@ from .status import GREEN_COMPLETED, GREEN_RUNNING, RED_FAILED, RED_UNSTABLE, St
 
 @dataclass(frozen=True)
 class StatusData:
+    """Data class representing entity status
+
+    :param status: Status enum of the entity
+    :type status: StatusEnum
+    :param return_code: Return code of the entity
+    :type return_code: Optional[int]
+    """
+
     status: StatusEnum
     return_code: t.Optional[int]
 
