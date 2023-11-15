@@ -66,18 +66,6 @@ with st.expander(label="Experiment Overview"):
         - [Orchestrators](https://www.craylabs.org/docs/orchestrator.html)
         - [Ensembles](https://www.craylabs.org/docs/experiment.html#ensemble)"""
     )
-    st.write("")
-
-st.write("")
-
-with st.expander(label="Workflow Telemetry"):
-    st.markdown(
-        """Gain deeper insights into your orchestrators in this section.
-        Simply select the orchestrator you wish to analyze from the
-        database summary table,
-        and unlock valuable information about its memory usage,
-        clients, and keys."""
-    )
 
 st.write("")
 
@@ -89,5 +77,5 @@ with st.expander(label="Support"):
     st.markdown(
         """The complete SmartSim documentation can be found
         [here](https://www.craylabs.org/docs/overview.html).
-        You can also contact us at craylabs@hpe.com"""
+        You can also contact us at craylabs@hpe.com."""
     )

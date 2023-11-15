@@ -76,7 +76,7 @@ def error_builder(error: SSDashboardError) -> ErrorView:
     )
 
     with st.expander(label="Traceback"):
-        st.code(traceback.format_exc(), language="python")
+        st.code(traceback.format_exc(), language=None)
 
     return view
 
