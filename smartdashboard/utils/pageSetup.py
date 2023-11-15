@@ -47,5 +47,7 @@ def set_streamlit_page_config() -> None:
     Also needs to be called on every page.
     """
     st.set_page_config(
-        layout="wide", page_title="SmartSim Dashboard", page_icon="/app/static/SmartSim.png"
+        layout="wide",
+        page_title="SmartSim Dashboard",
+        page_icon="/app/static/SmartSim.png",
     )
