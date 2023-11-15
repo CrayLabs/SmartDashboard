@@ -105,6 +105,22 @@ check-lint:
 	@pylint --rcfile=.pylintrc ./smartdashboard
 
 
+# help:
+# help: Documentation targets
+# help: ---------------------
+
+# help: docs                           - generate project documentation
+.PHONY: docs
+docs:
+	@cd doc; make html
+
+
+# help: docs-clean                     - delete generated project documentation
+.PHONY: docs-clean
+docs-clean:
+	@rm -rf ./doc/_build
+
+
 # help: check-mypy                     - run static type check
 .PHONY: check-mypy
 check-mypy:
