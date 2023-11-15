@@ -114,10 +114,6 @@ check-lint:
 docs:
 	@cd doc; make html
 
-# help:
-# help: Documentation targets
-# help: ---------------------
-
 
 # help: docs-clean                     - delete generated project documentation
 .PHONY: docs-clean
