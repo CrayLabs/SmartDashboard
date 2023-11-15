@@ -75,6 +75,14 @@ mypy = [
   "pandas-stubs",
   "types-Pillow",
 ]
+doc = [
+  "sphinx==4.4.0",
+  "sphinx-book-theme>=0.2.0",
+  "nbsphinx>=0.8.2",
+  "docutils>=0.17",
+  "ipython",
+  "jinja2==3.0.3",
+]
 
 
 [project.scripts]
