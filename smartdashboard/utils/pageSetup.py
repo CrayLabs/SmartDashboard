@@ -35,8 +35,11 @@ def local_css(file_name: str) -> None:
     :param file_name: CSS file
     :type file_name: str
     """
-    with open(file_name, encoding="utf-8") as file:
-        st.markdown(f"<style>{file.read()}</style>", unsafe_allow_html=True)
+    try:
+        with open(file_name, encoding="utf-8") as file:
+            st.markdown(f"<style>{file.read()}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        print("CSS file not found. Certain elements in the page will not be styled.")
 
 
 def set_streamlit_page_config() -> None:
