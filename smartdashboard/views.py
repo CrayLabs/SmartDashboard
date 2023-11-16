@@ -125,7 +125,7 @@ class ExperimentView(ViewBase):
     ) -> None:
         """Initialize an ExperimentView
 
-        :param experiment: Experiment
+        :param experiment: The experiment to display
         :type experiment: Optional[Dict[str, Any]]
         :param runs: Runs within an experiment
         :type runs: List[Dict[str, Any]]
@@ -154,7 +154,7 @@ class ApplicationView(EntityView):
     def __init__(self, application: t.Optional[t.Dict[str, t.Any]]) -> None:
         """Initialize an ApplicationView
 
-        :param application: Selected application
+        :param application: Selected application to display
         :type application: Optional[Dict[str, Any]]
         """
         self.status_element = DeltaGenerator()
@@ -201,7 +201,7 @@ class OrchestratorView(EntityView):
     ) -> None:
         """Initialize an OrchestratorView
 
-        :param orchestrator: Selected orchestrator
+        :param orchestrator: Selected orchestrator to display
         :type orchestrator: Optional[Dict[str, Any]]
         :param shard: Selected shard within the selected orchestrator
         :type shard: Optional[Dict[str, Any]]
@@ -243,9 +243,9 @@ class EnsembleView(EntityView):
     ) -> None:
         """Initialize an EnsembleView
 
-        :param ensemble: Selected ensemble
+        :param ensemble: Selected ensemble to display
         :type ensemble: Optional[Dict[str, Any]]
-        :param member: Selected member
+        :param member: Selected member to display
         :type member: Optional[Dict[str, Any]]
         """
         self.ensemble = ensemble
