@@ -44,7 +44,11 @@ from smartdashboard.utils.StatusReader import (
 
 class ViewBase(ABC):
     """Base class for Views. Views are groupings of UI elements
-    that are displayed in the dashboard.
+    that are displayed in the dashboard and are a representation
+    of a SmartSim entity.
+
+    Views update on a timestep of the event loop that renders
+    elements in the dashboard.
     """
 
     @abstractmethod
