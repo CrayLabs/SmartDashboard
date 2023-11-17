@@ -114,6 +114,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             "Select an application:",
             [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
         )
+
     if selected_app_name is not None:
         selected_application = get_entity_from_name(
             selected_app_name, manifest.applications
@@ -231,7 +232,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     else:
         selected_orchestrator = None
 
-    shards = get_all_shards(selected_orchestrator)
+    shards: t.List[t.Dict[str, t.Any]] = get_all_shards(selected_orchestrator)
     view = OrchestratorView(selected_orchestrator, shards[0] if shards else None)
 
     st.write("")
@@ -257,6 +258,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
                 "Select a shard:",
                 [shard["name"] for shard in shards if shard is not None],
             )
+
             if selected_shard_name is not None:
                 shard = get_shard(selected_shard_name, selected_orchestrator)
             else:
@@ -302,7 +304,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     else:
         selected_ensemble = None
 
-    members = get_ensemble_members(selected_ensemble)
+    members: t.List[t.Dict[str, t.Any]] = get_ensemble_members(selected_ensemble)
     view = EnsembleView(selected_ensemble, members[0] if members else None)
 
     st.write("")
@@ -424,6 +426,16 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
 
 
 def overview_builder(manifest: Manifest) -> OverviewView:
+    """Experiment Overview page to be rendered
+
+    This function organizes all of the above views
+    into their respective tabs inside the dashboard.
+
+    :param manifest: Manifest to get dashboard info from
+    :type manifest: Manifest
+    :return: View of the entire Overview page
+    :rtype: OverviewView
+    """
     st.header("Experiment Overview: " + manifest.experiment.get("name", ""))
     st.write("")
 
