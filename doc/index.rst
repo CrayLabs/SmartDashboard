@@ -1,4 +1,4 @@
-.. SmartRedis documentation master file, created by
+.. SmartDashboard documentation master file, created by
    sphinx-quickstart on Sat Sep 14 15:07:14 2019.
 
 
