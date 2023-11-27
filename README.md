@@ -74,9 +74,9 @@ is invoked locally.
 >
 > ```bash
 > # using ssh to establish port forwarding 
-> ssh -L<local-port>:<remote-name>:<remote-port> <user-id>@<remote-name>.<remote-address>
+> ssh -L [local-addr]:<local-port>:<remote-addr>:<remote-port> <user-id>@<remote-addr>
 > # example forwarding the remote port 8888 to localhost:8000
-> ssh -L8000:super1:8888 smartdash@super1.my.domain.net
+> ssh -L localhost:8000:super1.my.domain.net:8888 smartdash@super1.my.domain.net
 > ```
 >
 > After establishing the port-forwarding, a local browser can be pointed at the appropriate 
