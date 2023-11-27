@@ -80,7 +80,7 @@ is invoked locally.
 > ```
 >
 > After establishing the port-forwarding, a local browser can be pointed at the appropriate 
-> URL, such as `https://localhost:8000` for the example above.
+> URL, such as `http://localhost:8000` for the example above.
 
 The dashboard is also persistent, meaning that a user can still launch and use the dashboard even after the experiment has completed.
 

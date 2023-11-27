@@ -111,7 +111,7 @@ is invoked locally.
     ssh -L8000:super1:8888 smartdash@super1.my.domain.net
 
   After establishing the port-forwarding, a local browser can be pointed at the appropriate 
-  URL, such as `https://localhost:8000` for the example above.
+  URL, such as `http://localhost:8000` for the example above.
 
 The dashboard is also persistent, meaning that a user can launch and use the dashboard 
 even after the experiment has completed.
