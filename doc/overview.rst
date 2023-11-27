@@ -42,7 +42,7 @@ After launching a SmartSim experiment, the dashboard can be launched using Smart
   
 ``smart dashboard --port <port number> --directory <experiment directory path>``
   
-The port can optionally be specified, otherwise the dashboard port will default to `8501`.
+The port can optionally be specified, otherwise the dashboard port will default to ``8501``.
 The directory must be specified and should be a relative or absolute path to the created experiment directory.
 
 --port, -p        port number
@@ -95,7 +95,7 @@ By default, ``hello_world_exp`` is created in the directory of the driver script
   smart dashboard --port 8888 --directory hello_world_exp
  
 
-The dashboard will automatically open in a browser at port 8888 when `smart dashboard ...` 
+The dashboard will automatically open in a browser at port 8888 when ``smart dashboard`` 
 is invoked locally. 
 
 .. note::
@@ -111,7 +111,7 @@ is invoked locally.
     ssh -L localhost:8000:super1.my.domain.net:8888 smartdash@super1.my.domain.net
 
   After establishing the port-forwarding, a local browser can be pointed at the appropriate 
-  URL, such as `http://localhost:8000` for the example above.
+  URL, such as ``http://localhost:8000`` for the example above.
 
 The dashboard is also persistent, meaning that a user can launch and use the dashboard 
 even after the experiment has completed.
