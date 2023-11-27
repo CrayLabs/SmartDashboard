@@ -95,15 +95,32 @@ By default, ``hello_world_exp`` is created in the directory of the driver script
   smart dashboard --port 8888 --directory hello_world_exp
  
 
-The dashboard will automatically open in a browser at port 8888. The dashboard is also 
-persistent, meaning that a user can still launch and use the dashboard even after the experiment has completed.
+The dashboard will automatically open in a browser at port 8888 when `smart dashboard ...` 
+is invoked locally. 
+
+.. note::
+  If the dashboard is executed remotely, establishing port-forwarding to the 
+  remote machine will be necessary. This may be accomplished with ssh as follows:
+
+  .. code-block:: bash
+
+    # using ssh to establish port forwarding 
+    ssh -L<local-port>:<remote-name>:<remote-port> <user-id>@<remote-name>.<remote-address>
+
+    # example forwarding the remote port 8888 to localhost:8000
+    ssh -L8000:super1:8888 smartdash@super1.my.domain.net
+
+  After establishing the port-forwarding, a local browser can be pointed at the appropriate 
+  URL, such as `https://localhost:8000` for the example above.
+
+The dashboard is also persistent, meaning that a user can launch and use the dashboard 
+even after the experiment has completed.
 
 
 Using SmartDashboard
 ====================
 
-Once the dashboard is launched, a browser will open to ``http://localhost:<port>``. 
-SmartDashboard currently has two tabs on the left hand side.  
+Once displayed in the browser, SmartDashboard currently has two tabs on the left hand side.  
   
 ``Experiment Overview:`` This tab is where configuration information, statuses, and 
 logs are located for each launched entity of the experiment. The ``Experiment`` 
