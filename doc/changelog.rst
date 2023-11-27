@@ -21,7 +21,7 @@ Detailed Notes
 0.0.1
 -----
 
-Released on Nov 231, 2023
+Released on *TBD*, 2023
 
 Description
 
