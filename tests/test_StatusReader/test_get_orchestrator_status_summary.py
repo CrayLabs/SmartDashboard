@@ -24,8 +24,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import typing as t
-
 import pytest
 
 from smartdashboard.utils.status import GREEN_RUNNING, RED_UNSTABLE, StatusEnum
@@ -48,8 +46,6 @@ from ..utils.test_entities import *
         pytest.param(None, "Status: "),
     ],
 )
-def test_get_orchestrator_status_summary(
-    orchestrator: t.Dict[str, t.Any], expected_status
-):
+def test_get_orchestrator_status_summary(orchestrator: Orchestrator, expected_status):
     status = get_orchestrator_status_summary(orchestrator)
     assert status == expected_status

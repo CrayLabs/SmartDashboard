@@ -24,8 +24,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import typing as t
-
 import pytest
 
 from smartdashboard.utils.status import (
@@ -51,7 +49,7 @@ from ..utils.test_entities import *
         pytest.param(pending_shard, f"Status: {StatusEnum.PENDING.value}"),
     ],
 )
-def test_get_status(entity: t.Dict[str, t.Any], expected_status):
-    status_dir = entity["telemetry_metadata"]["status_dir"]
+def test_get_status(entity, expected_status):
+    status_dir = entity.telemetry_metadata["status_dir"]
     status = format_status(get_status(status_dir))
     assert status == expected_status

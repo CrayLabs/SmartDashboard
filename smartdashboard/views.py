@@ -29,7 +29,13 @@ from abc import ABC, abstractmethod
 
 from streamlit.delta_generator import DeltaGenerator
 
-from smartdashboard.utils.helpers import get_value
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.experiment import Experiment
+from smartdashboard.schemas.orchestrator import Orchestrator
+from smartdashboard.schemas.run import Run
+from smartdashboard.schemas.shard import Shard
 from smartdashboard.utils.LogReader import get_logs
 from smartdashboard.utils.status import StatusEnum
 from smartdashboard.utils.StatusReader import (
@@ -64,11 +70,11 @@ class EntityView(ViewBase):
     statuses that update.
     """
 
-    def __init__(self, view_model: t.Optional[t.Dict[str, t.Any]]) -> None:
+    def __init__(self, view_model: t.Optional[BaseEntity]) -> None:
         """Initialize an EntityView
 
         :param view_model: Selected entity view
-        :type view_model: Optional[Dict[str, Any]]
+        :type view_model: Optional[BaseEntity]
         """
         self.view_model = view_model
         self.out_logs_element = DeltaGenerator()
@@ -81,7 +87,9 @@ class EntityView(ViewBase):
         :return: Error logs
         :rtype: str
         """
-        return get_logs(file=get_value("err_file", self.view_model))
+        return get_logs(
+            file=self.view_model.err_file if self.view_model is not None else ""
+        )
 
     @property
     def out_logs(self) -> str:
@@ -90,7 +98,9 @@ class EntityView(ViewBase):
         :return: Output logs
         :rtype: str
         """
-        return get_logs(file=get_value("out_file", self.view_model))
+        return get_logs(
+            file=self.view_model.out_file if self.view_model is not None else ""
+        )
 
     def update(self) -> None:
         """Update logs and status elements in the selected entity view"""
@@ -106,14 +116,14 @@ class EntityView(ViewBase):
     def update_status(self) -> None:
         """Abstract method to update an entity's status"""
 
-    def update_view_model(self, new_view_model: t.Optional[t.Dict[str, t.Any]]) -> None:
+    def update_view_model(self, new_view_model: t.Optional[BaseEntity]) -> None:
         """Update view_model
 
         This is called after a new entity is selected
         in the dashboard to keep displayed data in sync.
 
         :param new_view_model: Selected entity view
-        :type new_view_model: Optional[Dict[str, Any]]
+        :type new_view_model: Optional[BaseEntity]
         """
         if new_view_model is not None:
             self.view_model = new_view_model
@@ -124,15 +134,15 @@ class ExperimentView(ViewBase):
 
     def __init__(
         self,
-        experiment: t.Optional[t.Dict[str, t.Any]],
-        runs: t.List[t.Dict[str, t.Any]],
+        experiment: t.Optional[Experiment],
+        runs: t.List[Run],
     ) -> None:
         """Initialize an ExperimentView
 
         :param experiment: The experiment to display
-        :type experiment: Optional[Dict[str, Any]]
+        :type experiment: Optional[Experiment]
         :param runs: Runs within an experiment
-        :type runs: List[Dict[str, Any]]
+        :type runs: List[Run]
         """
         self.status_element = DeltaGenerator()
         self.experiment = experiment
@@ -155,23 +165,23 @@ class ExperimentView(ViewBase):
 class ApplicationView(EntityView):
     """View class for applications"""
 
-    def __init__(self, application: t.Optional[t.Dict[str, t.Any]]) -> None:
+    def __init__(self, application: t.Optional[Application]) -> None:
         """Initialize an ApplicationView
 
         :param application: Selected application to display
-        :type application: Optional[Dict[str, Any]]
+        :type application: Optional[Application]
         """
         self.status_element = DeltaGenerator()
         super().__init__(view_model=application)
 
     @property
-    def application(self) -> t.Optional[t.Dict[str, t.Any]]:
+    def application(self) -> t.Optional[Application]:
         """Get application associated with the view model
 
         :return: Selected application
-        :rtype: Optional[Dict[str, Any]]
+        :rtype: Optional[Application]
         """
-        return self.view_model
+        return t.cast(t.Optional[Application], self.view_model)
 
     @property
     def status(self) -> str:
@@ -182,9 +192,7 @@ class ApplicationView(EntityView):
         """
         if self.application is not None:
             try:
-                status = get_status(
-                    self.application["telemetry_metadata"]["status_dir"]
-                )
+                status = get_status(self.application.telemetry_metadata["status_dir"])
             except KeyError:
                 status = StatusData(StatusEnum.UNKNOWN, None)
             return format_status(status)
@@ -200,28 +208,28 @@ class OrchestratorView(EntityView):
 
     def __init__(
         self,
-        orchestrator: t.Optional[t.Dict[str, t.Any]],
-        shard: t.Optional[t.Dict[str, t.Any]],
+        orchestrator: t.Optional[Orchestrator],
+        shard: t.Optional[Shard],
     ) -> None:
         """Initialize an OrchestratorView
 
         :param orchestrator: Selected orchestrator to display
-        :type orchestrator: Optional[Dict[str, Any]]
+        :type orchestrator: Optional[Orchestrator]
         :param shard: Selected shard within the selected orchestrator
-        :type shard: Optional[Dict[str, Any]]
+        :type shard: Optional[Shard]
         """
         self.orchestrator = orchestrator
         self.status_element = DeltaGenerator()
         super().__init__(view_model=shard)
 
     @property
-    def shard(self) -> t.Optional[t.Dict[str, t.Any]]:
+    def shard(self) -> t.Optional[Shard]:
         """Get shard associated with the view model
 
         :return: Selected shard
-        :rtype: Optional[Dict[str, Any]]
+        :rtype: Optional[Shard]
         """
-        return self.view_model
+        return t.cast(t.Optional[Shard], self.view_model)
 
     @property
     def status(self) -> str:
@@ -242,15 +250,15 @@ class EnsembleView(EntityView):
 
     def __init__(
         self,
-        ensemble: t.Optional[t.Dict[str, t.Any]],
-        member: t.Optional[t.Dict[str, t.Any]],
+        ensemble: t.Optional[Ensemble],
+        member: t.Optional[Application],
     ) -> None:
         """Initialize an EnsembleView
 
         :param ensemble: Selected ensemble to display
-        :type ensemble: Optional[Dict[str, Any]]
+        :type ensemble: Optional[Ensemble]
         :param member: Selected member to display
-        :type member: Optional[Dict[str, Any]]
+        :type member: Optional[Application]
         """
         self.ensemble = ensemble
         self.status_element = DeltaGenerator()
@@ -258,13 +266,13 @@ class EnsembleView(EntityView):
         super().__init__(view_model=member)
 
     @property
-    def member(self) -> t.Optional[t.Dict[str, t.Any]]:
+    def member(self) -> t.Optional[Application]:
         """Get member associated with the view model
 
         :return: Selected member
-        :rtype: Optional[Dict[str, Any]]
+        :rtype: Optional[Application]
         """
-        return self.view_model
+        return t.cast(t.Optional[Application], self.view_model)
 
     @property
     def status(self) -> str:
@@ -284,7 +292,7 @@ class EnsembleView(EntityView):
         """
         if self.member is not None:
             try:
-                status = get_status(self.member["telemetry_metadata"]["status_dir"])
+                status = get_status(self.member.telemetry_metadata["status_dir"])
             except KeyError:
                 status = StatusData(StatusEnum.UNKNOWN, None)
             return format_status(status)

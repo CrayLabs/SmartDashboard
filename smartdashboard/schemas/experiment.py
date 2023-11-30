@@ -25,3 +25,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pydantic import BaseModel
+
+
+class Experiment(BaseModel):
+    name: str = ""
+    path: str = ""
+    launcher: str = ""

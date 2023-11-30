@@ -27,14 +27,14 @@
 import typing as t
 
 from pydantic import BaseModel
-from schemas.application import Application
-from schemas.ensemble import Ensemble
-from schemas.orchestrator import Orchestrator
+
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.orchestrator import Orchestrator
 
 
 class Run(BaseModel):
     run_id: str
-    timestamp: int
-    model: t.List[Application]
-    orchestrator: t.List[Orchestrator]
-    ensemble: t.List[Ensemble]
+    model: t.List[Application] = []
+    orchestrator: t.List[Orchestrator] = []
+    ensemble: t.List[Ensemble] = []

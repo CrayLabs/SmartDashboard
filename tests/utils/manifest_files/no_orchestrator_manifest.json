@@ -12,7 +12,7 @@
     },
     "runs": [
         {
-            "run_id": 1,
+            "run_id": "1",
             "model": [
                 {
                     "name": "app1",
@@ -286,7 +286,7 @@
             ]
         },
         {
-            "run_id": 2,
+            "run_id": "2",
             "model": [
                 {
                     "name": "app3",
@@ -507,8 +507,11 @@
                                 "scripts": [],
                                 "models": []
                             },
-                            "job_id": "111",
-                            "step_id": 111,
+                            "telemetry_metadata": {
+                                "status_dir": "tests/utils/status_files/model_3",
+                                "job_id": "111",
+                                "step_id": 111
+                            },
                             "out_file": "tests/utils/log_files/model_1.out",
                             "err_file": "tests/utils/log_files/model_1.err"
                         }

@@ -37,7 +37,6 @@ from ..utils.test_entities import *
         pytest.param(orchestrator_1, ["shard1_host", "shard2_host"]),
         pytest.param(orchestrator_2, ["shard1_host", "shard2_host"]),
         pytest.param(orchestrator_3, ["shard1_host"]),
-        pytest.param(application_1, []),
         pytest.param(no_shards_orchestrator, []),
     ],
 )

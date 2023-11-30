@@ -26,12 +26,11 @@
 
 import typing as t
 
-from pydantic import BaseModel
-from schemas.shard import Shard
+from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.shard import Shard
 
 
-class Orchestrator(BaseModel):
-    name: str
+class Orchestrator(BaseEntity):
     type: str
-    interface: t.List[str]
-    shards: t.List[Shard]
+    interface: t.Union[str, t.List[str]] = ""
+    shards: t.List[Shard] = []

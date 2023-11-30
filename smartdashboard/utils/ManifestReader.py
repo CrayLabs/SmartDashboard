@@ -30,6 +30,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.experiment import Experiment
+from smartdashboard.schemas.orchestrator import Orchestrator
+from smartdashboard.schemas.run import Run
 from smartdashboard.utils.errors import (
     MalformedManifestError,
     ManifestError,
@@ -42,22 +47,22 @@ class Manifest:
     """Data class representing a manifest
 
     :param experiment: Experiment
-    :type experiment: Dict[str, Any]
+    :type experiment: Experiment
     :param runs: Runs of an experiment
-    :type runs: List[Dict[str, Any]]
+    :type runs: List[Run]
     :param applications: All applications across all runs
-    :type applications: List[Dict[str, Any]]
+    :type applications: List[Application]
     :param orchestrators: All orchestrators across all runs
-    :type orchestrators: List[Dict[str, Any]]
+    :type orchestrators: List[Orchestrator]
     :param ensembles: All ensembles across all runs
-    :type ensembles: List[Dict[str, Any]]
+    :type ensembles: List[Ensemble]
     """
 
-    experiment: Dict[str, Any]
-    runs: List[Dict[str, Any]]
-    applications: List[Dict[str, Any]]
-    orchestrators: List[Dict[str, Any]]
-    ensembles: List[Dict[str, Any]]
+    experiment: Experiment
+    runs: List[Run]
+    applications: List[Application]
+    orchestrators: List[Orchestrator]
+    ensembles: List[Ensemble]
 
 
 class ManifestReader(ABC):
@@ -104,12 +109,13 @@ class ManifestFileReader(ManifestReader):
         :return: Manifest
         :rtype: Manifest
         """
-        experiment = self._data.get("experiment", {})
-        runs = self._data.get("runs", [])
+        experiment = Experiment(**self._data.get("experiment", {}))
+        runs_data = self._data.get("runs", [])
+
         try:
             apps = [
-                {**app, "run_id": run["run_id"]}
-                for run in runs
+                Application(**{**app, "run_id": run["run_id"]})
+                for run in runs_data
                 for app in run.get("model", None)
                 if app
             ]
@@ -120,8 +126,8 @@ class ManifestFileReader(ManifestReader):
 
         try:
             orcs = [
-                {**orch, "run_id": run["run_id"]}
-                for run in runs
+                Orchestrator(**{**orch, "run_id": run["run_id"]})
+                for run in runs_data
                 for orch in run.get("orchestrator", None)
                 if orch
             ]
@@ -132,8 +138,8 @@ class ManifestFileReader(ManifestReader):
 
         try:
             ensembles = [
-                {**ensemble, "run_id": run["run_id"]}
-                for run in runs
+                Ensemble(**{**ensemble, "run_id": run["run_id"]})
+                for run in runs_data
                 for ensemble in run.get("ensemble", None)
                 if ensemble
             ]
@@ -141,6 +147,8 @@ class ManifestFileReader(ManifestReader):
             raise MalformedManifestError(
                 "Ensembles are malformed.", file=self._file_path, exception=exc
             ) from exc
+
+        runs = [Run(**run_data) for run_data in runs_data]
 
         return Manifest(
             experiment=experiment,

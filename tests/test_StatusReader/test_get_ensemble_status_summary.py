@@ -24,8 +24,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import typing as t
-
 import pytest
 
 from smartdashboard.utils.StatusReader import get_ensemble_status_summary
@@ -51,6 +49,6 @@ from ..utils.test_entities import *
         pytest.param(None, "Status: "),
     ],
 )
-def test_get_ensemble_status_summary(ensemble: t.Dict[str, t.Any], expected_status):
+def test_get_ensemble_status_summary(ensemble: Ensemble, expected_status):
     status = get_ensemble_status_summary(ensemble)
     assert status == expected_status
