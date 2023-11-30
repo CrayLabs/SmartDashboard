@@ -26,18 +26,14 @@
 
 import typing as t
 
-from pydantic import BaseModel
+from smartdashboard.schemas.base import BaseEntity
 
 
-class Application(BaseModel):
-    name: str
+class Application(BaseEntity):
     path: str
-    exe_args: t.List[str]
-    run_settings: t.Dict[str, t.Any]
-    batch_settings: t.Dict[str, t.Any]
-    params: t.Dict[str, t.Any]
-    files: t.Dict[str, t.List[str]]
-    colocated_db: t.Dict[str, t.Any]
-    telemetry_metadata: t.Dict[str, t.Any]
-    out_file: str
-    err_file: str
+    exe_args: t.List[str] = []
+    run_settings: t.Dict[str, t.Any] = {}
+    batch_settings: t.Dict[str, t.Any] = {}
+    params: t.Dict[str, t.Any] = {}
+    files: t.Dict[str, t.List[str]] = {}
+    colocated_db: t.Dict[str, t.Any] = {}

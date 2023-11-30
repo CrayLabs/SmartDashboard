@@ -26,18 +26,10 @@
 
 import typing as t
 
-from pydantic import BaseModel
+from smartdashboard.schemas.base import BaseEntity
 
 
-class Shard(BaseModel):
-    name: str
+class Shard(BaseEntity):
     hostname: str
     port: int
-    cluster: bool
-    conf_file: str
-    out_file: str
-    err_file: str
-    telemetry_metadata: t.Dict[str, t.Any]
-    step_id: str
-    task_id: str
-    managed: bool
+    conf_file: t.Optional[str]

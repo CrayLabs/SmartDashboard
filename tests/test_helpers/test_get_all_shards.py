@@ -34,9 +34,9 @@ from ..utils.test_entities import *
 @pytest.mark.parametrize(
     "orc, expected_length, expected_value",
     [
-        pytest.param(orchestrator_1, 2, orchestrator_1.get("shards")),
-        pytest.param(orchestrator_2, 2, orchestrator_2.get("shards")),
-        pytest.param(orchestrator_3, 1, orchestrator_3.get("shards")),
+        pytest.param(orchestrator_1, 2, orchestrator_1.shards),
+        pytest.param(orchestrator_2, 2, orchestrator_2.shards),
+        pytest.param(orchestrator_3, 1, orchestrator_3.shards),
         pytest.param(None, 0, []),
     ],
 )

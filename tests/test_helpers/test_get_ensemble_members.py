@@ -34,8 +34,8 @@ from ..utils.test_entities import *
 @pytest.mark.parametrize(
     "ensemble, expected_length, expected_value",
     [
-        pytest.param(ensemble_1, 1, ensemble_1.get("models")),
-        pytest.param(ensemble_2, 0, ensemble_2.get("models")),
+        pytest.param(ensemble_1, 1, ensemble_1.models),
+        pytest.param(ensemble_2, 0, ensemble_2.models),
         pytest.param(None, 0, []),
     ],
 )

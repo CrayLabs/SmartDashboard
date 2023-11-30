@@ -26,12 +26,11 @@
 
 import typing as t
 
-from pydantic import BaseModel
-from schemas.application import Application
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.base import BaseEntity
 
 
-class Ensemble(BaseModel):
-    name: str
+class Ensemble(BaseEntity):
     params: t.Dict[str, t.Any]
     batch_settings: t.Dict[str, t.Any]
     models: t.List[Application]

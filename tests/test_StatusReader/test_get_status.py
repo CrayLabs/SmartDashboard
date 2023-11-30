@@ -24,8 +24,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import typing as t
-
 import pytest
 
 from smartdashboard.utils.errors import MalformedManifestError
@@ -52,9 +50,9 @@ from ..utils.test_entities import *
         ),
     ],
 )
-def test_get_status(entity: t.Dict[str, t.Any], expected_status):
+def test_get_status(entity, expected_status):
     try:
-        status_dir = entity["telemetry_metadata"]["status_dir"]
+        status_dir = entity.telemetry_metadata["status_dir"]
         status = get_status(status_dir)
     except MalformedManifestError:
         assert expected_status == MalformedManifestError
