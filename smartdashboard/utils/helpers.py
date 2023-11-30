@@ -36,6 +36,8 @@ from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.orchestrator import Orchestrator
 from smartdashboard.schemas.shard import Shard
 
+_BaseEntityT = t.TypeVar("_BaseEntityT", bound=BaseEntity)
+
 
 def get_interfaces(entity: t.Optional[Orchestrator]) -> str:
     """Get and format the interfaces of an entity
@@ -242,16 +244,16 @@ def get_loaded_entities(
 
 
 def get_entity_from_name(
-    entity_name: str, entity_list: t.Sequence[BaseEntity]
-) -> t.Optional[BaseEntity]:
+    entity_name: str, entity_list: t.Sequence[_BaseEntityT]
+) -> t.Optional[_BaseEntityT]:
     """Get a specific entity from a list of entities
 
     :param entity_name: Name of the entity
     :type entity_name: str
     :param entity_list: Sequence of entities to search through
-    :type entity_list: Sequence[BaseEntity]
+    :type entity_list: Sequence[_BaseEntityT]
     :return: Entity
-    :rtype: Optional[BaseEntity]
+    :rtype: Optional[_BaseEntityT]
     """
     return next(
         (e for e in entity_list if entity_name == f"{e.name}: Run {e.run_id}"),
