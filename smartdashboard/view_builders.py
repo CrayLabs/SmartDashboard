@@ -118,9 +118,8 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         )
 
     if selected_app_name is not None:
-        selected_application = t.cast(
-            t.Optional[Application],
-            get_entity_from_name(selected_app_name, manifest.applications),
+        selected_application: t.Optional[Application] = get_entity_from_name(
+            selected_app_name, manifest.applications
         )
     else:
         selected_application = None
@@ -233,9 +232,8 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
         )
 
     if selected_orc_name is not None:
-        selected_orchestrator = t.cast(
-            t.Optional[Orchestrator],
-            get_entity_from_name(selected_orc_name, manifest.orchestrators),
+        selected_orchestrator: t.Optional[Orchestrator] = get_entity_from_name(
+            selected_orc_name, manifest.orchestrators
         )
     else:
         selected_orchestrator = None
@@ -309,9 +307,8 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         )
 
     if selected_ensemble_name is not None:
-        selected_ensemble = t.cast(
-            t.Optional[Ensemble],
-            get_entity_from_name(selected_ensemble_name, manifest.ensembles),
+        selected_ensemble: t.Optional[Ensemble] = get_entity_from_name(
+            selected_ensemble_name, manifest.ensembles
         )
     else:
         selected_ensemble = None
