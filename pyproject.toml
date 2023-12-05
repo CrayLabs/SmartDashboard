@@ -85,7 +85,7 @@ doc = [
 
 
 [project.scripts]
-smart-dash = "smartdashboard.Experiment_Overview:cli"
+smart-dash = "smartdashboard.__main__:main"
 
 
 [tool.setuptools]
