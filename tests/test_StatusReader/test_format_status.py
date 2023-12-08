@@ -52,6 +52,6 @@ from ..utils.test_entities import *
     ],
 )
 def test_get_status(entity: t.Dict[str, t.Any], expected_status):
-    status_dir = entity["telemetry_metadata"]["status_dir"]
+    status_dir = entity.telemetry_metadata["status_dir"]
     status = format_status(get_status(status_dir))
     assert status == expected_status

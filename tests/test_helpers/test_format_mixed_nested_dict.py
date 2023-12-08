@@ -63,7 +63,7 @@ from ..utils.test_entities import *
         ),
         pytest.param(
             "settings",
-            ensemble_1_member_1.get("colocated_db"),
+            ensemble_1_member_1.colocated_db,
             [
                 ("protocol", "TCP/IP"),
                 ("port", "1111"),

@@ -30,6 +30,10 @@ import typing as t
 import pandas as pd
 import streamlit as st
 
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.orchestrator import Orchestrator
+from smartdashboard.schemas.shard import Shard
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import (
     build_dataframe_generic,
@@ -40,12 +44,10 @@ from smartdashboard.utils.helpers import (
     get_db_hosts,
     get_ensemble_members,
     get_entity_from_name,
-    get_exe_args,
     get_interfaces,
     get_member,
     get_port,
     get_shard,
-    get_value,
     render_dataframe,
     shard_log_spacing,
 )
@@ -93,8 +95,8 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     st.subheader("Experiment Configuration")
     st.write("")
     view.status_element = st.empty()
-    st.write("Path: " + manifest.experiment.get("path", ""))
-    st.write("Launcher: " + manifest.experiment.get("launcher", ""))
+    st.write("Path: " + manifest.experiment.path)
+    st.write("Launcher: " + manifest.experiment.launcher)
 
     return view
 
@@ -112,11 +114,11 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     with col1:
         selected_app_name: t.Optional[str] = st.selectbox(
             "Select an application:",
-            [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
+            [f"{app.name}: Run {app.run_id}" for app in manifest.applications],
         )
 
     if selected_app_name is not None:
-        selected_application = get_entity_from_name(
+        selected_application: t.Optional[Application] = get_entity_from_name(
             selected_app_name, manifest.applications
         )
     else:
@@ -126,14 +128,16 @@ def app_builder(manifest: Manifest) -> ApplicationView:
 
     st.write("")
     view.status_element = st.empty()
-    st.write("Path: " + get_value("path", view.application))
+    st.write("Path: " + (view.application.path if view.application is not None else ""))
 
     st.write("")
     with st.expander(label="Executable Arguments"):
         render_dataframe(
             pd.DataFrame(
                 {
-                    "All Arguments": get_exe_args(selected_application),
+                    "All Arguments": selected_application.exe_args
+                    if selected_application is not None
+                    else [],
                 }
             )
         )
@@ -179,7 +183,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             app_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                selected_application.get("colocated_db")
+                selected_application.colocated_db
                 if selected_application is not None
                 else {}
             )
@@ -191,7 +195,9 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 df_columns=["Name", "Value"],
             )
             build_dataframe_loaded_entities(
-                column=col2, title="Loaded Scripts and Models", entity=app_colocated_db
+                column=col2,
+                title="Loaded Scripts and Models",
+                colocated_dict=app_colocated_db,
             )
 
     st.write("")
@@ -222,22 +228,25 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     with col1:
         selected_orc_name: t.Optional[str] = st.selectbox(
             "Select an orchestrator:",
-            [f'{orc["name"]}: Run {orc["run_id"]}' for orc in manifest.orchestrators],
+            [f"{orc.name}: Run {orc.run_id}" for orc in manifest.orchestrators],
         )
 
     if selected_orc_name is not None:
-        selected_orchestrator = get_entity_from_name(
+        selected_orchestrator: t.Optional[Orchestrator] = get_entity_from_name(
             selected_orc_name, manifest.orchestrators
         )
     else:
         selected_orchestrator = None
 
-    shards: t.List[t.Dict[str, t.Any]] = get_all_shards(selected_orchestrator)
+    shards: t.List[Shard] = get_all_shards(selected_orchestrator)
     view = OrchestratorView(selected_orchestrator, shards[0] if shards else None)
 
     st.write("")
     view.status_element = st.empty()
-    st.write("Type: " + get_value("type", selected_orchestrator))
+    st.write(
+        "Type: "
+        + (selected_orchestrator.type if selected_orchestrator is not None else "")
+    )
     st.write("Port: " + get_port(selected_orchestrator))
     st.write("Interface: " + get_interfaces(selected_orchestrator))
 
@@ -256,7 +265,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
         with col1:
             selected_shard_name: t.Optional[str] = st.selectbox(
                 "Select a shard:",
-                [shard["name"] for shard in shards if shard is not None],
+                [shard.name for shard in shards if shard is not None],
             )
 
             if selected_shard_name is not None:
@@ -292,19 +301,19 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         selected_ensemble_name: t.Optional[str] = st.selectbox(
             "Select an ensemble:",
             [
-                f'{ensemble["name"]}: Run {ensemble["run_id"]}'
+                f"{ensemble.name}: Run {ensemble.run_id}"
                 for ensemble in manifest.ensembles
             ],
         )
 
     if selected_ensemble_name is not None:
-        selected_ensemble = get_entity_from_name(
+        selected_ensemble: t.Optional[Ensemble] = get_entity_from_name(
             selected_ensemble_name, manifest.ensembles
         )
     else:
         selected_ensemble = None
 
-    members: t.List[t.Dict[str, t.Any]] = get_ensemble_members(selected_ensemble)
+    members: t.List[Application] = get_ensemble_members(selected_ensemble)
     view = EnsembleView(selected_ensemble, members[0] if members else None)
 
     st.write("")
@@ -338,11 +347,13 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with col1:
         selected_member_name: t.Optional[str] = st.selectbox(
             "Select a member:",
-            [member["name"] for member in members if member],
+            [member.name for member in members if member],
         )
 
     if selected_member_name is not None:
-        member = get_member(selected_member_name, selected_ensemble)
+        member: t.Optional[Application] = get_member(
+            selected_member_name, selected_ensemble
+        )
     else:
         member = None
 
@@ -350,11 +361,13 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
 
     st.write("")
     view.member_status_element = st.empty()
-    st.write("Path: " + get_value("path", member))
+    st.write("Path: " + (member.path if member else ""))
     st.write("")
     with st.expander(label="Executable Arguments"):
         render_dataframe(
-            pd.DataFrame({"All Arguments": get_exe_args(member)}),
+            pd.DataFrame(
+                {"All Arguments": member.exe_args if member is not None else []}
+            ),
         )
 
     st.write("")
@@ -398,7 +411,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             mem_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                member.get("colocated_db") if member is not None else {}
+                member.colocated_db if member is not None else {}
             )
             build_dataframe_generic(
                 column=col1,
@@ -408,7 +421,9 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
                 df_columns=["Name", "Value"],
             )
             build_dataframe_loaded_entities(
-                column=col2, title="Loaded Scripts and Models", entity=mem_colocated_db
+                column=col2,
+                title="Loaded Scripts and Models",
+                colocated_dict=mem_colocated_db,
             )
 
     st.write("")
@@ -436,7 +451,7 @@ def overview_builder(manifest: Manifest) -> OverviewView:
     :return: View of the entire Overview page
     :rtype: OverviewView
     """
-    st.header("Experiment Overview: " + manifest.experiment.get("name", ""))
+    st.header("Experiment Overview: " + manifest.experiment.name)
     st.write("")
 
     experiment, application, orchestrators, ensembles = st.tabs(

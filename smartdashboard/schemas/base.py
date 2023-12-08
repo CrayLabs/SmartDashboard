@@ -24,21 +24,15 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
+import typing as t
+from abc import ABC
 
-from smartdashboard.utils.helpers import get_exe_args
-
-from ..utils.test_entities import *
+from pydantic import BaseModel
 
 
-@pytest.mark.parametrize(
-    "entity, expected_value",
-    [
-        pytest.param(application_1, ["string"]),
-        pytest.param(application_2, ["string1", "string2", "string3"]),
-        pytest.param(None, []),
-    ],
-)
-def test_get_exe_args(entity, expected_value):
-    val = get_exe_args(entity)
-    assert val == expected_value
+class BaseEntity(BaseModel, ABC):
+    name: str
+    run_id: t.Optional[str] = None
+    out_file: str = ""
+    err_file: str = ""
+    telemetry_metadata: t.Dict[str, t.Any] = {}

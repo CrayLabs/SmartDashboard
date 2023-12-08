@@ -30,47 +30,29 @@ import pandas as pd
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.orchestrator import Orchestrator
+from smartdashboard.schemas.shard import Shard
 
-def get_value(key: str, entity: t.Optional[t.Dict[str, t.Any]]) -> str:
-    """Get the value of a key-value pair
+_BaseEntityT = t.TypeVar("_BaseEntityT", bound=BaseEntity)
 
-    :param key: Key of the dictionary
-    :type key: str
-    :param entity: Entity represented by a dictionary
-    :type entity: Optional[Dict[str, Any]]
-    :return: Value of the key-value pair
+
+def get_interfaces(entity: t.Optional[Orchestrator]) -> str:
+    """Get and format the network interfaces of an Orchestrator
+
+    If there are more than one network interfaces,
+    the dashboard will display them as a comma-separated
+    list.
+
+    :param entity: Orchestrator
+    :type entity: Optional[Orchestrator]
+    :return: Interfaces of the orchestrator
     :rtype: str
     """
     if entity:
-        return str(entity.get(key, ""))
-
-    return ""
-
-
-def get_exe_args(entity: t.Optional[t.Dict[str, t.Any]]) -> t.List[str]:
-    """Get the exe_args of an entity
-
-    :param entity: Entity represented by a dictionary
-    :type entity: Optional[Dict[str, Any]]
-    :return: exe_args of the entity
-    :rtype: List[str]
-    """
-    if entity:
-        return list(entity.get("exe_args", []))
-
-    return []
-
-
-def get_interfaces(entity: t.Optional[t.Dict[str, t.Any]]) -> str:
-    """Get and format the interfaces of an entity
-
-    :param entity: Entity represented by a dictionary
-    :type entity: Optional[Dict[str, Any]]
-    :return: Interfaces
-    :rtype: str
-    """
-    if entity:
-        value: str = entity.get("interface", "")
+        value = entity.interface
         if isinstance(value, list):
             return ", ".join(value)
         return value
@@ -78,56 +60,54 @@ def get_interfaces(entity: t.Optional[t.Dict[str, t.Any]]) -> str:
     return ""
 
 
-def get_ensemble_members(
-    ensemble: t.Optional[t.Dict[str, t.Any]]
-) -> t.List[t.Dict[str, t.Any]]:
+def get_ensemble_members(ensemble: t.Optional[Ensemble]) -> t.List[Application]:
     """Get the members of an ensemble
 
-    :param ensemble: Ensemble represented by a dictionary
-    :type ensemble: Optional[Dict[str, Any]]
+    :param ensemble: Ensemble
+    :type ensemble: Optional[Ensemble]
     :return: All members of the ensemble
-    :rtype: List[Dict[str, Any]]
+    :rtype: List[Application]
     """
     if ensemble:
-        return list(ensemble.get("models", []))
+        return ensemble.models
 
     return []
 
 
 def get_member(
-    member_name: str, ensemble: t.Optional[t.Dict[str, t.Any]]
-) -> t.Optional[t.Dict[str, t.Any]]:
+    member_name: str, ensemble: t.Optional[Ensemble]
+) -> t.Optional[Application]:
     """Get a specific member of an ensemble
 
     :param member_name: Name of the selected member
     :type member_name: str
-    :param ensemble: Ensemble represented by a dictionary
-    :type ensemble: Optional[Dict[str, Any]]
+    :param ensemble: Ensemble
+    :type ensemble: Optional[Ensemble]
     :return: Selected member
-    :rtype: Optional[Dict[str, Any]]
+    :rtype: Optional[Application]
     """
     for member in get_ensemble_members(ensemble):
-        if member.get("name", None) == member_name:
+        if member.name == member_name:
             return member
 
     return None
 
 
-def get_port(orc: t.Optional[t.Dict[str, t.Any]]) -> str:
+def get_port(orc: t.Optional[Orchestrator]) -> str:
     """Get the port of an orchestrator
 
     The ports in all of the shards should be the same.
 
-    :param orc: Orchestrator represented by a dictionary
-    :type orc: Optional[Dict[str, Any]]
+    :param orc: Orchestrator
+    :type orc: Optional[Orchestrator]
     :return: Port
     :rtype: str
     """
     shard_ports = set()
 
     if orc:
-        for shard in orc.get("shards", []):
-            port = str(shard.get("port"))
+        for shard in orc.shards:
+            port = str(shard.port)
             if port:
                 shard_ports.add(port)
 
@@ -142,21 +122,21 @@ def get_port(orc: t.Optional[t.Dict[str, t.Any]]) -> str:
     return ""
 
 
-def get_db_hosts(orc: t.Optional[t.Dict[str, t.Any]]) -> t.List[str]:
+def get_db_hosts(orc: t.Optional[Orchestrator]) -> t.List[str]:
     """Get the db_hosts of an orchestrator
 
     The hosts of all of the shards are displayed.
 
-    :param orc: Orchestrator represented by a dictionary
-    :type orc: Optional[Dict[str, Any]]
+    :param orc: Orchestrator
+    :type orc: Optional[Orchestrator]
     :return: Hosts
     :rtype: List[str]
     """
     hosts = []
 
     if orc:
-        for shard in orc.get("shards", []):
-            host = shard.get("hostname")
+        for shard in orc.shards:
+            host = shard.hostname
             if host:
                 hosts.append(host)
 
@@ -164,7 +144,8 @@ def get_db_hosts(orc: t.Optional[t.Dict[str, t.Any]]) -> t.List[str]:
 
 
 def flatten_nested_keyvalue_containers(
-    dict_name: str, entity: t.Optional[t.Dict[str, t.Any]]
+    dict_name: str,
+    entity: t.Union[t.Optional[t.Dict[str, t.Any]], t.Optional[BaseEntity]],
 ) -> t.List[t.Tuple[str, str]]:
     """Format dicts of all types to be displayed
 
@@ -174,8 +155,8 @@ def flatten_nested_keyvalue_containers(
 
     :param dict_name: Name of the dictionary
     :type dict_name: str
-    :param entity: Entity represented by a dictionary
-    :type entity: Optional[Dict[str, Any]]
+    :param entity: Entity represented by a dictionary or a BaseEntity
+    :type entity: Union[Optional[Dict[str, Any]], Optional[BaseEntity]]
     :return: (keys, values) list
     :rtype: List[Tuple[str,str]]
     """
@@ -183,7 +164,10 @@ def flatten_nested_keyvalue_containers(
     values = []
 
     if entity:
-        target_dict = entity.get(dict_name, {})
+        if isinstance(entity, BaseEntity):
+            target_dict = getattr(entity, dict_name, {})
+        else:
+            target_dict = entity.get(dict_name, {})
         for key, value in target_dict.items():
             if isinstance(value, list):
                 for val in value:
@@ -200,13 +184,11 @@ def flatten_nested_keyvalue_containers(
     return list(zip(keys, values))
 
 
-def format_ensemble_params(
-    entity: t.Optional[t.Dict[str, t.Any]]
-) -> t.List[t.Tuple[str, str]]:
+def format_ensemble_params(entity: t.Optional[Ensemble]) -> t.List[t.Tuple[str, str]]:
     """Format ensemble params to be displayed
 
-    :param entity: Entity represented by a dictionary
-    :type entity: Optional[Dict[str, Any]]
+    :param entity: Ensemble
+    :type entity: Optional[Ensemble]
     :return: (keys, values) list
     :rtype: List[Tuple[str,str]]
     """
@@ -214,7 +196,7 @@ def format_ensemble_params(
     values = []
 
     if entity:
-        target_dict = entity.get("params", {})
+        target_dict = entity.params
         for key, value in target_dict.items():
             comma_separated_string = ", ".join(value)
             keys.append(key)
@@ -224,21 +206,21 @@ def format_ensemble_params(
 
 
 def get_loaded_entities(
-    entity: t.Optional[t.Dict[str, t.Any]]
+    colocated_dict: t.Optional[t.Dict[str, t.Any]]
 ) -> t.Union[t.List[t.Dict[str, str]], t.Dict[str, t.List[t.Any]]]:
     """Combine and format loaded entities
 
     DB Models and DB Scripts are combined so they can be displayed as
     "Loaded Entities" in the dashboard.
 
-    :param entity: Entity represented by a dictionary
-    :type entity: Optional[Dict[str, Any]]
+    :param colocated_dict: Colocated database dictionary within an Application
+    :type colocated_dict: Optional[Dict[str, Any]]
     :return: A list of formatted loaded entity dicts, or one formatted dict
     :rtype: Union[List[Dict[str, str]], Dict[str, List[Any]]]
     """
     loaded_data = []
-    if entity:
-        for item in entity.get("models", []):
+    if colocated_dict:
+        for item in colocated_dict.get("models", []):
             for key, value in item.items():
                 loaded_data.append(
                     {
@@ -248,7 +230,7 @@ def get_loaded_entities(
                         "Device": value["device"],
                     }
                 )
-        for item in entity.get("scripts", []):
+        for item in colocated_dict.get("scripts", []):
             for key, value in item.items():
                 loaded_data.append(
                     {
@@ -266,19 +248,19 @@ def get_loaded_entities(
 
 
 def get_entity_from_name(
-    entity_name: str, entity_list: t.List[t.Dict[str, t.Any]]
-) -> t.Optional[t.Dict[str, t.Any]]:
+    entity_name: str, entity_list: t.Sequence[_BaseEntityT]
+) -> t.Optional[_BaseEntityT]:
     """Get a specific entity from a list of entities
 
     :param entity_name: Name of the entity
     :type entity_name: str
-    :param entity_list: List of entities to search through
-    :type entity_list: List[Dict[str, Any]]
-    :return: Entity represented by a dictionary
-    :rtype: Optional[Dict[str, Any]]
+    :param entity_list: Sequence of entities to search through
+    :type entity_list: Sequence[_BaseEntityT]
+    :return: Entity
+    :rtype: Optional[_BaseEntityT]
     """
     return next(
-        (e for e in entity_list if entity_name == f'{e["name"]}: Run {e["run_id"]}'),
+        (e for e in entity_list if entity_name == f"{e.name}: Run {e.run_id}"),
         None,
     )
 
@@ -287,7 +269,7 @@ def build_dataframe_generic(
     column: DeltaGenerator,
     title: str,
     dict_name: str,
-    entity: t.Optional[t.Dict[str, t.Any]],
+    entity: t.Union[t.Optional[t.Dict[str, t.Any]], t.Optional[BaseEntity]],
     df_columns: t.List[str],
 ) -> None:
     """Renders dataframe within a column
@@ -298,10 +280,10 @@ def build_dataframe_generic(
     :type title: str
     :param dict_name: Name of the dictionary
     :type dict_name: str
-    :param entity: Entity represented by a dictionary
-    :type entity: Optional[Dict[str, Any]]
+    :param entity: Entity or dictionary being rendered
+    :type entity: Union[Optional[Dict[str, Any]], Optional[BaseEntity]]
     :param df_columns: Dataframe column names
-    :type df_columns: t.List[str]
+    :type df_columns: List[str]
     """
     with column:
         render_dataframe(
@@ -314,7 +296,7 @@ def build_dataframe_generic(
 
 
 def build_dataframe_loaded_entities(
-    column: DeltaGenerator, title: str, entity: t.Optional[t.Dict[str, t.Any]]
+    column: DeltaGenerator, title: str, colocated_dict: t.Optional[t.Dict[str, t.Any]]
 ) -> None:
     """Renders dataframe within a column
 
@@ -326,13 +308,13 @@ def build_dataframe_loaded_entities(
     :type column: DeltaGenerator
     :param title: Title of the dataframe
     :type title: str
-    :param entity: Entity represented by a dictionary
-    :type entity: Optional[Dict[str, Any]]
+    :param colocated_dict: Colocated database dictionary within an Application
+    :type colocated_dict: Optional[Dict[str, Any]]
     """
     with column:
         render_dataframe(
             title=title,
-            dataframe=pd.DataFrame(get_loaded_entities(entity)),
+            dataframe=pd.DataFrame(get_loaded_entities(colocated_dict)),
         )
 
 
@@ -353,34 +335,32 @@ def render_dataframe(dataframe: pd.DataFrame, title: t.Optional[str] = None) -> 
     )
 
 
-def get_all_shards(orc: t.Optional[t.Dict[str, t.Any]]) -> t.List[t.Dict[str, t.Any]]:
+def get_all_shards(orc: t.Optional[Orchestrator]) -> t.List[Shard]:
     """Get all shards in an Orchestrator
 
-    :param orc: Orchestrator represented by a dictionary
-    :type orc: Optional[Dict[str, Any]]
+    :param orc: Orchestrator
+    :type orc: Optional[Orchestrator]
     :return: List of shards
-    :rtype: List[Optional[Dict[str, Any]]]
+    :rtype: List[Shard]
     """
     if orc:
-        return list(orc.get("shards", []))
+        return orc.shards
 
     return []
 
 
-def get_shard(
-    shard_name: str, orc: t.Optional[t.Dict[str, t.Any]]
-) -> t.Optional[t.Dict[str, t.Any]]:
+def get_shard(shard_name: str, orc: t.Optional[Orchestrator]) -> t.Optional[Shard]:
     """Get a specific shard from an Orchestrator
 
     :param shard_name: Name of shard selected
     :type shard_name: str
-    :param orc: Orchestrator represented by a dictionary
-    :type orc: Optional[Dict[str, Any]]
-    :return: List of shards
-    :rtype: List[Optional[Dict[str, Any]]]
+    :param orc: Orchestrator
+    :type orc: Optional[Orchestrator]
+    :return: Selected shard
+    :rtype: Optional[Shard]
     """
     for shard in get_all_shards(orc):
-        if shard.get("name", None) == shard_name:
+        if shard.name == shard_name:
             return shard
 
     return None

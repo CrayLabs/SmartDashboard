@@ -28,6 +28,7 @@ import typing as t
 
 import pytest
 
+from smartdashboard.schemas.base import BaseEntity
 from smartdashboard.utils.errors import MalformedManifestError
 from smartdashboard.utils.status import StatusEnum
 from smartdashboard.utils.StatusReader import StatusData, get_status
@@ -52,9 +53,9 @@ from ..utils.test_entities import *
         ),
     ],
 )
-def test_get_status(entity: t.Dict[str, t.Any], expected_status):
+def test_get_status(entity: BaseEntity, expected_status):
     try:
-        status_dir = entity["telemetry_metadata"]["status_dir"]
+        status_dir = entity.telemetry_metadata["status_dir"]
         status = get_status(status_dir)
     except MalformedManifestError:
         assert expected_status == MalformedManifestError
