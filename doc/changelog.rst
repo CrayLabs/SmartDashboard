@@ -14,7 +14,7 @@ Description
 Detailed Notes
 
 - The dictionary-based data will be enhanced with more well-defined
-  schemas (SmartDashboard-PR31_)
+  schemas. (SmartDashboard-PR31_)
 
 .. _SmartDashboard-PR31: https://github.com/CrayLabs/SmartDashboard/pull/31
 
@@ -31,4 +31,4 @@ Description
 Detailed Notes
 
 - The initial release of SmartDashboard includes capabilities for viewing
-  experiment entity properties and statuses
+  experiment entity properties and statuses.
