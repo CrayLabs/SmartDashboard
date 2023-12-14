@@ -18,7 +18,7 @@ Detailed Notes
 .. _PRXXX: https://github.com/CrayLabs/SmartDashboard/pull/XXX
 
 
-0.0.1
+0.0.2
 -----
 
 Released on *TBD*, 2023

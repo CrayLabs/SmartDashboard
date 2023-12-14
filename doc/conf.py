@@ -22,7 +22,7 @@ copyright = '2021-2023, Hewlett Packard Enterprise'
 author = 'Hewlett Packard Enterprise'
 
 # The full version, including alpha/beta/rc tags
-version = "0.0.1"
+version = "0.0.2"
 
 # The full version, including alpha/beta/rc tags
 release = version
