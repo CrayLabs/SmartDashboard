@@ -8,21 +8,29 @@ Work in progress
 
 Description
 
-- n / a
+- Add entity schemas
 
 
 Detailed Notes
 
-- n / a
+- The dictionary-based data will be enhanced with more well-defined
+  schemas (SmartDashboard-PR31)
 
-.. _PRXXX: https://github.com/CrayLabs/SmartDashboard/pull/XXX
+.. _PR31: https://github.com/CrayLabs/SmartDashboard/pull/31
 
 
 0.0.1
 -----
 
-Released on *TBD*, 2023
+Released on 14 December, 2023
 
 Description
 
 - Initial release of SmartDashboard
+
+Detailed Notes
+
+- The initial release of the SmartDashboard includes capabilities for reviewing 
+  static properties of the experiment as well as information about the execution
+  and completion of tasks started by the experiment.
+
