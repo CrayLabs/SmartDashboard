@@ -30,7 +30,5 @@ Description
 
 Detailed Notes
 
-- The initial release of the SmartDashboard includes capabilities for reviewing 
-  static properties of the experiment as well as information about the execution
-  and completion of tasks started by the experiment.
-
+- The initial release of SmartDashboard includes capabilities for viewing
+  experiment entity properties and statuses
