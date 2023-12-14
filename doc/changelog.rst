@@ -14,9 +14,9 @@ Description
 Detailed Notes
 
 - The dictionary-based data will be enhanced with more well-defined
-  schemas (SmartDashboard-PR31)
+  schemas (SmartDashboard-PR31_)
 
-.. _PR31: https://github.com/CrayLabs/SmartDashboard/pull/31
+.. _SmartDashboard-PR31: https://github.com/CrayLabs/SmartDashboard/pull/31
 
 
 0.0.1
