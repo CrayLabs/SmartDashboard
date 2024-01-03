@@ -24,23 +24,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
+import typing as t
 
-from smartdashboard.utils.helpers import get_all_shards
-
-from ..utils.test_entities import *
+from pydantic import BaseModel
 
 
-@pytest.mark.parametrize(
-    "orc, expected_length, expected_value",
-    [
-        pytest.param(orchestrator_1, 2, orchestrator_1.get("shards")),
-        pytest.param(orchestrator_2, 2, orchestrator_2.get("shards")),
-        pytest.param(orchestrator_3, 1, orchestrator_3.get("shards")),
-        pytest.param(None, 0, []),
-    ],
-)
-def test_get_all_shards(orc, expected_length, expected_value):
-    val = get_all_shards(orc)
-    assert len(val) == expected_length
-    assert val == expected_value
+class Files(BaseModel):
+    Symlink: t.List[str] = []
+    Configure: t.List[str] = []
+    Copy: t.List[str] = []

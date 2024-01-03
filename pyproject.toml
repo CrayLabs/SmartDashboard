@@ -51,6 +51,7 @@ classifiers = [
 readme = "README.md"
 dependencies = [
     "pandas>=2.0.0",
+    "pydantic>=2.5.2",
     "streamlit>=1.27.1",
     "watchdog>=3.0.0",
 ]

@@ -24,22 +24,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
-
-from smartdashboard.utils.helpers import get_shard
-
-from ..utils.test_entities import *
+from pydantic import BaseModel
 
 
-@pytest.mark.parametrize(
-    "shard_name, orc, shard",
-    [
-        pytest.param("shard 1", orchestrator_1, orch_1_shard_1),
-        pytest.param("shard 2", orchestrator_1, orch_1_shard_2),
-        pytest.param("shard doesnt_exist", orchestrator_1, None),
-        pytest.param("shard 1", None, None),
-    ],
-)
-def test_get_shard(shard_name, orc, shard):
-    sh = get_shard(shard_name, orc)
-    assert sh == shard
+class Experiment(BaseModel):
+    name: str = ""
+    path: str = ""
+    launcher: str = ""

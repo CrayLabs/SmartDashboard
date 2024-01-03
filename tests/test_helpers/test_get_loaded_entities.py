@@ -35,7 +35,7 @@ from ..utils.test_entities import *
     "entity, expected_value",
     [
         pytest.param(
-            application_1.get("colocated_db"),
+            application_1.colocated_db,
             [
                 {
                     "Name": "model1",
@@ -64,7 +64,7 @@ from ..utils.test_entities import *
             ],
         ),
         pytest.param(
-            application_2.get("colocated_db"),
+            application_2.colocated_db,
             [
                 {
                     "Name": "model1",
@@ -93,14 +93,11 @@ from ..utils.test_entities import *
             ],
         ),
         pytest.param(
-            orchestrator_1, {"Name": [], "Type": [], "Backend": [], "Device": []}
-        ),
-        pytest.param(
-            no_db_scripts_or_models,
+            no_db_scripts_or_models.colocated_db,
             {"Name": [], "Type": [], "Backend": [], "Device": []},
         ),
         pytest.param(
-            application_3.get("colocated_db"),
+            application_3.colocated_db,
             [
                 {
                     "Name": "model1",
@@ -117,7 +114,7 @@ from ..utils.test_entities import *
             ],
         ),
         pytest.param(
-            application_4.get("colocated_db"),
+            application_4.colocated_db,
             [
                 {
                     "Name": "script1",
