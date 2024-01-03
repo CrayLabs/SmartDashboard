@@ -28,15 +28,11 @@ import typing as t
 
 import pandas as pd
 import streamlit as st
+from pydantic import BaseModel
 from streamlit.delta_generator import DeltaGenerator
 
-from smartdashboard.schemas.application import Application
-from smartdashboard.schemas.base import BaseEntity
 from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.orchestrator import Orchestrator
-from smartdashboard.schemas.shard import Shard
-
-_BaseEntityT = t.TypeVar("_BaseEntityT", bound=BaseEntity)
 
 
 def get_interfaces(entity: t.Optional[Orchestrator]) -> str:
@@ -58,39 +54,6 @@ def get_interfaces(entity: t.Optional[Orchestrator]) -> str:
         return value
 
     return ""
-
-
-def get_ensemble_members(ensemble: t.Optional[Ensemble]) -> t.List[Application]:
-    """Get the members of an ensemble
-
-    :param ensemble: Ensemble
-    :type ensemble: Optional[Ensemble]
-    :return: All members of the ensemble
-    :rtype: List[Application]
-    """
-    if ensemble:
-        return ensemble.models
-
-    return []
-
-
-def get_member(
-    member_name: str, ensemble: t.Optional[Ensemble]
-) -> t.Optional[Application]:
-    """Get a specific member of an ensemble
-
-    :param member_name: Name of the selected member
-    :type member_name: str
-    :param ensemble: Ensemble
-    :type ensemble: Optional[Ensemble]
-    :return: Selected member
-    :rtype: Optional[Application]
-    """
-    for member in get_ensemble_members(ensemble):
-        if member.name == member_name:
-            return member
-
-    return None
 
 
 def get_port(orc: t.Optional[Orchestrator]) -> str:
@@ -145,7 +108,7 @@ def get_db_hosts(orc: t.Optional[Orchestrator]) -> t.List[str]:
 
 def flatten_nested_keyvalue_containers(
     dict_name: str,
-    entity: t.Union[t.Optional[t.Dict[str, t.Any]], t.Optional[BaseEntity]],
+    entity: t.Union[t.Optional[t.Dict[str, t.Any]], t.Optional[BaseModel]],
 ) -> t.List[t.Tuple[str, str]]:
     """Format dicts of all types to be displayed
 
@@ -155,19 +118,18 @@ def flatten_nested_keyvalue_containers(
 
     :param dict_name: Name of the dictionary
     :type dict_name: str
-    :param entity: Entity represented by a dictionary or a BaseEntity
-    :type entity: Union[Optional[Dict[str, Any]], Optional[BaseEntity]]
+    :param entity: Entity represented by a dictionary or a BaseModel
+    :type entity: Union[Optional[Dict[str, Any]], Optional[BaseModel]]
     :return: (keys, values) list
     :rtype: List[Tuple[str,str]]
     """
     keys = []
     values = []
 
-    if entity:
-        if isinstance(entity, BaseEntity):
-            target_dict = getattr(entity, dict_name, {})
-        else:
-            target_dict = entity.get(dict_name, {})
+    if entity is not None:
+        if isinstance(entity, BaseModel):
+            entity = entity.model_dump()
+        target_dict = entity.get(dict_name, {})
         for key, value in target_dict.items():
             if isinstance(value, list):
                 for val in value:
@@ -247,29 +209,11 @@ def get_loaded_entities(
     return loaded_data
 
 
-def get_entity_from_name(
-    entity_name: str, entity_list: t.Sequence[_BaseEntityT]
-) -> t.Optional[_BaseEntityT]:
-    """Get a specific entity from a list of entities
-
-    :param entity_name: Name of the entity
-    :type entity_name: str
-    :param entity_list: Sequence of entities to search through
-    :type entity_list: Sequence[_BaseEntityT]
-    :return: Entity
-    :rtype: Optional[_BaseEntityT]
-    """
-    return next(
-        (e for e in entity_list if entity_name == f"{e.name}: Run {e.run_id}"),
-        None,
-    )
-
-
 def build_dataframe_generic(
     column: DeltaGenerator,
     title: str,
     dict_name: str,
-    entity: t.Union[t.Optional[t.Dict[str, t.Any]], t.Optional[BaseEntity]],
+    entity: t.Union[t.Optional[t.Dict[str, t.Any]], t.Optional[BaseModel]],
     df_columns: t.List[str],
 ) -> None:
     """Renders dataframe within a column
@@ -281,7 +225,7 @@ def build_dataframe_generic(
     :param dict_name: Name of the dictionary
     :type dict_name: str
     :param entity: Entity or dictionary being rendered
-    :type entity: Union[Optional[Dict[str, Any]], Optional[BaseEntity]]
+    :type entity: Union[Optional[Dict[str, Any]], Optional[BaseModel]]
     :param df_columns: Dataframe column names
     :type df_columns: List[str]
     """
@@ -333,37 +277,6 @@ def render_dataframe(dataframe: pd.DataFrame, title: t.Optional[str] = None) -> 
         hide_index=True,
         use_container_width=True,
     )
-
-
-def get_all_shards(orc: t.Optional[Orchestrator]) -> t.List[Shard]:
-    """Get all shards in an Orchestrator
-
-    :param orc: Orchestrator
-    :type orc: Optional[Orchestrator]
-    :return: List of shards
-    :rtype: List[Shard]
-    """
-    if orc:
-        return orc.shards
-
-    return []
-
-
-def get_shard(shard_name: str, orc: t.Optional[Orchestrator]) -> t.Optional[Shard]:
-    """Get a specific shard from an Orchestrator
-
-    :param shard_name: Name of shard selected
-    :type shard_name: str
-    :param orc: Orchestrator
-    :type orc: Optional[Orchestrator]
-    :return: Selected shard
-    :rtype: Optional[Shard]
-    """
-    for shard in get_all_shards(orc):
-        if shard.name == shard_name:
-            return shard
-
-    return None
 
 
 def shard_log_spacing() -> None:

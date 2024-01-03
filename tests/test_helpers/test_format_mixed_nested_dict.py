@@ -49,7 +49,7 @@ from ..utils.test_entities import *
                 ("arg2", "None"),
             ],
         ),
-        pytest.param("params", ensemble_1_member_1, [("string", "Any")]),
+        pytest.param("params", ensemble_1.models[0], [("string", "Any")]),
         pytest.param(
             "files",
             application_2,
@@ -63,7 +63,7 @@ from ..utils.test_entities import *
         ),
         pytest.param(
             "settings",
-            ensemble_1_member_1.colocated_db,
+            ensemble_1.models[0].colocated_db,
             [
                 ("protocol", "TCP/IP"),
                 ("port", "1111"),
@@ -73,7 +73,7 @@ from ..utils.test_entities import *
                 ("debug", "False"),
             ],
         ),
-        pytest.param("doesnt_exist", ensemble_1_member_1, []),
+        pytest.param("doesnt_exist", ensemble_1.models[0], []),
         pytest.param("batch_settings", None, []),
     ],
 )

@@ -27,6 +27,7 @@
 import typing as t
 
 from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.files import Files
 
 
 class Application(BaseEntity):
@@ -35,5 +36,5 @@ class Application(BaseEntity):
     run_settings: t.Dict[str, t.Any] = {}
     batch_settings: t.Dict[str, t.Any] = {}
     params: t.Dict[str, t.Any] = {}
-    files: t.Dict[str, t.List[str]] = {}
+    files: Files
     colocated_db: t.Dict[str, t.Any] = {}

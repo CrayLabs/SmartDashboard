@@ -30,7 +30,7 @@ from abc import ABC, abstractmethod
 from streamlit.delta_generator import DeltaGenerator
 
 from smartdashboard.schemas.application import Application
-from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.base import BaseEntity  # pylint: disable=unused-import
 from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.experiment import Experiment
 from smartdashboard.schemas.orchestrator import Orchestrator
@@ -47,6 +47,8 @@ from smartdashboard.utils.StatusReader import (
     get_status,
 )
 
+_T = t.TypeVar("_T", bound="BaseEntity")
+
 
 class ViewBase(ABC):
     """Base class for Views. Views are groupings of UI elements
@@ -62,7 +64,7 @@ class ViewBase(ABC):
         """Abstract method to update elements in a view"""
 
 
-class EntityView(ViewBase):
+class EntityView(t.Generic[_T], ViewBase):
     """View class for entities. Entities include
     Applications, Orchestrators, Shards, Ensembles, and Members.
 
@@ -70,11 +72,11 @@ class EntityView(ViewBase):
     statuses that update.
     """
 
-    def __init__(self, view_model: t.Optional[BaseEntity]) -> None:
+    def __init__(self, view_model: t.Optional[_T]) -> None:
         """Initialize an EntityView
 
         :param view_model: Selected entity view
-        :type view_model: Optional[BaseEntity]
+        :type view_model: Optional[_T]
         """
         self.view_model = view_model
         self.out_logs_element = DeltaGenerator()
@@ -116,14 +118,14 @@ class EntityView(ViewBase):
     def update_status(self) -> None:
         """Abstract method to update an entity's status"""
 
-    def update_view_model(self, new_view_model: t.Optional[BaseEntity]) -> None:
+    def update_view_model(self, new_view_model: t.Optional[_T]) -> None:
         """Update view_model
 
         This is called after a new entity is selected
         in the dashboard to keep displayed data in sync.
 
         :param new_view_model: Selected entity view
-        :type new_view_model: Optional[BaseEntity]
+        :type new_view_model: Optional[_T]
         """
         if new_view_model is not None:
             self.view_model = new_view_model
@@ -162,7 +164,7 @@ class ExperimentView(ViewBase):
         self.status_element.write(self.status)
 
 
-class ApplicationView(EntityView):
+class ApplicationView(EntityView[Application]):
     """View class for applications"""
 
     def __init__(self, application: t.Optional[Application]) -> None:
@@ -181,7 +183,7 @@ class ApplicationView(EntityView):
         :return: Selected application
         :rtype: Optional[Application]
         """
-        return t.cast(t.Optional[Application], self.view_model)
+        return self.view_model
 
     @property
     def status(self) -> str:
@@ -203,7 +205,7 @@ class ApplicationView(EntityView):
         self.status_element.write(self.status)
 
 
-class OrchestratorView(EntityView):
+class OrchestratorView(EntityView[Shard]):
     """View class for orchestrators"""
 
     def __init__(
@@ -229,7 +231,7 @@ class OrchestratorView(EntityView):
         :return: Selected shard
         :rtype: Optional[Shard]
         """
-        return t.cast(t.Optional[Shard], self.view_model)
+        return self.view_model
 
     @property
     def status(self) -> str:
@@ -245,7 +247,7 @@ class OrchestratorView(EntityView):
         self.status_element.write(self.status)
 
 
-class EnsembleView(EntityView):
+class EnsembleView(EntityView[Application]):
     """View class for ensembles"""
 
     def __init__(
@@ -272,7 +274,7 @@ class EnsembleView(EntityView):
         :return: Selected member
         :rtype: Optional[Application]
         """
-        return t.cast(t.Optional[Application], self.view_model)
+        return self.view_model
 
     @property
     def status(self) -> str:

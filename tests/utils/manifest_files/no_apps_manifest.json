@@ -33,7 +33,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         },
                         {
@@ -46,7 +46,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         }
                     ]
@@ -144,7 +144,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             },
                             "out_file": "tests/utils/log_files/model_0.out",
                             "err_file": "tests/utils/log_files/model_0.err"
@@ -174,7 +174,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         },
                         {
@@ -187,7 +187,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         }
                     ]
@@ -207,7 +207,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         }
                     ]
@@ -280,7 +280,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             },
                             "out_file": "tests/utils/log_files/model_1.out",
                             "err_file": "tests/utils/log_files/model_1.err"
@@ -379,7 +379,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             },
                             "out_file": "tests/utils/log_files/model_0.out",
                             "err_file": "tests/utils/log_files/model_0.err"
@@ -461,7 +461,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             },
                             "out_file": "tests/utils/log_files/model_1.out",
                             "err_file": "tests/utils/log_files/model_1.err"

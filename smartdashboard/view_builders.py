@@ -30,9 +30,6 @@ import typing as t
 import pandas as pd
 import streamlit as st
 
-from smartdashboard.schemas.application import Application
-from smartdashboard.schemas.ensemble import Ensemble
-from smartdashboard.schemas.orchestrator import Orchestrator
 from smartdashboard.schemas.shard import Shard
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import (
@@ -40,14 +37,9 @@ from smartdashboard.utils.helpers import (
     build_dataframe_loaded_entities,
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
-    get_all_shards,
     get_db_hosts,
-    get_ensemble_members,
-    get_entity_from_name,
     get_interfaces,
-    get_member,
     get_port,
-    get_shard,
     render_dataframe,
     shard_log_spacing,
 )
@@ -112,17 +104,11 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     st.subheader("Application Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_app_name: t.Optional[str] = st.selectbox(
+        selected_application = st.selectbox(
             "Select an application:",
-            [f"{app.name}: Run {app.run_id}" for app in manifest.applications],
+            manifest.applications,
+            format_func=lambda app: f"{app.name}: Run {app.run_id}",
         )
-
-    if selected_app_name is not None:
-        selected_application: t.Optional[Application] = get_entity_from_name(
-            selected_app_name, manifest.applications
-        )
-    else:
-        selected_application = None
 
     view = ApplicationView(selected_application)
 
@@ -226,19 +212,15 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     st.subheader("Orchestrator Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_orc_name: t.Optional[str] = st.selectbox(
+        selected_orchestrator = st.selectbox(
             "Select an orchestrator:",
-            [f"{orc.name}: Run {orc.run_id}" for orc in manifest.orchestrators],
+            manifest.orchestrators,
+            format_func=lambda orc: f"{orc.name}: Run {orc.run_id}",
         )
 
-    if selected_orc_name is not None:
-        selected_orchestrator: t.Optional[Orchestrator] = get_entity_from_name(
-            selected_orc_name, manifest.orchestrators
-        )
-    else:
-        selected_orchestrator = None
-
-    shards: t.List[Shard] = get_all_shards(selected_orchestrator)
+    shards: t.List[Shard] = (
+        selected_orchestrator.shards if selected_orchestrator else []
+    )
     view = OrchestratorView(selected_orchestrator, shards[0] if shards else None)
 
     st.write("")
@@ -263,15 +245,9 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])
         with col1:
-            selected_shard_name: t.Optional[str] = st.selectbox(
-                "Select a shard:",
-                [shard.name for shard in shards if shard is not None],
+            shard = st.selectbox(
+                "Select a shard:", shards, format_func=lambda shard: shard.name
             )
-
-            if selected_shard_name is not None:
-                shard = get_shard(selected_shard_name, selected_orchestrator)
-            else:
-                shard = None
 
             view.update_view_model(shard)
 
@@ -298,22 +274,14 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     st.subheader("Ensemble Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_ensemble_name: t.Optional[str] = st.selectbox(
+        selected_ensemble = st.selectbox(
             "Select an ensemble:",
-            [
-                f"{ensemble.name}: Run {ensemble.run_id}"
-                for ensemble in manifest.ensembles
-            ],
+            manifest.ensembles,
+            format_func=lambda ens: f"{ens.name}: Run {ens.run_id}",
         )
 
-    if selected_ensemble_name is not None:
-        selected_ensemble: t.Optional[Ensemble] = get_entity_from_name(
-            selected_ensemble_name, manifest.ensembles
-        )
-    else:
-        selected_ensemble = None
+    members = selected_ensemble.models if selected_ensemble else []
 
-    members: t.List[Application] = get_ensemble_members(selected_ensemble)
     view = EnsembleView(selected_ensemble, members[0] if members else None)
 
     st.write("")
@@ -338,24 +306,16 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         )
 
     st.write("#")
-    if selected_ensemble_name is not None:
-        st.subheader(selected_ensemble_name + " Member Configuration")
+    if selected_ensemble is not None:
+        st.subheader(selected_ensemble.name + " Member Configuration")
     else:
         st.subheader("Member Configuration")
 
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_member_name: t.Optional[str] = st.selectbox(
-            "Select a member:",
-            [member.name for member in members if member],
+        member = st.selectbox(
+            "Select a member:", members, format_func=lambda member: member.name
         )
-
-    if selected_member_name is not None:
-        member: t.Optional[Application] = get_member(
-            selected_member_name, selected_ensemble
-        )
-    else:
-        member = None
 
     view.update_view_model(member)
 
