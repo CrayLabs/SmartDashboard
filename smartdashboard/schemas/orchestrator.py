@@ -44,3 +44,11 @@ class Orchestrator(BaseEntity):
             return [value]
 
         return value
+
+    @property
+    def ports(self) -> t.Sequence[int]:
+        return tuple({shard.port for shard in self.shards})
+
+    @property
+    def db_hosts(self) -> t.Sequence[str]:
+        return tuple({shard.hostname for shard in self.shards})

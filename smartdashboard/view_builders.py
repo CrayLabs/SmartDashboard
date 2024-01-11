@@ -30,15 +30,12 @@ import typing as t
 import pandas as pd
 import streamlit as st
 
-from smartdashboard.schemas.shard import Shard
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import (
     build_dataframe_generic,
     build_dataframe_loaded_entities,
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
-    get_db_hosts,
-    get_interfaces,
     get_port,
     render_dataframe,
     shard_log_spacing,
@@ -121,9 +118,11 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         render_dataframe(
             pd.DataFrame(
                 {
-                    "All Arguments": selected_application.exe_args
-                    if selected_application is not None
-                    else [],
+                    "All Arguments": (
+                        selected_application.exe_args
+                        if selected_application is not None
+                        else []
+                    ),
                 }
             )
         )
@@ -135,14 +134,14 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             column=col1,
             title="Batch Settings",
             dict_name="batch_settings",
-            entity=selected_application,
+            entity=selected_application.model_dump() if selected_application else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Run Settings",
             dict_name="run_settings",
-            entity=selected_application,
+            entity=selected_application.model_dump() if selected_application else {},
             df_columns=["Name", "Value"],
         )
 
@@ -153,14 +152,14 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             column=col1,
             title="Parameters",
             dict_name="params",
-            entity=selected_application,
+            entity=selected_application.model_dump() if selected_application else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Files",
             dict_name="files",
-            entity=selected_application,
+            entity=selected_application.model_dump() if selected_application else {},
             df_columns=["Type", "File"],
         )
 
@@ -183,7 +182,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             build_dataframe_loaded_entities(
                 column=col2,
                 title="Loaded Scripts and Models",
-                colocated_dict=app_colocated_db,
+                entity=selected_application,
             )
 
     st.write("")
@@ -218,9 +217,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
             format_func=lambda orc: f"{orc.name}: Run {orc.run_id}",
         )
 
-    shards: t.List[Shard] = (
-        selected_orchestrator.shards if selected_orchestrator else []
-    )
+    shards = selected_orchestrator.shards if selected_orchestrator else []
     view = OrchestratorView(selected_orchestrator, shards[0] if shards else None)
 
     st.write("")
@@ -230,14 +227,20 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
         + (selected_orchestrator.type if selected_orchestrator is not None else "")
     )
     st.write("Port: " + get_port(selected_orchestrator))
-    st.write("Interface: " + get_interfaces(selected_orchestrator))
+    st.write(
+        "Interface: " + ", ".join(selected_orchestrator.interface)
+        if selected_orchestrator
+        else ""
+    )
 
     st.write("")
     with st.expander(label="Database Hosts"):
         render_dataframe(
             pd.DataFrame(
                 {
-                    "Hosts": get_db_hosts(selected_orchestrator),
+                    "Hosts": (
+                        selected_orchestrator.db_hosts if selected_orchestrator else []
+                    ),
                 }
             )
         )
@@ -291,7 +294,10 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with st.expander(label="Batch Settings"):
         render_dataframe(
             pd.DataFrame(
-                flatten_nested_keyvalue_containers("batch_settings", selected_ensemble),
+                flatten_nested_keyvalue_containers(
+                    "batch_settings",
+                    selected_ensemble.model_dump() if selected_ensemble else {},
+                ),
                 columns=["Name", "Value"],
             )
         )
@@ -337,14 +343,14 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             column=col1,
             title="Batch Settings",
             dict_name="batch_settings",
-            entity=member,
+            entity=member.model_dump() if member else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Run Settings",
             dict_name="run_settings",
-            entity=member,
+            entity=member.model_dump() if member else {},
             df_columns=["Name", "Value"],
         )
 
@@ -355,14 +361,14 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             column=col1,
             title="Parameters",
             dict_name="params",
-            entity=member,
+            entity=member.model_dump() if member else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Files",
             dict_name="files",
-            entity=member,
+            entity=member.model_dump() if member else {},
             df_columns=["Type", "File"],
         )
 
@@ -383,7 +389,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             build_dataframe_loaded_entities(
                 column=col2,
                 title="Loaded Scripts and Models",
-                colocated_dict=mem_colocated_db,
+                entity=member,
             )
 
     st.write("")

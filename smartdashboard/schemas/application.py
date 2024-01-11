@@ -24,6 +24,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import itertools
 import typing as t
 
 from smartdashboard.schemas.base import BaseEntity
@@ -38,3 +39,39 @@ class Application(BaseEntity):
     params: t.Dict[str, t.Any] = {}
     files: Files
     colocated_db: t.Dict[str, t.Any] = {}
+
+    @property
+    def loaded_entities(self) -> t.Mapping[str, t.Sequence[str]]:
+        """Combine and format loaded entities
+
+        DB Models and DB Scripts are combined so they can be displayed as
+        "Loaded Entities" in the dashboard.
+
+        :return: A list of formatted loaded entity dicts, or one formatted dict
+        :rtype: Union[List[Dict[str, str]], Dict[str, List[Any]]]
+        """
+        models_ = self.colocated_db.get("models", [])
+        models = (("DB Model", model) for model in models_)
+        scripts_ = self.colocated_db.get("scripts", [])
+        scripts = (("DB Script", script) for script in scripts_)
+
+        combine = (item for item in itertools.chain(models, scripts))
+        flatten = (
+            (name, type_, info["backend"], info["device"])
+            for type_, data in combine
+            for name, info in data.items()
+        )
+
+        def take_idx(idx: int) -> t.Callable[[t.Any], t.Any]:
+            return lambda xs: xs[idx]
+
+        names, types, backends, devices = (
+            map(take_idx(i), xss) for i, xss in enumerate(itertools.tee(flatten, 4))
+        )
+
+        return {
+            "Name": tuple(names),
+            "Type": tuple(types),
+            "Backend": tuple(backends),
+            "Device": tuple(devices),
+        }

@@ -28,32 +28,11 @@ import typing as t
 
 import pandas as pd
 import streamlit as st
-from pydantic import BaseModel
 from streamlit.delta_generator import DeltaGenerator
 
+from smartdashboard.schemas.application import Application
 from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.orchestrator import Orchestrator
-
-
-def get_interfaces(entity: t.Optional[Orchestrator]) -> str:
-    """Get and format the network interfaces of an Orchestrator
-
-    If there are more than one network interfaces,
-    the dashboard will display them as a comma-separated
-    list.
-
-    :param entity: Orchestrator
-    :type entity: Optional[Orchestrator]
-    :return: Interfaces of the orchestrator
-    :rtype: str
-    """
-    if entity:
-        value = entity.interface
-        if isinstance(value, list):
-            return ", ".join(value)
-        return value
-
-    return ""
 
 
 def get_port(orc: t.Optional[Orchestrator]) -> str:
@@ -66,49 +45,22 @@ def get_port(orc: t.Optional[Orchestrator]) -> str:
     :return: Port
     :rtype: str
     """
-    shard_ports = set()
 
     if orc:
-        for shard in orc.shards:
-            port = str(shard.port)
-            if port:
-                shard_ports.add(port)
-
-        if len(shard_ports) == 1:
-            return shard_ports.pop()
+        if len(orc.ports) == 1:
+            return str(orc.ports[0])
 
         return (
             "Warning! Shards within an Orchestrator should have the same port. "
-            + ", ".join(sorted(shard_ports))
+            + ", ".join(map(str, sorted(orc.ports)))
         )
 
     return ""
 
 
-def get_db_hosts(orc: t.Optional[Orchestrator]) -> t.List[str]:
-    """Get the db_hosts of an orchestrator
-
-    The hosts of all of the shards are displayed.
-
-    :param orc: Orchestrator
-    :type orc: Optional[Orchestrator]
-    :return: Hosts
-    :rtype: List[str]
-    """
-    hosts = []
-
-    if orc:
-        for shard in orc.shards:
-            host = shard.hostname
-            if host:
-                hosts.append(host)
-
-    return hosts
-
-
 def flatten_nested_keyvalue_containers(
     dict_name: str,
-    entity: t.Union[t.Optional[t.Dict[str, t.Any]], t.Optional[BaseModel]],
+    entity: t.Optional[t.Dict[str, t.Any]],
 ) -> t.List[t.Tuple[str, str]]:
     """Format dicts of all types to be displayed
 
@@ -118,8 +70,8 @@ def flatten_nested_keyvalue_containers(
 
     :param dict_name: Name of the dictionary
     :type dict_name: str
-    :param entity: Entity represented by a dictionary or a BaseModel
-    :type entity: Union[Optional[Dict[str, Any]], Optional[BaseModel]]
+    :param entity: Entity represented by a dictionary
+    :type entity: Optional[Dict[str, Any]]
     :return: (keys, values) list
     :rtype: List[Tuple[str,str]]
     """
@@ -127,8 +79,6 @@ def flatten_nested_keyvalue_containers(
     values = []
 
     if entity is not None:
-        if isinstance(entity, BaseModel):
-            entity = entity.model_dump()
         target_dict = entity.get(dict_name, {})
         for key, value in target_dict.items():
             if isinstance(value, list):
@@ -167,53 +117,11 @@ def format_ensemble_params(entity: t.Optional[Ensemble]) -> t.List[t.Tuple[str, 
     return list(zip(keys, values))
 
 
-def get_loaded_entities(
-    colocated_dict: t.Optional[t.Dict[str, t.Any]]
-) -> t.Union[t.List[t.Dict[str, str]], t.Dict[str, t.List[t.Any]]]:
-    """Combine and format loaded entities
-
-    DB Models and DB Scripts are combined so they can be displayed as
-    "Loaded Entities" in the dashboard.
-
-    :param colocated_dict: Colocated database dictionary within an Application
-    :type colocated_dict: Optional[Dict[str, Any]]
-    :return: A list of formatted loaded entity dicts, or one formatted dict
-    :rtype: Union[List[Dict[str, str]], Dict[str, List[Any]]]
-    """
-    loaded_data = []
-    if colocated_dict:
-        for item in colocated_dict.get("models", []):
-            for key, value in item.items():
-                loaded_data.append(
-                    {
-                        "Name": key,
-                        "Type": "DB Model",
-                        "Backend": value["backend"],
-                        "Device": value["device"],
-                    }
-                )
-        for item in colocated_dict.get("scripts", []):
-            for key, value in item.items():
-                loaded_data.append(
-                    {
-                        "Name": key,
-                        "Type": "DB Script",
-                        "Backend": value["backend"],
-                        "Device": value["device"],
-                    }
-                )
-
-    if not loaded_data:
-        return {"Name": [], "Type": [], "Backend": [], "Device": []}
-
-    return loaded_data
-
-
 def build_dataframe_generic(
     column: DeltaGenerator,
     title: str,
     dict_name: str,
-    entity: t.Union[t.Optional[t.Dict[str, t.Any]], t.Optional[BaseModel]],
+    entity: t.Optional[t.Dict[str, t.Any]],
     df_columns: t.List[str],
 ) -> None:
     """Renders dataframe within a column
@@ -225,7 +133,7 @@ def build_dataframe_generic(
     :param dict_name: Name of the dictionary
     :type dict_name: str
     :param entity: Entity or dictionary being rendered
-    :type entity: Union[Optional[Dict[str, Any]], Optional[BaseModel]]
+    :type entity: Optional[Dict[str, Any]]
     :param df_columns: Dataframe column names
     :type df_columns: List[str]
     """
@@ -240,7 +148,7 @@ def build_dataframe_generic(
 
 
 def build_dataframe_loaded_entities(
-    column: DeltaGenerator, title: str, colocated_dict: t.Optional[t.Dict[str, t.Any]]
+    column: DeltaGenerator, title: str, entity: t.Optional[Application]
 ) -> None:
     """Renders dataframe within a column
 
@@ -252,13 +160,17 @@ def build_dataframe_loaded_entities(
     :type column: DeltaGenerator
     :param title: Title of the dataframe
     :type title: str
-    :param colocated_dict: Colocated database dictionary within an Application
-    :type colocated_dict: Optional[Dict[str, Any]]
+    :param entity: Application to get loaded entities from
+    :type entity: Application
     """
     with column:
         render_dataframe(
             title=title,
-            dataframe=pd.DataFrame(get_loaded_entities(colocated_dict)),
+            dataframe=pd.DataFrame(
+                entity.loaded_entities
+                if entity is not None
+                else {"Name": [], "Type": [], "Backend": [], "Device": []}
+            ),
         )
 
 
