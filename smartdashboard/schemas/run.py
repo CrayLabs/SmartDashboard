@@ -38,3 +38,15 @@ class Run(BaseModel):
     model: t.List[Application] = []
     orchestrator: t.List[Orchestrator] = []
     ensemble: t.List[Ensemble] = []
+
+    @property
+    def apps_with_ctx(self) -> t.Tuple[t.Tuple[str, Application], ...]:
+        return tuple((self.run_id, app) for app in self.model)
+
+    @property
+    def orcs_with_ctx(self) -> t.Tuple[t.Tuple[str, Orchestrator], ...]:
+        return tuple((self.run_id, orc) for orc in self.orchestrator)
+
+    @property
+    def ensemble_with_ctx(self) -> t.Tuple[t.Tuple[str, Ensemble], ...]:
+        return tuple((self.run_id, ens) for ens in self.ensemble)

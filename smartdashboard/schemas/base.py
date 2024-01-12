@@ -32,7 +32,6 @@ from pydantic import BaseModel
 
 class BaseEntity(BaseModel, ABC):
     name: str
-    run_id: t.Optional[str] = None
     out_file: str = ""
     err_file: str = ""
     telemetry_metadata: t.Dict[str, t.Any] = {}

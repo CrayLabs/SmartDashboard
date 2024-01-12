@@ -31,8 +31,17 @@ import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 
 from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.base import BaseEntity
 from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.orchestrator import Orchestrator
+
+_T = t.TypeVar("_T", bound=BaseEntity)
+
+
+def flatten(
+    entities: t.Iterable[t.Tuple[t.Tuple[str, _T], ...]]
+) -> t.List[t.Tuple[str, _T]]:
+    return [element for outer_tuple in entities for element in outer_tuple]
 
 
 def get_port(orc: t.Optional[Orchestrator]) -> str:

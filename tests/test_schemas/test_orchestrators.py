@@ -24,31 +24,46 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import typing as t
+import pytest
 
-from pydantic import field_validator
-
-from smartdashboard.schemas.base import BaseEntity
-from smartdashboard.schemas.shard import Shard
+from tests.utils.test_entities import *
 
 
-class Orchestrator(BaseEntity):
-    type: str
-    interface: t.List[str] = []
-    shards: t.List[Shard] = []
+@pytest.mark.parametrize(
+    "orchestrator, expected_value",
+    [
+        pytest.param(orchestrator_1, ("shard1_host", "shard2_host")),
+        pytest.param(orchestrator_2, ("shard1_host", "shard2_host")),
+        pytest.param(orchestrator_3, ("shard1_host",)),
+        pytest.param(no_shards_orchestrator, ()),
+    ],
+)
+def test_get_db_hosts(orchestrator: Orchestrator, expected_value):
+    hosts = orchestrator.db_hosts
+    assert hosts == expected_value
 
-    @field_validator("interface", mode="before")
-    @classmethod
-    def convert_interface(cls, value: t.Union[str, t.List[str]]) -> t.List[str]:
-        if isinstance(value, str):
-            return [value]
 
-        return value
+@pytest.mark.parametrize(
+    "entity, expected_value",
+    [
+        pytest.param(orchestrator_1, ["lo", "lo2"]),
+        pytest.param(orchestrator_2, ["lo"]),
+        pytest.param(orchestrator_3, ["lo"]),
+    ],
+)
+def test_get_interfaces(entity: Orchestrator, expected_value):
+    val = entity.interface
+    assert val == expected_value
 
-    @property
-    def ports(self) -> t.Sequence[int]:
-        return tuple({shard.port for shard in self.shards})
 
-    @property
-    def db_hosts(self) -> t.Sequence[str]:
-        return tuple(sorted({shard.hostname for shard in self.shards}))
+@pytest.mark.parametrize(
+    "orc, expected_length",
+    [
+        pytest.param(orchestrator_1, 2),
+        pytest.param(orchestrator_2, 2),
+        pytest.param(orchestrator_3, 1),
+    ],
+)
+def test_get_all_shards(orc: Orchestrator, expected_length):
+    val = orc.shards
+    assert len(val) == expected_length

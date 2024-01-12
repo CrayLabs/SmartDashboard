@@ -25,7 +25,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import io
+import itertools
 import json
+import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List
@@ -50,19 +52,22 @@ class Manifest:
     :type experiment: Experiment
     :param runs: Runs of an experiment
     :type runs: List[Run]
-    :param applications: All applications across all runs
-    :type applications: List[Application]
-    :param orchestrators: All orchestrators across all runs
-    :type orchestrators: List[Orchestrator]
-    :param ensembles: All ensembles across all runs
-    :type ensembles: List[Ensemble]
     """
 
     experiment: Experiment
     runs: List[Run]
-    applications: List[Application]
-    orchestrators: List[Orchestrator]
-    ensembles: List[Ensemble]
+
+    @property
+    def apps_with_run_ctx(self) -> t.Iterable[t.Tuple[t.Tuple[str, Application], ...]]:
+        return itertools.chain(run.apps_with_ctx for run in self.runs)
+
+    @property
+    def orcs_with_run_ctx(self) -> t.Iterable[t.Tuple[t.Tuple[str, Orchestrator], ...]]:
+        return itertools.chain(run.orcs_with_ctx for run in self.runs)
+
+    @property
+    def ensemble_with_run_ctx(self) -> t.Iterable[t.Tuple[t.Tuple[str, Ensemble], ...]]:
+        return itertools.chain(run.ensemble_with_ctx for run in self.runs)
 
 
 class ManifestReader(ABC):
@@ -112,50 +117,11 @@ class ManifestFileReader(ManifestReader):
         experiment = Experiment(**self._data.get("experiment", {}))
         runs_data = self._data.get("runs", [])
 
-        try:
-            apps = [
-                Application(**app, run_id=run["run_id"])
-                for run in runs_data
-                for app in run.get("model", None)
-                if app
-            ]
-        except Exception as exc:
-            raise MalformedManifestError(
-                "Applications are malformed.", file=self._file_path, exception=exc
-            ) from exc
-
-        try:
-            orcs = [
-                Orchestrator(**orch, run_id=run["run_id"])
-                for run in runs_data
-                for orch in run.get("orchestrator", None)
-                if orch
-            ]
-        except Exception as exc:
-            raise MalformedManifestError(
-                "Orchestrators are malformed.", file=self._file_path, exception=exc
-            ) from exc
-
-        try:
-            ensembles = [
-                Ensemble(**ensemble, run_id=run["run_id"])
-                for run in runs_data
-                for ensemble in run.get("ensemble", None)
-                if ensemble
-            ]
-        except Exception as exc:
-            raise MalformedManifestError(
-                "Ensembles are malformed.", file=self._file_path, exception=exc
-            ) from exc
-
         runs = [Run(**run_data) for run_data in runs_data]
 
         return Manifest(
             experiment=experiment,
             runs=runs,
-            applications=apps,
-            orchestrators=orcs,
-            ensembles=ensembles,
         )
 
     @classmethod

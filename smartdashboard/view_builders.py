@@ -30,10 +30,14 @@ import typing as t
 import pandas as pd
 import streamlit as st
 
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.orchestrator import Orchestrator
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import (
     build_dataframe_generic,
     build_dataframe_loaded_entities,
+    flatten,
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
     get_port,
@@ -61,10 +65,8 @@ def error_builder(error: SSDashboardError) -> ErrorView:
     """
     view = ErrorView()
     st.header(str(error))
-    st.error(
-        f"""Error found in file: {error.file}  
-             Error Message: {error.exception}"""
-    )
+    st.error(f"""Error found in file: {error.file}  
+             Error Message: {error.exception}""")
 
     with st.expander(label="Traceback"):
         st.code(traceback.format_exc(), language=None)
@@ -101,11 +103,19 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     st.subheader("Application Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_application = st.selectbox(
-            "Select an application:",
-            manifest.applications,
-            format_func=lambda app: f"{app.name}: Run {app.run_id}",
+        flattened_data: t.List[t.Tuple[str, Application]] = flatten(
+            manifest.apps_with_run_ctx
         )
+        selected_application_tuple = st.selectbox(
+            "Select an application:",
+            flattened_data,
+            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
+        )
+
+    if selected_application_tuple is not None:
+        _, selected_application = selected_application_tuple
+    else:
+        selected_application = None
 
     view = ApplicationView(selected_application)
 
@@ -211,11 +221,19 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     st.subheader("Orchestrator Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_orchestrator = st.selectbox(
-            "Select an orchestrator:",
-            manifest.orchestrators,
-            format_func=lambda orc: f"{orc.name}: Run {orc.run_id}",
+        flattened_data: t.List[t.Tuple[str, Orchestrator]] = flatten(
+            manifest.orcs_with_run_ctx
         )
+        selected_orchestrator_tuple = st.selectbox(
+            "Select an orchestrator:",
+            flattened_data,
+            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
+        )
+
+    if selected_orchestrator_tuple is not None:
+        _, selected_orchestrator = selected_orchestrator_tuple
+    else:
+        selected_orchestrator = None
 
     shards = selected_orchestrator.shards if selected_orchestrator else []
     view = OrchestratorView(selected_orchestrator, shards[0] if shards else None)
@@ -277,11 +295,19 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     st.subheader("Ensemble Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_ensemble = st.selectbox(
-            "Select an ensemble:",
-            manifest.ensembles,
-            format_func=lambda ens: f"{ens.name}: Run {ens.run_id}",
+        flattened_data: t.List[t.Tuple[str, Ensemble]] = flatten(
+            manifest.ensemble_with_run_ctx
         )
+        selected_ensemble_tuple = st.selectbox(
+            "Select an ensemble:",
+            flattened_data,
+            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
+        )
+
+    if selected_ensemble_tuple is not None:
+        _, selected_ensemble = selected_ensemble_tuple
+    else:
+        selected_ensemble = None
 
     members = selected_ensemble.models if selected_ensemble else []
 
