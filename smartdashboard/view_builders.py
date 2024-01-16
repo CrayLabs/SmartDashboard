@@ -87,6 +87,16 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     st.write("Path: " + manifest.experiment.path)
     st.write("Launcher: " + manifest.experiment.launcher)
 
+    with st.expander(label="Logs"):
+        col1, col2 = st.columns([6, 6])
+        with col1:
+            st.write("Output")
+            view.out_logs_element = st.code(view.out_logs, language=None)
+
+        with col2:
+            st.write("Error")
+            view.err_logs_element = st.code(view.err_logs, language=None)
+
     return view
 
 

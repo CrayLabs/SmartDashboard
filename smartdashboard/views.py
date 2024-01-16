@@ -30,7 +30,7 @@ from abc import ABC, abstractmethod
 from streamlit.delta_generator import DeltaGenerator
 
 from smartdashboard.schemas.application import Application
-from smartdashboard.schemas.base import EntityWithNameTelemetryMetaDataErrOut
+from smartdashboard.schemas.base import HasOutErrFiles
 from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.experiment import Experiment
 from smartdashboard.schemas.orchestrator import Orchestrator
@@ -47,7 +47,7 @@ from smartdashboard.utils.StatusReader import (
     get_status,
 )
 
-_T = t.TypeVar("_T", bound=EntityWithNameTelemetryMetaDataErrOut)
+_T = t.TypeVar("_T", bound=HasOutErrFiles)
 
 
 class ViewBase(ABC):
@@ -131,7 +131,7 @@ class EntityView(t.Generic[_T], ViewBase):
             self.view_model = new_view_model
 
 
-class ExperimentView(ViewBase):
+class ExperimentView(EntityView[Experiment]):
     """View class for experiments"""
 
     def __init__(
@@ -149,6 +149,7 @@ class ExperimentView(ViewBase):
         self.status_element = DeltaGenerator()
         self.experiment = experiment
         self.runs = runs
+        super().__init__(view_model=experiment)
 
     @property
     def status(self) -> str:
@@ -159,7 +160,7 @@ class ExperimentView(ViewBase):
         """
         return get_experiment_status_summary(self.runs)
 
-    def update(self) -> None:
+    def update_status(self) -> None:
         """Update status element in ExperimentView"""
         self.status_element.write(self.status)
 
