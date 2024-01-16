@@ -26,10 +26,10 @@
 
 import typing as t
 
-from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.base import EntityWithNameTelemetryMetaDataErrOut
 
 
-class Shard(BaseEntity):
+class Shard(EntityWithNameTelemetryMetaDataErrOut):
     hostname: str
     port: int
     conf_file: t.Optional[str]

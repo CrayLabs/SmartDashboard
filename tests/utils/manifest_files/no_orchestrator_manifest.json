@@ -95,7 +95,7 @@
                         "step_id": "111"
                     },
                     "out_file": "tests/utils/log_files/model_0.out",
-                    "err_path": "tests/utils/log_files/model_0.err"
+                    "err_file": "tests/utils/log_files/model_0.err"
                 },
                 {
                     "name": "app2",

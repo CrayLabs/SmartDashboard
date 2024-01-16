@@ -32,6 +32,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
+from pydantic import ValidationError
+
 from smartdashboard.schemas.application import Application
 from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.experiment import Experiment
@@ -58,16 +60,16 @@ class Manifest:
     runs: List[Run]
 
     @property
-    def apps_with_run_ctx(self) -> t.Iterable[t.Tuple[t.Tuple[str, Application], ...]]:
-        return itertools.chain(run.apps_with_ctx for run in self.runs)
+    def apps_with_run_ctx(self) -> t.Iterable[t.Tuple[str, Application]]:
+        return itertools.chain.from_iterable(run.apps_with_ctx for run in self.runs)
 
     @property
-    def orcs_with_run_ctx(self) -> t.Iterable[t.Tuple[t.Tuple[str, Orchestrator], ...]]:
-        return itertools.chain(run.orcs_with_ctx for run in self.runs)
+    def orcs_with_run_ctx(self) -> t.Iterable[t.Tuple[str, Orchestrator]]:
+        return itertools.chain.from_iterable(run.orcs_with_ctx for run in self.runs)
 
     @property
-    def ensemble_with_run_ctx(self) -> t.Iterable[t.Tuple[t.Tuple[str, Ensemble], ...]]:
-        return itertools.chain(run.ensemble_with_ctx for run in self.runs)
+    def ensemble_with_run_ctx(self) -> t.Iterable[t.Tuple[str, Ensemble]]:
+        return itertools.chain.from_iterable(run.ensemble_with_ctx for run in self.runs)
 
 
 class ManifestReader(ABC):
@@ -172,4 +174,8 @@ def load_manifest(path: str) -> Manifest:
         raise ManifestError(
             title="Manifest file could not be decoded.", file=path, exception=jde
         ) from jde
+    except ValidationError as val:
+        raise MalformedManifestError(
+            title="Manifest file is malformed.", file=path, exception=val
+        ) from val
     return manifest

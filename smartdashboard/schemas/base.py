@@ -25,13 +25,43 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import typing as t
-from abc import ABC
 
 from pydantic import BaseModel
 
 
-class BaseEntity(BaseModel, ABC):
+class HasName(BaseModel):
     name: str
-    out_file: str = ""
-    err_file: str = ""
-    telemetry_metadata: t.Dict[str, t.Any] = {}
+
+
+class HasOutErrFiles(BaseModel):
+    out_file: str
+    err_file: str
+
+
+class HasTelemetryMetaData(BaseModel):
+    telemetry_metadata: t.Dict[str, t.Any]
+
+
+class EntitiyWithOnlyNameAndOutErrFiles(
+    HasName,
+    HasOutErrFiles,
+    BaseModel,
+):
+    pass
+
+
+class EntityWithOnlyNameAndTelemetryMetaData(
+    HasName,
+    HasTelemetryMetaData,
+    BaseModel,
+):
+    pass
+
+
+class EntityWithNameTelemetryMetaDataErrOut(
+    HasName,
+    HasTelemetryMetaData,
+    HasOutErrFiles,
+    BaseModel,
+):
+    pass

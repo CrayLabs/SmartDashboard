@@ -27,11 +27,11 @@
 import itertools
 import typing as t
 
-from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.base import EntityWithNameTelemetryMetaDataErrOut
 from smartdashboard.schemas.files import Files
 
 
-class Application(BaseEntity):
+class Application(EntityWithNameTelemetryMetaDataErrOut):
     path: str
     exe_args: t.List[str] = []
     run_settings: t.Dict[str, t.Any] = {}

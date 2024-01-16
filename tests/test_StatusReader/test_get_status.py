@@ -24,11 +24,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import typing as t
 
 import pytest
 
-from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.base import EntityWithNameTelemetryMetaDataErrOut
 from smartdashboard.utils.errors import MalformedManifestError
 from smartdashboard.utils.status import StatusEnum
 from smartdashboard.utils.StatusReader import StatusData, get_status
@@ -48,12 +47,9 @@ from ..utils.test_entities import *
         pytest.param(pending_shard, StatusData(StatusEnum.PENDING, None)),
         pytest.param(malformed_status_dir_shard, StatusData(StatusEnum.UNKNOWN, None)),
         pytest.param(no_return_code_shard, StatusData(StatusEnum.UNKNOWN, None)),
-        pytest.param(
-            JSONDecoderError_status_shard, StatusData(StatusEnum.UNKNOWN, None)
-        ),
     ],
 )
-def test_get_status(entity: BaseEntity, expected_status):
+def test_get_status(entity: EntityWithNameTelemetryMetaDataErrOut, expected_status):
     try:
         status_dir = entity.telemetry_metadata["status_dir"]
         status = get_status(status_dir)

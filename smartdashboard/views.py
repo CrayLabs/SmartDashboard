@@ -30,7 +30,7 @@ from abc import ABC, abstractmethod
 from streamlit.delta_generator import DeltaGenerator
 
 from smartdashboard.schemas.application import Application
-from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.base import EntityWithNameTelemetryMetaDataErrOut
 from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.experiment import Experiment
 from smartdashboard.schemas.orchestrator import Orchestrator
@@ -47,7 +47,7 @@ from smartdashboard.utils.StatusReader import (
     get_status,
 )
 
-_T = t.TypeVar("_T", bound=BaseEntity)
+_T = t.TypeVar("_T", bound=EntityWithNameTelemetryMetaDataErrOut)
 
 
 class ViewBase(ABC):
@@ -192,15 +192,13 @@ class ApplicationView(EntityView[Application]):
         :return: Status
         :rtype: str
         """
-        if self.application is None:
-            return "Status: "
-
-        status = get_status(
-            self.application.telemetry_metadata.get(
-                "status_dir", StatusData(StatusEnum.UNKNOWN, None)
-            )
-        )
-        return format_status(status)
+        if self.application is not None:
+            try:
+                status = get_status(self.application.telemetry_metadata["status_dir"])
+            except KeyError:
+                status = StatusData(StatusEnum.UNKNOWN, None)
+            return format_status(status)
+        return "Status: "
 
     def update_status(self) -> None:
         """Update status element in ApplicationView"""
@@ -294,15 +292,13 @@ class EnsembleView(EntityView[Application]):
         :return: Status
         :rtype: str
         """
-        if self.member is None:
-            return "Status: "
-
-        status = get_status(
-            self.member.telemetry_metadata.get(
-                "status_dir", StatusData(StatusEnum.UNKNOWN, None)
-            )
-        )
-        return format_status(status)
+        if self.member is not None:
+            try:
+                status = get_status(self.member.telemetry_metadata["status_dir"])
+            except KeyError:
+                status = StatusData(StatusEnum.UNKNOWN, None)
+            return format_status(status)
+        return "Status: "
 
     def update_status(self) -> None:
         """Update ensemble and member status elements in EnsembleView"""

@@ -44,9 +44,6 @@ from smartdashboard.utils.StatusReader import get_experiment_status_summary
             "tests/utils/manifest_files/no_running.json",
             f"Status: {StatusEnum.INACTIVE.value}",
         ),
-        pytest.param(
-            "tests/utils/manifest_files/no_experiment_manifest.json", "Status: "
-        ),
     ],
 )
 def test_get_experiment_status_summary(json_file, expected_status):

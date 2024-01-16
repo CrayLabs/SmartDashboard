@@ -28,11 +28,11 @@ import typing as t
 
 from pydantic import field_validator
 
-from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.base import HasName
 from smartdashboard.schemas.shard import Shard
 
 
-class Orchestrator(BaseEntity):
+class Orchestrator(HasName):
     type: str
     interface: t.List[str] = []
     shards: t.List[Shard] = []

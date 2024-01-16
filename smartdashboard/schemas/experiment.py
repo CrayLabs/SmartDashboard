@@ -24,10 +24,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pydantic import BaseModel
+from smartdashboard.schemas.base import HasName
 
 
-class Experiment(BaseModel):
-    name: str = ""
+class Experiment(HasName):
     path: str = ""
     launcher: str = ""

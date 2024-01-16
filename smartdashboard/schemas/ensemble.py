@@ -27,10 +27,10 @@
 import typing as t
 
 from smartdashboard.schemas.application import Application
-from smartdashboard.schemas.base import BaseEntity
+from smartdashboard.schemas.base import HasName
 
 
-class Ensemble(BaseEntity):
+class Ensemble(HasName):
     params: t.Dict[str, t.Any]
     batch_settings: t.Dict[str, t.Any]
     models: t.List[Application]

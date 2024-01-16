@@ -30,14 +30,10 @@ import typing as t
 import pandas as pd
 import streamlit as st
 
-from smartdashboard.schemas.application import Application
-from smartdashboard.schemas.ensemble import Ensemble
-from smartdashboard.schemas.orchestrator import Orchestrator
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import (
     build_dataframe_generic,
     build_dataframe_loaded_entities,
-    flatten,
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
     get_port,
@@ -105,12 +101,9 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     st.subheader("Application Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        flattened_data: t.List[t.Tuple[str, Application]] = flatten(
-            manifest.apps_with_run_ctx
-        )
         selected_application_tuple = st.selectbox(
             "Select an application:",
-            flattened_data,
+            manifest.apps_with_run_ctx,
             format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
         )
 
@@ -223,12 +216,9 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     st.subheader("Orchestrator Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        flattened_data: t.List[t.Tuple[str, Orchestrator]] = flatten(
-            manifest.orcs_with_run_ctx
-        )
         selected_orchestrator_tuple = st.selectbox(
             "Select an orchestrator:",
-            flattened_data,
+            manifest.orcs_with_run_ctx,
             format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
         )
 
@@ -297,12 +287,9 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     st.subheader("Ensemble Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        flattened_data: t.List[t.Tuple[str, Ensemble]] = flatten(
-            manifest.ensemble_with_run_ctx
-        )
         selected_ensemble_tuple = st.selectbox(
             "Select an ensemble:",
-            flattened_data,
+            manifest.ensemble_with_run_ctx,
             format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
         )
 
