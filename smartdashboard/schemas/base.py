@@ -24,22 +24,44 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
+import typing as t
 
-from smartdashboard.utils.helpers import get_ensemble_members
-
-from ..utils.test_entities import *
+from pydantic import BaseModel
 
 
-@pytest.mark.parametrize(
-    "ensemble, expected_length, expected_value",
-    [
-        pytest.param(ensemble_1, 1, ensemble_1.get("models")),
-        pytest.param(ensemble_2, 0, ensemble_2.get("models")),
-        pytest.param(None, 0, []),
-    ],
-)
-def test_get_ensemble_members(ensemble, expected_length, expected_value):
-    val = get_ensemble_members(ensemble)
-    assert len(val) == expected_length
-    assert val == expected_value
+class HasName(BaseModel):
+    name: str
+
+
+class HasOutErrFiles(BaseModel):
+    out_file: str
+    err_file: str
+
+
+class HasTelemetryMetaData(BaseModel):
+    telemetry_metadata: t.Dict[str, t.Any]
+
+
+class EntitiyWithOnlyNameAndOutErrFiles(
+    HasName,
+    HasOutErrFiles,
+    BaseModel,
+):
+    pass
+
+
+class EntityWithOnlyNameAndTelemetryMetaData(
+    HasName,
+    HasTelemetryMetaData,
+    BaseModel,
+):
+    pass
+
+
+class EntityWithNameTelemetryMetaDataErrOut(
+    HasName,
+    HasTelemetryMetaData,
+    HasOutErrFiles,
+    BaseModel,
+):
+    pass

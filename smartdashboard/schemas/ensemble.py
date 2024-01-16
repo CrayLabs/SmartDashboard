@@ -24,21 +24,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
+import typing as t
 
-from smartdashboard.utils.helpers import get_exe_args
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.base import HasName
 
-from ..utils.test_entities import *
 
-
-@pytest.mark.parametrize(
-    "entity, expected_value",
-    [
-        pytest.param(application_1, ["string"]),
-        pytest.param(application_2, ["string1", "string2", "string3"]),
-        pytest.param(None, []),
-    ],
-)
-def test_get_exe_args(entity, expected_value):
-    val = get_exe_args(entity)
-    assert val == expected_value
+class Ensemble(HasName):
+    params: t.Dict[str, t.Any]
+    batch_settings: t.Dict[str, t.Any]
+    models: t.List[Application]

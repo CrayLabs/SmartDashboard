@@ -36,16 +36,7 @@ from smartdashboard.utils.helpers import (
     build_dataframe_loaded_entities,
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
-    get_all_shards,
-    get_db_hosts,
-    get_ensemble_members,
-    get_entity_from_name,
-    get_exe_args,
-    get_interfaces,
-    get_member,
     get_port,
-    get_shard,
-    get_value,
     render_dataframe,
     shard_log_spacing,
 )
@@ -93,8 +84,8 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     st.subheader("Experiment Configuration")
     st.write("")
     view.status_element = st.empty()
-    st.write("Path: " + manifest.experiment.get("path", ""))
-    st.write("Launcher: " + manifest.experiment.get("launcher", ""))
+    st.write("Path: " + manifest.experiment.path)
+    st.write("Launcher: " + manifest.experiment.launcher)
 
     return view
 
@@ -110,15 +101,14 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     st.subheader("Application Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_app_name: t.Optional[str] = st.selectbox(
+        selected_application_tuple = st.selectbox(
             "Select an application:",
-            [f'{app["name"]}: Run {app["run_id"]}' for app in manifest.applications],
+            manifest.apps_with_run_ctx,
+            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
         )
 
-    if selected_app_name is not None:
-        selected_application = get_entity_from_name(
-            selected_app_name, manifest.applications
-        )
+    if selected_application_tuple is not None:
+        _, selected_application = selected_application_tuple
     else:
         selected_application = None
 
@@ -126,14 +116,18 @@ def app_builder(manifest: Manifest) -> ApplicationView:
 
     st.write("")
     view.status_element = st.empty()
-    st.write("Path: " + get_value("path", view.application))
+    st.write("Path: " + (view.application.path if view.application is not None else ""))
 
     st.write("")
     with st.expander(label="Executable Arguments"):
         render_dataframe(
             pd.DataFrame(
                 {
-                    "All Arguments": get_exe_args(selected_application),
+                    "All Arguments": (
+                        selected_application.exe_args
+                        if selected_application is not None
+                        else []
+                    ),
                 }
             )
         )
@@ -145,14 +139,14 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             column=col1,
             title="Batch Settings",
             dict_name="batch_settings",
-            entity=selected_application,
+            entity=selected_application.model_dump() if selected_application else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Run Settings",
             dict_name="run_settings",
-            entity=selected_application,
+            entity=selected_application.model_dump() if selected_application else {},
             df_columns=["Name", "Value"],
         )
 
@@ -163,14 +157,14 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             column=col1,
             title="Parameters",
             dict_name="params",
-            entity=selected_application,
+            entity=selected_application.model_dump() if selected_application else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Files",
             dict_name="files",
-            entity=selected_application,
+            entity=selected_application.model_dump() if selected_application else {},
             df_columns=["Type", "File"],
         )
 
@@ -179,7 +173,7 @@ def app_builder(manifest: Manifest) -> ApplicationView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             app_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                selected_application.get("colocated_db")
+                selected_application.colocated_db
                 if selected_application is not None
                 else {}
             )
@@ -191,7 +185,9 @@ def app_builder(manifest: Manifest) -> ApplicationView:
                 df_columns=["Name", "Value"],
             )
             build_dataframe_loaded_entities(
-                column=col2, title="Loaded Scripts and Models", entity=app_colocated_db
+                column=col2,
+                title="Loaded Scripts and Models",
+                entity=selected_application,
             )
 
     st.write("")
@@ -220,33 +216,41 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     st.subheader("Orchestrator Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_orc_name: t.Optional[str] = st.selectbox(
+        selected_orchestrator_tuple = st.selectbox(
             "Select an orchestrator:",
-            [f'{orc["name"]}: Run {orc["run_id"]}' for orc in manifest.orchestrators],
+            manifest.orcs_with_run_ctx,
+            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
         )
 
-    if selected_orc_name is not None:
-        selected_orchestrator = get_entity_from_name(
-            selected_orc_name, manifest.orchestrators
-        )
+    if selected_orchestrator_tuple is not None:
+        _, selected_orchestrator = selected_orchestrator_tuple
     else:
         selected_orchestrator = None
 
-    shards: t.List[t.Dict[str, t.Any]] = get_all_shards(selected_orchestrator)
+    shards = selected_orchestrator.shards if selected_orchestrator else []
     view = OrchestratorView(selected_orchestrator, shards[0] if shards else None)
 
     st.write("")
     view.status_element = st.empty()
-    st.write("Type: " + get_value("type", selected_orchestrator))
+    st.write(
+        "Type: "
+        + (selected_orchestrator.type if selected_orchestrator is not None else "")
+    )
     st.write("Port: " + get_port(selected_orchestrator))
-    st.write("Interface: " + get_interfaces(selected_orchestrator))
+    st.write(
+        "Interface: " + ", ".join(selected_orchestrator.interface)
+        if selected_orchestrator
+        else ""
+    )
 
     st.write("")
     with st.expander(label="Database Hosts"):
         render_dataframe(
             pd.DataFrame(
                 {
-                    "Hosts": get_db_hosts(selected_orchestrator),
+                    "Hosts": (
+                        selected_orchestrator.db_hosts if selected_orchestrator else []
+                    ),
                 }
             )
         )
@@ -254,15 +258,9 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])
         with col1:
-            selected_shard_name: t.Optional[str] = st.selectbox(
-                "Select a shard:",
-                [shard["name"] for shard in shards if shard is not None],
+            shard = st.selectbox(
+                "Select a shard:", shards, format_func=lambda shard: shard.name
             )
-
-            if selected_shard_name is not None:
-                shard = get_shard(selected_shard_name, selected_orchestrator)
-            else:
-                shard = None
 
             view.update_view_model(shard)
 
@@ -289,22 +287,19 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     st.subheader("Ensemble Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_ensemble_name: t.Optional[str] = st.selectbox(
+        selected_ensemble_tuple = st.selectbox(
             "Select an ensemble:",
-            [
-                f'{ensemble["name"]}: Run {ensemble["run_id"]}'
-                for ensemble in manifest.ensembles
-            ],
+            manifest.ensemble_with_run_ctx,
+            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
         )
 
-    if selected_ensemble_name is not None:
-        selected_ensemble = get_entity_from_name(
-            selected_ensemble_name, manifest.ensembles
-        )
+    if selected_ensemble_tuple is not None:
+        _, selected_ensemble = selected_ensemble_tuple
     else:
         selected_ensemble = None
 
-    members: t.List[t.Dict[str, t.Any]] = get_ensemble_members(selected_ensemble)
+    members = selected_ensemble.models if selected_ensemble else []
+
     view = EnsembleView(selected_ensemble, members[0] if members else None)
 
     st.write("")
@@ -314,7 +309,10 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with st.expander(label="Batch Settings"):
         render_dataframe(
             pd.DataFrame(
-                flatten_nested_keyvalue_containers("batch_settings", selected_ensemble),
+                flatten_nested_keyvalue_containers(
+                    "batch_settings",
+                    selected_ensemble.model_dump() if selected_ensemble else {},
+                ),
                 columns=["Name", "Value"],
             )
         )
@@ -329,32 +327,28 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         )
 
     st.write("#")
-    if selected_ensemble_name is not None:
-        st.subheader(selected_ensemble_name + " Member Configuration")
+    if selected_ensemble is not None:
+        st.subheader(selected_ensemble.name + " Member Configuration")
     else:
         st.subheader("Member Configuration")
 
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_member_name: t.Optional[str] = st.selectbox(
-            "Select a member:",
-            [member["name"] for member in members if member],
+        member = st.selectbox(
+            "Select a member:", members, format_func=lambda member: member.name
         )
-
-    if selected_member_name is not None:
-        member = get_member(selected_member_name, selected_ensemble)
-    else:
-        member = None
 
     view.update_view_model(member)
 
     st.write("")
     view.member_status_element = st.empty()
-    st.write("Path: " + get_value("path", member))
+    st.write("Path: " + (member.path if member else ""))
     st.write("")
     with st.expander(label="Executable Arguments"):
         render_dataframe(
-            pd.DataFrame({"All Arguments": get_exe_args(member)}),
+            pd.DataFrame(
+                {"All Arguments": member.exe_args if member is not None else []}
+            ),
         )
 
     st.write("")
@@ -364,14 +358,14 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             column=col1,
             title="Batch Settings",
             dict_name="batch_settings",
-            entity=member,
+            entity=member.model_dump() if member else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Run Settings",
             dict_name="run_settings",
-            entity=member,
+            entity=member.model_dump() if member else {},
             df_columns=["Name", "Value"],
         )
 
@@ -382,14 +376,14 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             column=col1,
             title="Parameters",
             dict_name="params",
-            entity=member,
+            entity=member.model_dump() if member else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Files",
             dict_name="files",
-            entity=member,
+            entity=member.model_dump() if member else {},
             df_columns=["Type", "File"],
         )
 
@@ -398,7 +392,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         with st.container():
             col1, col2 = st.columns([6, 6])
             mem_colocated_db: t.Optional[t.Dict[str, t.Any]] = (
-                member.get("colocated_db") if member is not None else {}
+                member.colocated_db if member is not None else {}
             )
             build_dataframe_generic(
                 column=col1,
@@ -408,7 +402,9 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
                 df_columns=["Name", "Value"],
             )
             build_dataframe_loaded_entities(
-                column=col2, title="Loaded Scripts and Models", entity=mem_colocated_db
+                column=col2,
+                title="Loaded Scripts and Models",
+                entity=member,
             )
 
     st.write("")
@@ -436,7 +432,7 @@ def overview_builder(manifest: Manifest) -> OverviewView:
     :return: View of the entire Overview page
     :rtype: OverviewView
     """
-    st.header("Experiment Overview: " + manifest.experiment.get("name", ""))
+    st.header("Experiment Overview: " + manifest.experiment.name)
     st.write("")
 
     experiment, application, orchestrators, ensembles = st.tabs(

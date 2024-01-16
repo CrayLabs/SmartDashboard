@@ -26,30 +26,44 @@
 
 import pytest
 
-from smartdashboard.utils.LogReader import get_logs
-
-from ..utils.test_entities import *
+from tests.utils.test_entities import *
 
 
 @pytest.mark.parametrize(
-    "entity, expected_output_log, expected_error_log",
+    "orchestrator, expected_value",
     [
-        pytest.param(
-            application_1,
-            model0_out_logs,
-            model0_err_logs,
-        ),
-        pytest.param(
-            application_2,
-            model1_out_logs,
-            model1_err_logs,
-        ),
+        pytest.param(orchestrator_1, ("shard1_host", "shard2_host")),
+        pytest.param(orchestrator_2, ("shard1_host", "shard2_host")),
+        pytest.param(orchestrator_3, ("shard1_host",)),
+        pytest.param(no_shards_orchestrator, ()),
     ],
 )
-def test_load_log_data(entity, expected_output_log, expected_error_log):
-    output_log_path = entity.out_file
-    error_log_path = entity.err_file
-    output_logs = get_logs(output_log_path)
-    error_logs = get_logs(error_log_path)
-    assert output_logs == expected_output_log
-    assert error_logs == expected_error_log
+def test_get_db_hosts(orchestrator: Orchestrator, expected_value):
+    hosts = orchestrator.db_hosts
+    assert hosts == expected_value
+
+
+@pytest.mark.parametrize(
+    "entity, expected_value",
+    [
+        pytest.param(orchestrator_1, ["lo", "lo2"]),
+        pytest.param(orchestrator_2, ["lo"]),
+        pytest.param(orchestrator_3, ["lo"]),
+    ],
+)
+def test_get_interfaces(entity: Orchestrator, expected_value):
+    val = entity.interface
+    assert val == expected_value
+
+
+@pytest.mark.parametrize(
+    "orc, expected_length",
+    [
+        pytest.param(orchestrator_1, 2),
+        pytest.param(orchestrator_2, 2),
+        pytest.param(orchestrator_3, 1),
+    ],
+)
+def test_get_all_shards(orc: Orchestrator, expected_length):
+    val = orc.shards
+    assert len(val) == expected_length

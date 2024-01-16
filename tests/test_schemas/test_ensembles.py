@@ -26,20 +26,16 @@
 
 import pytest
 
-from smartdashboard.utils.helpers import get_shard
-
-from ..utils.test_entities import *
+from tests.utils.test_entities import *
 
 
 @pytest.mark.parametrize(
-    "shard_name, orc, shard",
+    "ensemble, expected_length",
     [
-        pytest.param("shard 1", orchestrator_1, orch_1_shard_1),
-        pytest.param("shard 2", orchestrator_1, orch_1_shard_2),
-        pytest.param("shard doesnt_exist", orchestrator_1, None),
-        pytest.param("shard 1", None, None),
+        pytest.param(ensemble_1, 1),
+        pytest.param(ensemble_2, 0),
     ],
 )
-def test_get_shard(shard_name, orc, shard):
-    sh = get_shard(shard_name, orc)
-    assert sh == shard
+def test_get_ensemble_members(ensemble: Ensemble, expected_length):
+    val = ensemble.models
+    assert len(val) == expected_length

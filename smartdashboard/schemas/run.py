@@ -24,23 +24,29 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
+import typing as t
 
-from smartdashboard.utils.helpers import get_interfaces
+from pydantic import BaseModel
 
-from ..utils.test_entities import *
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.orchestrator import Orchestrator
 
 
-@pytest.mark.parametrize(
-    "entity, expected_value",
-    [
-        pytest.param(orchestrator_1, "lo, lo2"),
-        pytest.param(orchestrator_2, "lo"),
-        pytest.param(orchestrator_3, "lo"),
-        pytest.param(application_1, ""),
-        pytest.param(None, ""),
-    ],
-)
-def test_get_interfaces(entity, expected_value):
-    val = get_interfaces(entity)
-    assert val == expected_value
+class Run(BaseModel):
+    run_id: str
+    model: t.List[Application] = []
+    orchestrator: t.List[Orchestrator] = []
+    ensemble: t.List[Ensemble] = []
+
+    @property
+    def apps_with_ctx(self) -> t.Tuple[t.Tuple[str, Application], ...]:
+        return tuple((self.run_id, app) for app in self.model)
+
+    @property
+    def orcs_with_ctx(self) -> t.Tuple[t.Tuple[str, Orchestrator], ...]:
+        return tuple((self.run_id, orc) for orc in self.orchestrator)
+
+    @property
+    def ensemble_with_ctx(self) -> t.Tuple[t.Tuple[str, Ensemble], ...]:
+        return tuple((self.run_id, ens) for ens in self.ensemble)

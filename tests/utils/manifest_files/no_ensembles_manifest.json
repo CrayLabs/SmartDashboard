@@ -12,7 +12,7 @@
     },
     "runs": [
         {
-            "run_id": 1,
+            "run_id": "1",
             "model": [
                 {
                     "name": "app1",
@@ -92,10 +92,10 @@
                     "telemetry_metadata": {
                         "status_dir": "tests/utils/status_files/model_3",
                         "job_id": "111",
-                        "step_id": 111
+                        "step_id": "111"
                     },
                     "out_file": "tests/utils/log_files/model_0.out",
-                    "err_path": "tests/utils/log_files/model_0.err"
+                    "err_file": "tests/utils/log_files/model_0.err"
                 },
                 {
                     "name": "app2",
@@ -177,7 +177,7 @@
                     "telemetry_metadata": {
                         "status_dir": "tests/utils/status_files/model_3",
                         "job_id": "111",
-                        "step_id": 111
+                        "step_id": "111"
                     },
                     "out_file": "tests/utils/log_files/model_1.out",
                     "err_file": "tests/utils/log_files/model_1.err"
@@ -194,7 +194,7 @@
                     "shards": [
                         {
                             "name": "shard 1",
-                            "host": "shard1_host",
+                            "hostname": "shard1_host",
                             "port": "11111",
                             "out_file": "tests/utils/log_files/model_0.out",
                             "err_file": "tests/utils/log_files/model_0.err",
@@ -202,12 +202,12 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         },
                         {
                             "name": "shard 2",
-                            "host": "shard2_host",
+                            "hostname": "shard2_host",
                             "port": "11111",
                             "out_file": "tests/utils/log_files/model_1.out",
                             "err_file": "tests/utils/log_files/model_1.err",
@@ -215,7 +215,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         }
                     ]
@@ -224,7 +224,7 @@
             "ensemble": []
         },
         {
-            "run_id": 2,
+            "run_id": "2",
             "model": [
                 {
                     "name": "app3",
@@ -291,7 +291,7 @@
                     "telemetry_metadata": {
                         "status_dir": "tests/utils/status_files/model_3",
                         "job_id": "111",
-                        "step_id": 111
+                        "step_id": "111"
                     },
                     "out_file": "tests/utils/log_files/model_0.out",
                     "err_file": "tests/utils/log_files/model_0.err"
@@ -374,7 +374,7 @@
                     "telemetry_metadata": {
                         "status_dir": "tests/utils/status_files/model_3",
                         "job_id": "111",
-                        "step_id": 111
+                        "step_id": "111"
                     },
                     "out_file": "tests/utils/log_files/model_1.out",
                     "err_file": "tests/utils/log_files/model_1.err"
@@ -390,7 +390,7 @@
                     "shards": [
                         {
                             "name": "orc 2 shard 1",
-                            "host": "shard1_host",
+                            "hostname": "shard1_host",
                             "port": 22222,
                             "out_file": "tests/utils/log_files/model_1.out",
                             "err_file": "tests/utils/log_files/model_1.err",
@@ -398,12 +398,12 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         },
                         {
                             "name": "orc 2 shard 2",
-                            "host": "shard2_host",
+                            "hostname": "shard2_host",
                             "port": 22222,
                             "out_file": "tests/utils/log_files/model_0.out",
                             "err_file": "tests/utils/log_files/model_0.err",
@@ -411,7 +411,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         }
                     ]
@@ -423,7 +423,7 @@
                     "shards": [
                         {
                             "name": "orc 3 shard 1",
-                            "host": "shard1_host",
+                            "hostname": "shard1_host",
                             "port": "12345",
                             "out_file": "tests/utils/log_files/model_0.out",
                             "err_file": "tests/utils/log_files/model_0.err",
@@ -431,7 +431,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         }
                     ]
