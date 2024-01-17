@@ -56,11 +56,16 @@ def build_app(manifest_path: str) -> None:
         error_builder(ex)
     else:
         views = overview_builder(manifest)
+        to_update: t.Iterable[EntityView[t.Any]] = (
+            views.exp_view,
+            views.app_view,
+            views.orc_view,
+            views.ens_view,
+        )
 
         while True:
-            for v in [views.exp_view, views.app_view, views.orc_view, views.ens_view]:
-                if isinstance(v, EntityView):
-                    v.update()
+            for v in to_update:
+                v.update()
 
             time.sleep(1)
 
