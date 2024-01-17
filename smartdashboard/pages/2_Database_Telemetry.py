@@ -95,7 +95,7 @@ def update_telemetry_page() -> None:
     views = db_telem_builder(st.session_state["orchestrators"])
 
     while True:
-        for v in [views.summary_view, views.memory_view, views.client_view]:
+        for v in [views.memory_view, views.client_view]:
             v.update()
 
         time.sleep(1)

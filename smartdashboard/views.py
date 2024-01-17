@@ -347,18 +347,18 @@ class OverviewView:
 
 
 class MemoryView(ViewBase):
-    def __init__(self, shard: t.Optional[t.Dict[str, t.Any]]) -> None:
+    def __init__(self, shard: t.Optional[Shard]) -> None:
         self.shard = shard
         self.memory_table_element = DeltaGenerator()
         self.memory_graph_element = DeltaGenerator()
 
-    def update_shard(self, new_shard: t.Optional[t.Dict[str, t.Any]]) -> None:
+    def update_shard(self, new_shard: t.Optional[Shard]) -> None:
         if new_shard is not None:
             self.shard = new_shard
 
     def update(self) -> None:
         if self.shard is not None:
-            df = pd.read_csv(self.shard["memory_file"])
+            df = pd.read_csv(self.shard.memory_file)
             df = df.drop(columns="time")
             df /= 1024**3
             self.update_memory_table(df)
@@ -397,18 +397,18 @@ class MemoryView(ViewBase):
 
 
 class ClientView(ViewBase):
-    def __init__(self, shard: t.Optional[t.Dict[str, t.Any]]) -> None:
+    def __init__(self, shard: t.Optional[Shard]) -> None:
         self.shard = shard
         self.client_table_element = DeltaGenerator()
         self.client_graph_element = DeltaGenerator()
 
-    def update_shard(self, new_shard: t.Optional[t.Dict[str, t.Any]]) -> None:
+    def update_shard(self, new_shard: t.Optional[Shard]) -> None:
         if new_shard is not None:
             self.shard = new_shard
 
     def update(self) -> None:
         if self.shard is not None:
-            df = pd.read_csv(self.shard["client_file"])
+            df = pd.read_csv(self.shard.client_file)
             self.update_client_table(df[["Client ID", "Host"]])
             self.update_client_graph(df)
         else:

@@ -52,6 +52,8 @@ from smartdashboard.views import (
     ClientView,
     MemoryView
 )
+from smartdashboard.schemas.orchestrator import Orchestrator
+from smartdashboard.schemas.shard import Shard
 
 
 def error_builder(error: SSDashboardError) -> ErrorView:
@@ -470,7 +472,7 @@ def overview_builder(manifest: Manifest) -> OverviewView:
 
     return OverviewView(exp_view, app_view, orc_view, ens_view)
 
-def db_telem_builder(orcs: t.List[t.Dict[str, t.Any]]) -> TelemetryView:
+def db_telem_builder(orcs: t.Iterable[t.Tuple[str, Orchestrator]]) -> TelemetryView:
     """Database Telemetry page to be rendered
 
     This function organizes the views within
@@ -482,30 +484,36 @@ def db_telem_builder(orcs: t.List[t.Dict[str, t.Any]]) -> TelemetryView:
     :rtype: TelemetryView
     """
     st.header("Database Telemetry")
+    print(orcs)
 
     st.write("##")
+    # print("BEGINNING ORCS")
+    # print(orcs)
 
     col1, col2 = st.columns([6,6])
     with col1:
         selected_orchestrator_tuple = st.selectbox(
             "Select an orchestrator:",
-            manifest.orcs_with_run_ctx,
+            orcs,
             format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
         )
-
+    # print(selected_orchestrator_tuple)
     if selected_orchestrator_tuple is not None:
-        _, selected_orchestrator = selected_orchestrator_tuple
+        selected_run, selected_orchestrator = selected_orchestrator_tuple
     else:
         selected_orchestrator = None
-
-    st.write("##")
+    
+    shards = selected_orchestrator.shards if selected_orchestrator else []
+    # print("Ending ORCS")
+    # print(orcs)
+    # st.write("##")
 
     if selected_orchestrator:
-        st.subheader(selected_orchestrator["name"] + " Telemetry")
+        st.subheader(selected_orchestrator.name + " Telemetry")
     else:
         st.subheader("No Orchestrator Selected")
 
-    shards = selected_orchestrator.shards if selected_orchestrator else []
+    # shards = selected_orchestrator.shards if selected_orchestrator else []
 
     ### Memory ###
     memory_view = memory_view_builder(shards)
@@ -518,7 +526,7 @@ def db_telem_builder(orcs: t.List[t.Dict[str, t.Any]]) -> TelemetryView:
     return TelemetryView(memory_view, client_view)
 
 
-def memory_view_builder(shards: t.List[t.Dict[str, t.Any]]) -> MemoryView:
+def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
     with st.expander(label="Memory "):
         col1, col2 = st.columns([6, 6])
         with col1:
@@ -526,7 +534,7 @@ def memory_view_builder(shards: t.List[t.Dict[str, t.Any]]) -> MemoryView:
             shard = st.selectbox(
                 "Select a shard:",
                 shards,
-                format_func=lambda sh: sh["name"],
+                format_func=lambda sh: sh.name,
                 key="memory_shard",
             )
             view.update_shard(shard)
@@ -540,7 +548,7 @@ def memory_view_builder(shards: t.List[t.Dict[str, t.Any]]) -> MemoryView:
     return view
 
 
-def client_view_builder(shards: t.List[t.Dict[str, t.Any]]) -> ClientView:
+def client_view_builder(shards: t.List[Shard]) -> ClientView:
     with st.expander(label="Clients "):
         col1, col2 = st.columns([6, 6])
         with col1:
@@ -548,7 +556,7 @@ def client_view_builder(shards: t.List[t.Dict[str, t.Any]]) -> ClientView:
             shard = st.selectbox(
                 "Select a shard:",
                 shards,
-                format_func=lambda sh: sh["name"],
+                format_func=lambda sh: sh.name,
                 key="client_shard",
             )
             view.update_shard(shard)

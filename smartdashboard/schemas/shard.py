@@ -33,3 +33,5 @@ class Shard(EntityWithNameTelemetryMetaDataErrOut):
     hostname: str
     port: int
     conf_file: t.Optional[str]
+    memory_file: str
+    client_file: str
