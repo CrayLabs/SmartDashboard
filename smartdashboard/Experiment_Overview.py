@@ -32,6 +32,7 @@ import time
 import typing as t
 from subprocess import run
 
+from smartdashboard.views import EntityView
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.ManifestReader import load_manifest
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
@@ -58,7 +59,8 @@ def build_app(manifest_path: str) -> None:
 
         while True:
             for v in [views.exp_view, views.app_view, views.orc_view, views.ens_view]:
-                v.update()
+                if isinstance(v, EntityView):
+                    v.update()
 
             time.sleep(1)
 
