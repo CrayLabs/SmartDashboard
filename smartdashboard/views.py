@@ -26,6 +26,8 @@
 
 import typing as t
 from abc import ABC, abstractmethod
+import pandas as pd
+import altair as alt
 
 from streamlit.delta_generator import DeltaGenerator
 
@@ -342,3 +344,119 @@ class OverviewView:
         self.app_view = app_view
         self.ens_view = ens_view
         self.orc_view = orc_view
+
+
+class MemoryView(ViewBase):
+    def __init__(self, shard: t.Optional[t.Dict[str, t.Any]]) -> None:
+        self.shard = shard
+        self.memory_table_element = DeltaGenerator()
+        self.memory_graph_element = DeltaGenerator()
+
+    def update_shard(self, new_shard: t.Optional[t.Dict[str, t.Any]]) -> None:
+        if new_shard is not None:
+            self.shard = new_shard
+
+    def update(self) -> None:
+        if self.shard is not None:
+            df = pd.read_csv(self.shard["memory_file"])
+            df = df.drop(columns="time")
+            df /= 1024**3
+            self.update_memory_table(df)
+            self.update_memory_graph(df)
+
+    def update_memory_graph(self, df: pd.DataFrame) -> None:
+        df = df.drop(columns=["Total System Memory (GB)"])
+        chart = (
+            alt.Chart(
+                df.reset_index().melt("index"),
+                height=500,
+                title=alt.TitleParams("Memory Usage", anchor="middle"),
+            )
+            .mark_line()
+            .encode(
+                x=alt.X("index:Q", axis=alt.Axis(title="Time in seconds")),
+                y=alt.Y("value:Q", axis=alt.Axis(title="Memory in GB")),
+                color=alt.Color(
+                    "variable:N", scale=alt.Scale(scheme="category10"), title="Legend"
+                ),
+                tooltip=["index:Q", "variable:N", "value:Q"],
+            )
+            .configure_legend(
+                orient="bottom",
+            )
+        )
+
+        self.memory_graph_element.altair_chart(
+            chart, use_container_width=True, theme="streamlit"
+        )
+
+    def update_memory_table(self, df: pd.DataFrame) -> None:
+        self.memory_table_element.dataframe(
+            df.tail(1), use_container_width=True, hide_index=True
+        )
+
+
+class ClientView(ViewBase):
+    def __init__(self, shard: t.Optional[t.Dict[str, t.Any]]) -> None:
+        self.shard = shard
+        self.client_table_element = DeltaGenerator()
+        self.client_graph_element = DeltaGenerator()
+
+    def update_shard(self, new_shard: t.Optional[t.Dict[str, t.Any]]) -> None:
+        if new_shard is not None:
+            self.shard = new_shard
+
+    def update(self) -> None:
+        if self.shard is not None:
+            df = pd.read_csv(self.shard["client_file"])
+            self.update_client_table(df[["Client ID", "Host"]])
+            self.update_client_graph(df)
+        else:
+            df = pd.DataFrame(columns=["Client ID", "Host"])
+            self.update_client_table(df[["Client ID", "Host"]])
+            self.update_client_graph(df)
+
+    def update_client_table(self, df: pd.DataFrame) -> None:
+        self.client_table_element.dataframe(
+            df, use_container_width=True, hide_index=True
+        )
+
+    def update_client_graph(self, df) -> None:
+        chart = (
+            alt.Chart(df)
+            .mark_line()
+            .encode(
+                x=alt.X("time:O", title="Time"),
+                y=alt.Y("count():Q", title="Number of Clients"),
+            )
+            .properties(
+                height=500,
+                title=alt.TitleParams("Total Client Count", anchor="middle"),
+            )
+            .interactive()
+        )
+
+        self.client_graph_element.altair_chart(chart, use_container_width=True)
+
+
+# class SummaryView(ViewBase):
+#     def __init__(self, orcs: t.Optional[t.List[t.Dict[str, t.Any]]]) -> None:
+#         self.orcs = orcs
+#         self.dataframe: pd.DataFrame
+#         self.selected_row = AgGridReturn()
+
+#     def update(self):
+#         ...
+#         # self.dataframe["Status"]
+
+
+class TelemetryView:
+    def __init__(
+        self,
+        # summary_view: SummaryView,
+        memory_view: MemoryView,
+        client_view: ClientView,
+    ) -> None:
+        # self.summary_view = summary_view
+        self.memory_view = memory_view
+        self.client_view = client_view
