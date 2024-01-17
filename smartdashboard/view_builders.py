@@ -48,6 +48,9 @@ from smartdashboard.views import (
     ExperimentView,
     OrchestratorView,
     OverviewView,
+    TelemetryView,
+    ClientView,
+    MemoryView
 )
 
 
@@ -466,3 +469,94 @@ def overview_builder(manifest: Manifest) -> OverviewView:
         ens_view = ens_builder(manifest)
 
     return OverviewView(exp_view, app_view, orc_view, ens_view)
+
+def db_telem_builder(orcs: t.List[t.Dict[str, t.Any]]) -> TelemetryView:
+    """Database Telemetry page to be rendered
+
+    This function organizes the views within
+    the Database Telemetry page.
+
+    :param orcs: Orchestrators
+    :type orcs: t.List[t.Dict[str, t.Any]]
+    :return: View of the DB Telemetry Page
+    :rtype: TelemetryView
+    """
+    st.header("Database Telemetry")
+
+    st.write("##")
+
+    col1, col2 = st.columns([6,6])
+    with col1:
+        selected_orchestrator_tuple = st.selectbox(
+            "Select an orchestrator:",
+            manifest.orcs_with_run_ctx,
+            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
+        )
+
+    if selected_orchestrator_tuple is not None:
+        _, selected_orchestrator = selected_orchestrator_tuple
+    else:
+        selected_orchestrator = None
+
+    st.write("##")
+
+    if selected_orchestrator:
+        st.subheader(selected_orchestrator["name"] + " Telemetry")
+    else:
+        st.subheader("No Orchestrator Selected")
+
+    shards = selected_orchestrator.shards if selected_orchestrator else []
+
+    ### Memory ###
+    memory_view = memory_view_builder(shards)
+    st.write("")
+
+    ### Clients ###
+    client_view = client_view_builder(shards)
+    st.write("")
+
+    return TelemetryView(memory_view, client_view)
+
+
+def memory_view_builder(shards: t.List[t.Dict[str, t.Any]]) -> MemoryView:
+    with st.expander(label="Memory "):
+        col1, col2 = st.columns([6, 6])
+        with col1:
+            view = MemoryView(shards[0] if shards else None)
+            shard = st.selectbox(
+                "Select a shard:",
+                shards,
+                format_func=lambda sh: sh["name"],
+                key="memory_shard",
+            )
+            view.update_shard(shard)
+            view.memory_table_element = st.empty()
+        with col2:
+            st.write("")
+            st.write("")
+            st.write("")
+            view.memory_graph_element = st.empty()
+
+    return view
+
+
+def client_view_builder(shards: t.List[t.Dict[str, t.Any]]) -> ClientView:
+    with st.expander(label="Clients "):
+        col1, col2 = st.columns([6, 6])
+        with col1:
+            view = ClientView(shards[0] if shards else None)
+            shard = st.selectbox(
+                "Select a shard:",
+                shards,
+                format_func=lambda sh: sh["name"],
+                key="client_shard",
+            )
+            view.update_shard(shard)
+            view.client_table_element = st.empty()
+        with col2:
+            st.write("")
+            st.write("")
+            st.write("")
+            view.client_graph_element = st.empty()
+
+    return view
