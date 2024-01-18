@@ -107,15 +107,15 @@ class EntityView(t.Generic[_T], ViewBase):
     def update(self) -> None:
         """Update logs and status elements in the selected entity view"""
         self.update_logs()
-        self.update_status()
+        self._update_status()
 
     def update_logs(self) -> None:
         """Update error and output log elements in the selected entity view"""
-        self.out_logs_element.code(self.out_logs, language=None)
-        self.err_logs_element.code(self.err_logs, language=None)
+        self.out_logs_element.code(self.out_logs, language="log")
+        self.err_logs_element.code(self.err_logs, language="log")
 
     @abstractmethod
-    def update_status(self) -> None:
+    def _update_status(self) -> None:
         """Abstract method to update an entity's status"""
 
     def update_view_model(self, new_view_model: t.Optional[_T]) -> None:
@@ -147,7 +147,6 @@ class ExperimentView(EntityView[Experiment]):
         :type runs: List[Run]
         """
         self.status_element = DeltaGenerator()
-        self.experiment = experiment
         self.runs = runs
         super().__init__(view_model=experiment)
 
@@ -160,7 +159,7 @@ class ExperimentView(EntityView[Experiment]):
         """
         return get_experiment_status_summary(self.runs)
 
-    def update_status(self) -> None:
+    def _update_status(self) -> None:
         """Update status element in ExperimentView"""
         self.status_element.write(self.status)
 
@@ -201,7 +200,7 @@ class ApplicationView(EntityView[Application]):
             return format_status(status)
         return "Status: "
 
-    def update_status(self) -> None:
+    def _update_status(self) -> None:
         """Update status element in ApplicationView"""
         self.status_element.write(self.status)
 
@@ -243,7 +242,7 @@ class OrchestratorView(EntityView[Shard]):
         """
         return get_orchestrator_status_summary(self.orchestrator)
 
-    def update_status(self) -> None:
+    def _update_status(self) -> None:
         """Update status element in OrchestratorView"""
         self.status_element.write(self.status)
 
@@ -301,7 +300,7 @@ class EnsembleView(EntityView[Application]):
             return format_status(status)
         return "Status: "
 
-    def update_status(self) -> None:
+    def _update_status(self) -> None:
         """Update ensemble and member status elements in EnsembleView"""
         self.status_element.write(self.status)
         self.member_status_element.write(self.member_status)
@@ -314,7 +313,8 @@ class ErrorView(ViewBase):
     information.
     """
 
-    def update(self) -> None: ...
+    def update(self) -> None:
+        ...
 
 
 class OverviewView:

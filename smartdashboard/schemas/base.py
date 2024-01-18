@@ -42,7 +42,7 @@ class HasTelemetryMetaData(BaseModel):
     telemetry_metadata: t.Dict[str, t.Any]
 
 
-class EntitiyWithOnlyNameAndOutErrFiles(
+class EntityWithOnlyNameAndOutErrFiles(
     HasName,
     HasOutErrFiles,
     BaseModel,
