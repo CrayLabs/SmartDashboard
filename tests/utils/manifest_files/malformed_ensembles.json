@@ -34,7 +34,9 @@
                                 "status_dir": "tests/utils/status_files/model_1us/dir",
                                 "job_id": "111",
                                 "step_id": "111"
-                            }
+                            },
+                            "client_file": "tests/utils/clients/client.csv",
+                            "memory_file": "tests/utils/memory/memory.csv"
                         },
                         {
                             "name": "shard 2",
@@ -47,7 +49,9 @@
                                 "status_dir": "tests/utils/status_files/model_1us/dir",
                                 "job_id": "111",
                                 "step_id": "111"
-                            }
+                            },
+                            "client_file": "tests/utils/clients/client.csv",
+                            "memory_file": "tests/utils/memory/memory.csv"
                         }
                     ]
                 }
