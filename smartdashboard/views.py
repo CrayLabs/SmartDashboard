@@ -315,8 +315,7 @@ class ErrorView(ViewBase):
     information.
     """
 
-    def update(self) -> None:
-        ...
+    def update(self) -> None: ...
 
 
 class OverviewView:
@@ -411,10 +410,6 @@ class ClientView(ViewBase):
             dframe = pd.read_csv(self.shard.client_file)
             self.update_client_table(dframe[["Client ID", "Host"]])
             self.update_client_graph(dframe)
-        else:
-            dframe = pd.DataFrame(columns=["Client ID", "Host"])
-            self.update_client_table(dframe[["Client ID", "Host"]])
-            self.update_client_graph(dframe)
 
     def update_client_table(self, dframe: pd.DataFrame) -> None:
         self.client_table_element.dataframe(
@@ -422,10 +417,7 @@ class ClientView(ViewBase):
         )
 
     def update_client_graph(self, dframe: pd.DataFrame) -> None:
-        df_count = pd.DataFrame(
-            {"time": dframe["time"], "Client Count": len(dframe)}
-        )
-        df_count.columns = ["Time", "Client Count"]
+        df_count = pd.DataFrame({"Time": dframe["time"], "Client Count": len(dframe)})
         chart = (
             alt.Chart(df_count)
             .mark_line()

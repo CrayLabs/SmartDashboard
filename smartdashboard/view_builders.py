@@ -254,9 +254,8 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     )
     st.write("Port: " + get_port(selected_orchestrator))
     st.write(
-        "Interface: " + ", ".join(selected_orchestrator.interface)
-        if selected_orchestrator
-        else ""
+        "Interface: "
+        + (", ".join(selected_orchestrator.interface) if selected_orchestrator else "")
     )
 
     st.write("")
@@ -582,9 +581,8 @@ def orc_summary_builder(
         st.write("")
         view.status_element = st.empty()
         st.write(
-            "Number of shards: " + str(len(selected_orchestrator.shards))
-            if selected_orchestrator
-            else ""
+            "Number of shards: "
+            + (str(len(selected_orchestrator.shards)) if selected_orchestrator else "")
         )
         st.write(
             "Type: "
@@ -592,9 +590,12 @@ def orc_summary_builder(
         )
         st.write("Port: " + get_port(selected_orchestrator))
         st.write(
-            "Interface: " + ", ".join(selected_orchestrator.interface)
-            if selected_orchestrator
-            else ""
+            "Interface: "
+            + (
+                ", ".join(selected_orchestrator.interface)
+                if selected_orchestrator
+                else ""
+            )
         )
 
         st.write("")

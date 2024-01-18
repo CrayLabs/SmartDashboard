@@ -230,7 +230,7 @@ orchestrator_1 = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
-            "memory_file": "tests/utils/memory/memory.csv"
+            "memory_file": "tests/utils/memory/memory.csv",
         },
         {
             "name": "shard 2",
@@ -245,7 +245,7 @@ orchestrator_1 = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
-            "memory_file": "tests/utils/memory/memory.csv"
+            "memory_file": "tests/utils/memory/memory.csv",
         },
     ],
 )
@@ -270,7 +270,7 @@ orchestrator_2 = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
-            "memory_file": "tests/utils/memory/memory.csv"
+            "memory_file": "tests/utils/memory/memory.csv",
         },
         {
             "name": "orc 2 shard 2",
@@ -285,7 +285,7 @@ orchestrator_2 = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
-            "memory_file": "tests/utils/memory/memory.csv"
+            "memory_file": "tests/utils/memory/memory.csv",
         },
     ],
 )
@@ -309,7 +309,7 @@ orchestrator_3 = Orchestrator(
                 "step_id": "111",
             },
             client_file="tests/utils/clients/client.csv",
-            memory_file="tests/utils/memory/memory.csv"
+            memory_file="tests/utils/memory/memory.csv",
         )
     ],
 )
@@ -333,7 +333,7 @@ orchestrator_4 = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
-            "memory_file": "tests/utils/memory/memory.csv"
+            "memory_file": "tests/utils/memory/memory.csv",
         }
     ],
 )
@@ -357,7 +357,7 @@ no_shards_started = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
-            "memory_file": "tests/utils/memory/memory.csv"
+            "memory_file": "tests/utils/memory/memory.csv",
         },
         {
             "name": "orc 2 shard 2",
@@ -372,7 +372,7 @@ no_shards_started = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
-            "memory_file": "tests/utils/memory/memory.csv"
+            "memory_file": "tests/utils/memory/memory.csv",
         },
     ],
 )
@@ -396,7 +396,7 @@ mismatched_port_orchestrator = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
-            "memory_file": "tests/utils/memory/memory.csv"
+            "memory_file": "tests/utils/memory/memory.csv",
         },
         {
             "name": "shard 2",
@@ -411,7 +411,7 @@ mismatched_port_orchestrator = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
-            "memory_file": "tests/utils/memory/memory.csv"
+            "memory_file": "tests/utils/memory/memory.csv",
         },
     ],
 )
@@ -437,7 +437,7 @@ pending_shard = Shard(
         "step_id": "111",
     },
     client_file="tests/utils/clients/client.csv",
-    memory_file="tests/utils/memory/memory.csv"
+    memory_file="tests/utils/memory/memory.csv",
 )
 
 no_return_code_shard = Shard(
@@ -453,7 +453,7 @@ no_return_code_shard = Shard(
         "step_id": "111",
     },
     client_file="tests/utils/clients/client.csv",
-    memory_file="tests/utils/memory/memory.csv"
+    memory_file="tests/utils/memory/memory.csv",
 )
 
 malformed_status_dir_shard = Shard(
@@ -469,7 +469,7 @@ malformed_status_dir_shard = Shard(
         "step_id": "111",
     },
     client_file="tests/utils/clients/client.csv",
-    memory_file="tests/utils/memory/memory.csv"
+    memory_file="tests/utils/memory/memory.csv",
 )
 
 JSONDecoderError_status_shard = Shard(
@@ -485,7 +485,7 @@ JSONDecoderError_status_shard = Shard(
         "step_id": "111",
     },
     client_file="tests/utils/clients/client.csv",
-    memory_file="tests/utils/memory/memory.csv"
+    memory_file="tests/utils/memory/memory.csv",
 )
 
 ensemble_1 = Ensemble(
