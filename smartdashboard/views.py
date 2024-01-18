@@ -422,18 +422,18 @@ class ClientView(ViewBase):
         )
 
     def update_client_graph(self, dframe: pd.DataFrame) -> None:
+        df_count = pd.DataFrame(
+            {"time": dframe["time"], "Client Count": len(dframe)}
+        )
+        df_count.columns = ["Time", "Client Count"]
         chart = (
-            alt.Chart(dframe)
+            alt.Chart(df_count)
             .mark_line()
-            .encode(
-                x=alt.X("time:O", title="Time"),
-                y=alt.Y("count():Q", title="Number of Clients"),
-            )
+            .encode(x="Time", y="Client Count", tooltip=["Time", "Client Count"])
             .properties(
                 height=500,
                 title=alt.TitleParams("Total Client Count", anchor="middle"),
             )
-            .interactive()
         )
 
         self.client_graph_element.altair_chart(chart, use_container_width=True)

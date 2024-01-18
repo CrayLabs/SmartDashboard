@@ -510,7 +510,7 @@ def db_telem_builder(manifest: Manifest) -> TelemetryView:
         st.subheader(f"{selected_orchestrator.name}: Run {run_id} Telemetry")
     else:
         st.subheader("No Orchestrator Selected")
-    
+
     st.write("")
 
     ### Orchestrator Summary ###
@@ -598,7 +598,7 @@ def orc_summary_builder(
         )
 
         st.write("")
-        
+
         render_dataframe(
             pd.DataFrame(
                 {
