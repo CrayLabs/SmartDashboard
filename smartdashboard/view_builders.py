@@ -500,14 +500,14 @@ def db_telem_builder(manifest: Manifest) -> TelemetryView:
     st.write("")
 
     if selected_orchestrator_tuple is not None:
-        _, selected_orchestrator = selected_orchestrator_tuple
+        run_id, selected_orchestrator = selected_orchestrator_tuple
     else:
         selected_orchestrator = None
 
     shards = selected_orchestrator.shards if selected_orchestrator else []
 
     if selected_orchestrator:
-        st.subheader(selected_orchestrator.name + " Telemetry")
+        st.subheader(f"{selected_orchestrator.name}: Run {run_id} Telemetry")
     else:
         st.subheader("No Orchestrator Selected")
     
@@ -582,7 +582,7 @@ def orc_summary_builder(
         st.write("")
         view.status_element = st.empty()
         st.write(
-            "Numbers of shards: " + str(len(selected_orchestrator.shards))
+            "Number of shards: " + str(len(selected_orchestrator.shards))
             if selected_orchestrator
             else ""
         )
