@@ -26,9 +26,9 @@
 
 import typing as t
 from abc import ABC, abstractmethod
-import pandas as pd
-import altair as alt
 
+import altair as alt
+import pandas as pd
 from streamlit.delta_generator import DeltaGenerator
 
 from smartdashboard.schemas.application import Application
@@ -358,17 +358,17 @@ class MemoryView(ViewBase):
 
     def update(self) -> None:
         if self.shard is not None:
-            df = pd.read_csv(self.shard.memory_file)
-            df = df.drop(columns="time")
-            df /= 1024**3
-            self.update_memory_table(df)
-            self.update_memory_graph(df)
+            dframe = pd.read_csv(self.shard.memory_file)
+            dframe = dframe.drop(columns="time")
+            dframe /= 1024**3
+            self.update_memory_table(dframe)
+            self.update_memory_graph(dframe)
 
-    def update_memory_graph(self, df: pd.DataFrame) -> None:
-        df = df.drop(columns=["Total System Memory (GB)"])
+    def update_memory_graph(self, dframe: pd.DataFrame) -> None:
+        dframe = dframe.drop(columns=["Total System Memory (GB)"])
         chart = (
             alt.Chart(
-                df.reset_index().melt("index"),
+                dframe.reset_index().melt("index"),
                 height=500,
                 title=alt.TitleParams("Memory Usage", anchor="middle"),
             )
@@ -390,9 +390,9 @@ class MemoryView(ViewBase):
             chart, use_container_width=True, theme="streamlit"
         )
 
-    def update_memory_table(self, df: pd.DataFrame) -> None:
+    def update_memory_table(self, dframe: pd.DataFrame) -> None:
         self.memory_table_element.dataframe(
-            df.tail(1), use_container_width=True, hide_index=True
+            dframe.tail(1), use_container_width=True, hide_index=True
         )
 
 
@@ -408,22 +408,22 @@ class ClientView(ViewBase):
 
     def update(self) -> None:
         if self.shard is not None:
-            df = pd.read_csv(self.shard.client_file)
-            self.update_client_table(df[["Client ID", "Host"]])
-            self.update_client_graph(df)
+            dframe = pd.read_csv(self.shard.client_file)
+            self.update_client_table(dframe[["Client ID", "Host"]])
+            self.update_client_graph(dframe)
         else:
-            df = pd.DataFrame(columns=["Client ID", "Host"])
-            self.update_client_table(df[["Client ID", "Host"]])
-            self.update_client_graph(df)
+            dframe = pd.DataFrame(columns=["Client ID", "Host"])
+            self.update_client_table(dframe[["Client ID", "Host"]])
+            self.update_client_graph(dframe)
 
-    def update_client_table(self, df: pd.DataFrame) -> None:
+    def update_client_table(self, dframe: pd.DataFrame) -> None:
         self.client_table_element.dataframe(
-            df, use_container_width=True, hide_index=True
+            dframe, use_container_width=True, hide_index=True
         )
 
-    def update_client_graph(self, df) -> None:
+    def update_client_graph(self, dframe: pd.DataFrame) -> None:
         chart = (
-            alt.Chart(df)
+            alt.Chart(dframe)
             .mark_line()
             .encode(
                 x=alt.X("time:O", title="Time"),
@@ -439,24 +439,32 @@ class ClientView(ViewBase):
         self.client_graph_element.altair_chart(chart, use_container_width=True)
 
 
-# class SummaryView(ViewBase):
-#     def __init__(self, orcs: t.Optional[t.List[t.Dict[str, t.Any]]]) -> None:
-#         self.orcs = orcs
-#         self.dataframe: pd.DataFrame
-#         self.selected_row = AgGridReturn()
+class OrchestratorSummaryView(ViewBase):
+    def __init__(self, orchestrator: t.Optional[Orchestrator]) -> None:
+        self.orchestrator = orchestrator
+        self.status_element = DeltaGenerator()
 
-#     def update(self):
-#         ...
-#         # self.dataframe["Status"]
+    @property
+    def status(self) -> str:
+        """Get orchestrator status summary
+
+        :return: Status summary
+        :rtype: str
+        """
+        return get_orchestrator_status_summary(self.orchestrator)
+
+    def update(self) -> None:
+        """Update status element in OrchestratorView"""
+        self.status_element.write(self.status)
 
 
 class TelemetryView:
     def __init__(
         self,
-        # summary_view: SummaryView,
+        orc_summary_view: OrchestratorSummaryView,
         memory_view: MemoryView,
         client_view: ClientView,
     ) -> None:
-        # self.summary_view = summary_view
+        self.orc_summary_view = orc_summary_view
         self.memory_view = memory_view
         self.client_view = client_view

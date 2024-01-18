@@ -75,11 +75,11 @@ def build_telemetry_page() -> None:
     curr_path = pathlib.Path(os.path.abspath(__file__)).parent.parent
     local_css(str(curr_path / "static/style.css"))
 
-    if "orchestrators" not in st.session_state:
+    if "manifest" not in st.session_state:
         manifest_path = get_path(sys.argv[1:])
         try:
             manifest = load_manifest(manifest_path)
-            st.session_state["orchestrators"] = manifest.orcs_with_run_ctx
+            st.session_state["manifest"] = manifest
         except SSDashboardError as ex:
             error_builder(ex)
 
@@ -92,10 +92,10 @@ def build_telemetry_page() -> None:
 
 def update_telemetry_page() -> None:
     """Update the components for the Database Telemetry page"""
-    views = db_telem_builder(st.session_state["orchestrators"])
+    views = db_telem_builder(st.session_state["manifest"])
 
     while True:
-        for v in [views.memory_view, views.client_view]:
+        for v in [views.orc_summary_view, views.memory_view, views.client_view]:
             v.update()
 
         time.sleep(1)

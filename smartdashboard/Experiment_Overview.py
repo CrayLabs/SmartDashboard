@@ -31,6 +31,7 @@ import sys
 import time
 import typing as t
 from subprocess import run
+
 import streamlit as st
 
 from smartdashboard.utils.errors import SSDashboardError
@@ -53,7 +54,7 @@ def build_app(manifest_path: str) -> None:
 
     try:
         manifest = load_manifest(manifest_path)
-        st.session_state["orchestrators"] = manifest.orcs_with_run_ctx
+        st.session_state["manifest"] = manifest
     except SSDashboardError as ex:
         error_builder(ex)
     else:

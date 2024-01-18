@@ -30,6 +30,8 @@ import typing as t
 import pandas as pd
 import streamlit as st
 
+from smartdashboard.schemas.orchestrator import Orchestrator
+from smartdashboard.schemas.shard import Shard
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.helpers import (
     build_dataframe_generic,
@@ -43,17 +45,16 @@ from smartdashboard.utils.helpers import (
 from smartdashboard.utils.ManifestReader import Manifest
 from smartdashboard.views import (
     ApplicationView,
+    ClientView,
     EnsembleView,
     ErrorView,
     ExperimentView,
+    MemoryView,
+    OrchestratorSummaryView,
     OrchestratorView,
     OverviewView,
     TelemetryView,
-    ClientView,
-    MemoryView
 )
-from smartdashboard.schemas.orchestrator import Orchestrator
-from smartdashboard.schemas.shard import Shard
 
 
 def error_builder(error: SSDashboardError) -> ErrorView:
@@ -472,7 +473,8 @@ def overview_builder(manifest: Manifest) -> OverviewView:
 
     return OverviewView(exp_view, app_view, orc_view, ens_view)
 
-def db_telem_builder(orcs: t.Iterable[t.Tuple[str, Orchestrator]]) -> TelemetryView:
+
+def db_telem_builder(manifest: Manifest) -> TelemetryView:
     """Database Telemetry page to be rendered
 
     This function organizes the views within
@@ -484,36 +486,36 @@ def db_telem_builder(orcs: t.Iterable[t.Tuple[str, Orchestrator]]) -> TelemetryV
     :rtype: TelemetryView
     """
     st.header("Database Telemetry")
-    print(orcs)
 
-    st.write("##")
-    # print("BEGINNING ORCS")
-    # print(orcs)
+    st.write("")
 
-    col1, col2 = st.columns([6,6])
+    col1, _ = st.columns([6, 6])
     with col1:
         selected_orchestrator_tuple = st.selectbox(
             "Select an orchestrator:",
-            orcs,
+            manifest.orcs_with_run_ctx,
             format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
         )
-    # print(selected_orchestrator_tuple)
+
+    st.write("")
+
     if selected_orchestrator_tuple is not None:
-        selected_run, selected_orchestrator = selected_orchestrator_tuple
+        _, selected_orchestrator = selected_orchestrator_tuple
     else:
         selected_orchestrator = None
-    
+
     shards = selected_orchestrator.shards if selected_orchestrator else []
-    # print("Ending ORCS")
-    # print(orcs)
-    # st.write("##")
 
     if selected_orchestrator:
         st.subheader(selected_orchestrator.name + " Telemetry")
     else:
         st.subheader("No Orchestrator Selected")
+    
+    st.write("")
 
-    # shards = selected_orchestrator.shards if selected_orchestrator else []
+    ### Orchestrator Summary ###
+    orc_summary_view = orc_summary_builder(selected_orchestrator)
+    st.write("")
 
     ### Memory ###
     memory_view = memory_view_builder(shards)
@@ -523,18 +525,18 @@ def db_telem_builder(orcs: t.Iterable[t.Tuple[str, Orchestrator]]) -> TelemetryV
     client_view = client_view_builder(shards)
     st.write("")
 
-    return TelemetryView(memory_view, client_view)
+    return TelemetryView(orc_summary_view, memory_view, client_view)
 
 
 def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
-    with st.expander(label="Memory "):
+    with st.expander(label="Memory"):
         col1, col2 = st.columns([6, 6])
         with col1:
             view = MemoryView(shards[0] if shards else None)
             shard = st.selectbox(
                 "Select a shard:",
                 shards,
-                format_func=lambda sh: sh.name,
+                format_func=lambda shard: shard.name,
                 key="memory_shard",
             )
             view.update_shard(shard)
@@ -549,14 +551,14 @@ def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
 
 
 def client_view_builder(shards: t.List[Shard]) -> ClientView:
-    with st.expander(label="Clients "):
+    with st.expander(label="Clients"):
         col1, col2 = st.columns([6, 6])
         with col1:
             view = ClientView(shards[0] if shards else None)
             shard = st.selectbox(
                 "Select a shard:",
                 shards,
-                format_func=lambda sh: sh.name,
+                format_func=lambda shard: shard.name,
                 key="client_shard",
             )
             view.update_shard(shard)
@@ -566,5 +568,45 @@ def client_view_builder(shards: t.List[Shard]) -> ClientView:
             st.write("")
             st.write("")
             view.client_graph_element = st.empty()
+
+    return view
+
+
+def orc_summary_builder(
+    selected_orchestrator: t.Optional[Orchestrator],
+) -> OrchestratorSummaryView:
+    with st.expander(label="Orchestrator Summary"):
+
+        view = OrchestratorSummaryView(selected_orchestrator)
+
+        st.write("")
+        view.status_element = st.empty()
+        st.write(
+            "Numbers of shards: " + str(len(selected_orchestrator.shards))
+            if selected_orchestrator
+            else ""
+        )
+        st.write(
+            "Type: "
+            + (selected_orchestrator.type if selected_orchestrator is not None else "")
+        )
+        st.write("Port: " + get_port(selected_orchestrator))
+        st.write(
+            "Interface: " + ", ".join(selected_orchestrator.interface)
+            if selected_orchestrator
+            else ""
+        )
+
+        st.write("")
+        
+        render_dataframe(
+            pd.DataFrame(
+                {
+                    "Hosts": (
+                        selected_orchestrator.db_hosts if selected_orchestrator else []
+                    ),
+                }
+            )
+        )
 
     return view
