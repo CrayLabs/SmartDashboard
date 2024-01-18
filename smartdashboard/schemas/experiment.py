@@ -24,9 +24,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from smartdashboard.schemas.base import HasName
+from smartdashboard.schemas.base import EntityWithOnlyNameAndOutErrFiles
 
 
-class Experiment(HasName):
+class Experiment(EntityWithOnlyNameAndOutErrFiles):
     path: str = ""
     launcher: str = ""

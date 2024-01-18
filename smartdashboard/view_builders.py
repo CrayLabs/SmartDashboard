@@ -67,7 +67,7 @@ def error_builder(error: SSDashboardError) -> ErrorView:
     )
 
     with st.expander(label="Traceback"):
-        st.code(traceback.format_exc(), language=None)
+        st.code(traceback.format_exc(), language="log")
 
     return view
 
@@ -86,6 +86,16 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     view.status_element = st.empty()
     st.write("Path: " + manifest.experiment.path)
     st.write("Launcher: " + manifest.experiment.launcher)
+
+    with st.expander(label="Logs"):
+        col1, col2 = st.columns([6, 6])
+        with col1:
+            st.write("Output")
+            view.out_logs_element = st.code(view.out_logs, language="log")
+
+        with col2:
+            st.write("Error")
+            view.err_logs_element = st.code(view.err_logs, language="log")
 
     return view
 
@@ -196,11 +206,11 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             col1, col2 = st.columns([6, 6])
             with col1:
                 st.write("Output")
-                view.out_logs_element = st.code(view.out_logs, language=None)
+                view.out_logs_element = st.code(view.out_logs, language="log")
 
             with col2:
                 st.write("Error")
-                view.err_logs_element = st.code(view.err_logs, language=None)
+                view.err_logs_element = st.code(view.err_logs, language="log")
 
     return view
 
@@ -266,12 +276,12 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
 
             st.write("")
             st.write("Output")
-            view.out_logs_element = st.code(view.out_logs, language=None)
+            view.out_logs_element = st.code(view.out_logs, language="log")
 
         with col2:
             shard_log_spacing()
             st.write("Error")
-            view.err_logs_element = st.code(view.err_logs, language=None)
+            view.err_logs_element = st.code(view.err_logs, language="log")
 
     return view
 
@@ -412,11 +422,11 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
         col1, col2 = st.columns([6, 6])
         with col1:
             st.write("Output")
-            view.out_logs_element = st.code(view.out_logs, language=None)
+            view.out_logs_element = st.code(view.out_logs, language="log")
 
         with col2:
             st.write("Error")
-            view.err_logs_element = st.code(view.err_logs, language=None)
+            view.err_logs_element = st.code(view.err_logs, language="log")
 
     return view
 
