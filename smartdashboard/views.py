@@ -351,9 +351,9 @@ class MemoryView(ViewBase):
         self.memory_table_element = DeltaGenerator()
         self.memory_graph_element = DeltaGenerator()
 
-    # def update_shard(self, new_shard: t.Optional[Shard]) -> None:
-    #     if new_shard is not None:
-    #         self.shard = new_shard
+    def update_shard(self, new_shard: t.Optional[Shard]) -> None:
+        if new_shard is not None:
+            self.shard = new_shard
 
     def update(self) -> None:
         if self.shard is not None:
@@ -399,9 +399,9 @@ class ClientView(ViewBase):
         self.client_table_element = DeltaGenerator()
         self.client_graph_element = DeltaGenerator()
 
-    # def update_shard(self, new_shard: t.Optional[Shard]) -> None:
-    #     if new_shard is not None:
-    #         self.shard = new_shard
+    def update_shard(self, new_shard: t.Optional[Shard]) -> None:
+        if new_shard is not None:
+            self.shard = new_shard
 
     def update(self) -> None:
         if self.shard is not None:

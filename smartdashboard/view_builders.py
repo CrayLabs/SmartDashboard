@@ -545,7 +545,7 @@ def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
                 format_func=lambda shard: shard.name,
                 key="memory_shard",
             )
-            # view.update_shard(shard)
+            view.update_shard(shard)
             view.memory_table_element = st.empty()
         with col2:
             st.write("")
@@ -574,7 +574,7 @@ def client_view_builder(shards: t.List[Shard]) -> ClientView:
                 format_func=lambda shard: shard.name,
                 key="client_shard",
             )
-            # view.update_shard(shard)
+            view.update_shard(shard)
             view.client_table_element = st.empty()
         with col2:
             st.write("")
