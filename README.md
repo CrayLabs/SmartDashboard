@@ -88,6 +88,11 @@ The dashboard is also persistent, meaning that a user can still launch and use t
 
 Once the dashboard is launched, a browser will open to `http://localhost:<port>`. SmartDashboard currently has two tabs on the left hand side.
   
-`Experiment Overview:` This tab is where configuration information, statuses, and logs are located for each launched entity of the experiment. The `Experiment` section displays configuaration information for the overall experiment. In the `Applications` section, also known as SmartSim `Models`, select a launched application to see its status, what it was configured with, and its logs. The `Orchestrators` section also provides configuration and status information, as well as logs per shard for a selected orchestrator. Finally, in the `Ensembles` section, select an ensemble to see its status and configuration. Then select any of its members to see its status, configuration, and logs.
+`Experiment Overview:` This tab is where configuration information, statuses, and logs are located for each launched entity of the experiment. The `Experiment` section displays configuration information for the overall experiment. In the `Applications` section, also known as SmartSim `Models`, select a launched application to see its status, what it was configured with, and its logs. The `Orchestrators` section also provides configuration and status information, as well as logs per shard for a selected orchestrator. Finally, in the `Ensembles` section, select an ensemble to see its status and configuration. Then select any of its members to see its status, configuration, and logs.
   
+`Database Telemetry:` This tab provides additional details about `Orchestrators`.
+The `Orchestrator Summary` section shows configuration and status information of the selected. The `Memory`
+section provides memory usage data per shard within the `Orchestrator`. The `Clients`
+section displays client data per shard within the `Orchestrator`.  
+
 `Help:` This tab links to SmartSim documentation and provides a SmartSim contact for support.

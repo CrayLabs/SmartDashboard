@@ -417,11 +417,10 @@ class ClientView(ViewBase):
         )
 
     def update_client_graph(self, dframe: pd.DataFrame) -> None:
-        df_count = pd.DataFrame({"Time": dframe["time"], "Client Count": len(dframe)})
         chart = (
-            alt.Chart(df_count)
+            alt.Chart(dframe)
             .mark_line()
-            .encode(x="Time", y="Client Count", tooltip=["Time", "Client Count"])
+            .encode(x="time", y="Client Count", tooltip=["time", "Client Count"])
             .properties(
                 height=500,
                 title=alt.TitleParams("Total Client Count", anchor="middle"),
