@@ -407,9 +407,10 @@ class ClientView(ViewBase):
 
     def update(self) -> None:
         if self.shard is not None:
-            dframe = pd.read_csv(self.shard.client_file)
-            self.update_client_table(dframe[["Client ID", "Host"]])
-            self.update_client_graph(dframe)
+            client_df = pd.read_csv(self.shard.client_file)
+            counts_df = pd.read_csv(self.shard.client_count_file)
+            self.update_client_table(client_df)
+            self.update_client_graph(counts_df)
 
     def update_client_table(self, dframe: pd.DataFrame) -> None:
         self.client_table_element.dataframe(
@@ -420,7 +421,7 @@ class ClientView(ViewBase):
         chart = (
             alt.Chart(dframe)
             .mark_line()
-            .encode(x="time", y="Client Count", tooltip=["time", "Client Count"])
+            .encode(x="Time", y="Client Count", tooltip=["Time", "Client Count"])
             .properties(
                 height=500,
                 title=alt.TitleParams("Total Client Count", anchor="middle"),

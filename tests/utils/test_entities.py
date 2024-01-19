@@ -230,6 +230,7 @@ orchestrator_1 = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
+            "client_count_file":"tests/utils/clients/client_counts.csv",
             "memory_file": "tests/utils/memory/memory.csv",
         },
         {
@@ -245,6 +246,7 @@ orchestrator_1 = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
+            "client_count_file":"tests/utils/clients/client_counts.csv",
             "memory_file": "tests/utils/memory/memory.csv",
         },
     ],
@@ -270,6 +272,7 @@ orchestrator_2 = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
+            "client_count_file":"tests/utils/clients/client_counts.csv",
             "memory_file": "tests/utils/memory/memory.csv",
         },
         {
@@ -285,6 +288,7 @@ orchestrator_2 = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
+            "client_count_file":"tests/utils/clients/client_counts.csv",
             "memory_file": "tests/utils/memory/memory.csv",
         },
     ],
@@ -309,6 +313,7 @@ orchestrator_3 = Orchestrator(
                 "step_id": "111",
             },
             client_file="tests/utils/clients/client.csv",
+            client_count_file="tests/utils/clients/client_counts.csv",
             memory_file="tests/utils/memory/memory.csv",
         )
     ],
@@ -333,6 +338,7 @@ orchestrator_4 = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
+            "client_count_file":"tests/utils/clients/client_counts.csv",
             "memory_file": "tests/utils/memory/memory.csv",
         }
     ],
@@ -357,6 +363,7 @@ no_shards_started = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
+            "client_count_file":"tests/utils/clients/client_counts.csv",
             "memory_file": "tests/utils/memory/memory.csv",
         },
         {
@@ -372,6 +379,7 @@ no_shards_started = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
+            "client_count_file":"tests/utils/clients/client_counts.csv",
             "memory_file": "tests/utils/memory/memory.csv",
         },
     ],
@@ -396,6 +404,7 @@ mismatched_port_orchestrator = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
+            "client_count_file":"tests/utils/clients/client_counts.csv",
             "memory_file": "tests/utils/memory/memory.csv",
         },
         {
@@ -411,6 +420,7 @@ mismatched_port_orchestrator = Orchestrator(
                 "step_id": "111",
             },
             "client_file": "tests/utils/clients/client.csv",
+            "client_count_file":"tests/utils/clients/client_counts.csv",
             "memory_file": "tests/utils/memory/memory.csv",
         },
     ],
@@ -437,6 +447,7 @@ pending_shard = Shard(
         "step_id": "111",
     },
     client_file="tests/utils/clients/client.csv",
+    client_count_file="tests/utils/clients/client_counts.csv",
     memory_file="tests/utils/memory/memory.csv",
 )
 
@@ -453,6 +464,7 @@ no_return_code_shard = Shard(
         "step_id": "111",
     },
     client_file="tests/utils/clients/client.csv",
+    client_count_file="tests/utils/clients/client_counts.csv",
     memory_file="tests/utils/memory/memory.csv",
 )
 
@@ -469,6 +481,7 @@ malformed_status_dir_shard = Shard(
         "step_id": "111",
     },
     client_file="tests/utils/clients/client.csv",
+    client_count_file="tests/utils/clients/client_counts.csv",
     memory_file="tests/utils/memory/memory.csv",
 )
 
@@ -485,6 +498,7 @@ JSONDecoderError_status_shard = Shard(
         "step_id": "111",
     },
     client_file="tests/utils/clients/client.csv",
+    client_count_file="tests/utils/clients/client_counts.csv",
     memory_file="tests/utils/memory/memory.csv",
 )
 

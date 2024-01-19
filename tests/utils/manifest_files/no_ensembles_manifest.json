@@ -205,6 +205,7 @@
                                 "step_id": "111"
                             },
                             "client_file": "tests/utils/clients/client.csv",
+                            "client_count_file":"tests/utils/clients/client_counts.csv",
                             "memory_file": "tests/utils/memory/memory.csv"
                         },
                         {
@@ -220,6 +221,7 @@
                                 "step_id": "111"
                             },
                             "client_file": "tests/utils/clients/client.csv",
+                            "client_count_file":"tests/utils/clients/client_counts.csv",
                             "memory_file": "tests/utils/memory/memory.csv"
                         }
                     ]
@@ -405,6 +407,7 @@
                                 "step_id": "111"
                             },
                             "client_file": "tests/utils/clients/client.csv",
+                            "client_count_file":"tests/utils/clients/client_counts.csv",
                             "memory_file": "tests/utils/memory/memory.csv"
                         },
                         {
@@ -420,6 +423,7 @@
                                 "step_id": "111"
                             },
                             "client_file": "tests/utils/clients/client.csv",
+                            "client_count_file":"tests/utils/clients/client_counts.csv",
                             "memory_file": "tests/utils/memory/memory.csv"
                         }
                     ]
@@ -442,6 +446,7 @@
                                 "step_id": "111"
                             },
                             "client_file": "tests/utils/clients/client.csv",
+                            "client_count_file":"tests/utils/clients/client_counts.csv",
                             "memory_file": "tests/utils/memory/memory.csv"
                         }
                     ]
