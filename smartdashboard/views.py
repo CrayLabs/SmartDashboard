@@ -346,39 +346,70 @@ class OverviewView:
 
 
 class MemoryView(ViewBase):
+    """View class for memory section of the Database Telemetry page"""
+
     def __init__(self, shard: t.Optional[Shard]) -> None:
+        """Initialize a MemoryView
+
+        :param shard: Selected shard
+        :type shard: t.Optional[Shard]
+        """
         self.shard = shard
         self.memory_table_element = DeltaGenerator()
         self.memory_graph_element = DeltaGenerator()
 
     def update_shard(self, new_shard: t.Optional[Shard]) -> None:
+        """Update selected shard
+
+        This is called after a new shard is selected
+        in the dashboard to keep displayed data in sync.
+
+        :param new_shard: Selected shard
+        :type new_shard: Optional[Shard]
+        """
         if new_shard is not None:
             self.shard = new_shard
 
     def update(self) -> None:
+        """Update memory table and graph elements for selected shard"""
         if self.shard is not None:
             try:
                 dframe = pd.read_csv(self.shard.memory_file)
-                gb_columns = ["Used Memory (GB)", "Used Memory Peak (GB)","Total System Memory (GB)"]
+                gb_columns = [
+                    "Used Memory (GB)",
+                    "Used Memory Peak (GB)",
+                    "Total System Memory (GB)",
+                ]
                 dframe[gb_columns] /= 1024**3
                 self.update_memory_table(dframe)
                 self.update_memory_graph(dframe)
             except FileNotFoundError:
-                self.memory_table_element.info(f"Memory data was not found for {self.shard.name}")
+                self.memory_table_element.info(
+                    f"Memory data was not found for {self.shard.name}"
+                )
 
     def update_memory_graph(self, dframe: pd.DataFrame) -> None:
+        """Update memory graph for selected shard
+
+        :param dframe: DataFrame with memory data
+        :type dframe: pandas.DataFrame
+        """
         dframe = dframe.drop(columns=["Total System Memory (GB)"])
-        dframe_long = dframe.melt('time', var_name='Metric', value_name='Memory (GB)')
+        dframe_long = dframe.melt("time", var_name="Metric", value_name="Memory (GB)")
         chart = (
             alt.Chart(dframe_long)
             .mark_line()
             .encode(
                 x=alt.X("time:O", axis=alt.Axis(title="Time")),
                 y=alt.Y("Memory (GB):Q", axis=alt.Axis(title="Memory in GB")),
-                color=alt.Color("Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"),
+                color=alt.Color(
+                    "Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"
+                ),
                 tooltip=["time:O", "Metric:N", "Memory (GB):Q"],
             )
-            .properties(height=500, title=alt.TitleParams("Memory Usage", anchor="middle"))
+            .properties(
+                height=500, title=alt.TitleParams("Memory Usage", anchor="middle")
+            )
             .configure_legend(orient="bottom")
         )
 
@@ -387,6 +418,11 @@ class MemoryView(ViewBase):
         )
 
     def update_memory_table(self, dframe: pd.DataFrame) -> None:
+        """Update memory table for selected shard
+
+        :param dframe: DataFrame with memory data
+        :type dframe: pandas.DataFrame
+        """
         dframe = dframe.drop(columns=["time"])
         self.memory_table_element.dataframe(
             dframe.tail(1), use_container_width=True, hide_index=True
@@ -394,16 +430,32 @@ class MemoryView(ViewBase):
 
 
 class ClientView(ViewBase):
+    """View class for client section of the Database Telemetry page"""
+
     def __init__(self, shard: t.Optional[Shard]) -> None:
+        """Initialize a ClientView
+
+        :param shard: Selected shard
+        :type shard: t.Optional[Shard]
+        """
         self.shard = shard
         self.client_table_element = DeltaGenerator()
         self.client_graph_element = DeltaGenerator()
 
     def update_shard(self, new_shard: t.Optional[Shard]) -> None:
+        """Update selected shard
+
+        This is called after a new shard is selected
+        in the dashboard to keep displayed data in sync.
+
+        :param new_shard: Selected shard
+        :type new_shard: Optional[Shard]
+        """
         if new_shard is not None:
             self.shard = new_shard
 
     def update(self) -> None:
+        """Update client table and graph elements for selected shard"""
         if self.shard is not None:
             try:
                 client_df = pd.read_csv(self.shard.client_file)
@@ -411,14 +463,26 @@ class ClientView(ViewBase):
                 self.update_client_table(client_df)
                 self.update_client_graph(counts_df)
             except FileNotFoundError:
-                self.client_table_element.info(f"Client data was not found for {self.shard.name}")
+                self.client_table_element.info(
+                    f"Client data was not found for {self.shard.name}"
+                )
 
     def update_client_table(self, dframe: pd.DataFrame) -> None:
+        """Update client table for selected shard
+
+        :param dframe: DataFrame with client data
+        :type dframe: pandas.DataFrame
+        """
         self.client_table_element.dataframe(
             dframe, use_container_width=True, hide_index=True
         )
 
     def update_client_graph(self, dframe: pd.DataFrame) -> None:
+        """Update client graph for selected shard
+
+        :param dframe: DataFrame with client data
+        :type dframe: pandas.DataFrame
+        """
         chart = (
             alt.Chart(dframe)
             .mark_line()
@@ -433,7 +497,14 @@ class ClientView(ViewBase):
 
 
 class OrchestratorSummaryView(ViewBase):
+    """View class for orchestrator summary section of the Database Telemetry page"""
+
     def __init__(self, orchestrator: t.Optional[Orchestrator]) -> None:
+        """Initialize an OrchestratorSummaryView
+
+        :param orchestrator: Selected orchestrator
+        :type orchestrator: t.Optional[Orchestrator]
+        """
         self.orchestrator = orchestrator
         self.status_element = DeltaGenerator()
 
@@ -452,12 +523,23 @@ class OrchestratorSummaryView(ViewBase):
 
 
 class TelemetryView:
+    """View class for the collection of Database Telemetry views"""
+
     def __init__(
         self,
         orc_summary_view: OrchestratorSummaryView,
         memory_view: MemoryView,
         client_view: ClientView,
     ) -> None:
+        """Initialize a TelemetryView
+
+        :param orc_summary_view: OrchestratorSummaryView rendered in the dashboard
+        :type orc_summary_view: OrchestratorSummaryView
+        :param memory_view: MemoryView rendered in the dashboard
+        :type memory_view: MemoryView
+        :param client_view: ClientView view rendered in the dashboard
+        :type client_view: ClientView
+        """
         self.orc_summary_view = orc_summary_view
         self.memory_view = memory_view
         self.client_view = client_view
