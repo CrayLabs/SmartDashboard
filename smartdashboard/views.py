@@ -319,7 +319,7 @@ class ErrorView(ViewBase):
 
 
 class OverviewView:
-    """View class for the collection of views"""
+    """View class for the collection of Experiment Overview views"""
 
     def __init__(
         self,
@@ -357,32 +357,29 @@ class MemoryView(ViewBase):
 
     def update(self) -> None:
         if self.shard is not None:
-            dframe = pd.read_csv(self.shard.memory_file)
-            dframe = dframe.drop(columns="time")
-            dframe /= 1024**3
-            self.update_memory_table(dframe)
-            self.update_memory_graph(dframe)
+            try:
+                dframe = pd.read_csv(self.shard.memory_file)
+                gb_columns = ["Used Memory (GB)", "Used Memory Peak (GB)","Total System Memory (GB)"]
+                dframe[gb_columns] /= 1024**3
+                self.update_memory_table(dframe)
+                self.update_memory_graph(dframe)
+            except FileNotFoundError:
+                self.memory_table_element.info(f"Memory data was not found for {self.shard.name}")
 
     def update_memory_graph(self, dframe: pd.DataFrame) -> None:
         dframe = dframe.drop(columns=["Total System Memory (GB)"])
+        dframe_long = dframe.melt('time', var_name='Metric', value_name='Memory (GB)')
         chart = (
-            alt.Chart(
-                dframe.reset_index().melt("index"),
-                height=500,
-                title=alt.TitleParams("Memory Usage", anchor="middle"),
-            )
+            alt.Chart(dframe_long)
             .mark_line()
             .encode(
-                x=alt.X("index:Q", axis=alt.Axis(title="Time in seconds")),
-                y=alt.Y("value:Q", axis=alt.Axis(title="Memory in GB")),
-                color=alt.Color(
-                    "variable:N", scale=alt.Scale(scheme="category10"), title="Legend"
-                ),
-                tooltip=["index:Q", "variable:N", "value:Q"],
+                x=alt.X("time:O", axis=alt.Axis(title="Time")),
+                y=alt.Y("Memory (GB):Q", axis=alt.Axis(title="Memory in GB")),
+                color=alt.Color("Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"),
+                tooltip=["time:O", "Metric:N", "Memory (GB):Q"],
             )
-            .configure_legend(
-                orient="bottom",
-            )
+            .properties(height=500, title=alt.TitleParams("Memory Usage", anchor="middle"))
+            .configure_legend(orient="bottom")
         )
 
         self.memory_graph_element.altair_chart(
@@ -390,6 +387,7 @@ class MemoryView(ViewBase):
         )
 
     def update_memory_table(self, dframe: pd.DataFrame) -> None:
+        dframe = dframe.drop(columns=["time"])
         self.memory_table_element.dataframe(
             dframe.tail(1), use_container_width=True, hide_index=True
         )
@@ -407,10 +405,13 @@ class ClientView(ViewBase):
 
     def update(self) -> None:
         if self.shard is not None:
-            client_df = pd.read_csv(self.shard.client_file)
-            counts_df = pd.read_csv(self.shard.client_count_file)
-            self.update_client_table(client_df)
-            self.update_client_graph(counts_df)
+            try:
+                client_df = pd.read_csv(self.shard.client_file)
+                counts_df = pd.read_csv(self.shard.client_count_file)
+                self.update_client_table(client_df)
+                self.update_client_graph(counts_df)
+            except FileNotFoundError:
+                self.client_table_element.info(f"Client data was not found for {self.shard.name}")
 
     def update_client_table(self, dframe: pd.DataFrame) -> None:
         self.client_table_element.dataframe(

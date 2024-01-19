@@ -67,7 +67,8 @@ with st.expander(label="Database Telemetry"):
     st.markdown(
         """Gain deeper insights into your orchestrators in this section.
         Select the orchestrator you want to analyze from the
-        orchestrator dropdown and find information about its memory usage and clients per shard."""
+        orchestrator dropdown and find information about its memory usage and
+        clients per shard."""
     )
     st.markdown("""
         - [Orchestrators](https://www.craylabs.org/docs/orchestrator.html)""")

@@ -479,8 +479,8 @@ def db_telem_builder(manifest: Manifest) -> TelemetryView:
     This function organizes the views within
     the Database Telemetry page.
 
-    :param orcs: Orchestrators
-    :type orcs: t.List[t.Dict[str, t.Any]]
+    :param manifest: Manifest of the Experiment
+    :type manifest: Manifest
     :return: View of the DB Telemetry Page
     :rtype: TelemetryView
     """
@@ -528,6 +528,13 @@ def db_telem_builder(manifest: Manifest) -> TelemetryView:
 
 
 def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
+    """Memory section of Database Telemetry page to be rendered
+
+    :param shards: Shards of the selected Orchestrator
+    :type shards: t.List[Shard]
+    :return: View of the memory portion of the DB Telemetry page
+    :rtype: MemoryView
+    """
     with st.expander(label="Memory"):
         col1, col2 = st.columns([6, 6])
         with col1:
@@ -550,6 +557,13 @@ def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
 
 
 def client_view_builder(shards: t.List[Shard]) -> ClientView:
+    """Client section of Database Telemetry page to be rendered
+
+    :param shards: Shards of the selected Orchestrator
+    :type shards: t.List[Shard]
+    :return: View of the client portion of the DB Telemetry page
+    :rtype: ClientView
+    """
     with st.expander(label="Clients"):
         col1, col2 = st.columns([6, 6])
         with col1:
@@ -574,6 +588,13 @@ def client_view_builder(shards: t.List[Shard]) -> ClientView:
 def orc_summary_builder(
     selected_orchestrator: t.Optional[Orchestrator],
 ) -> OrchestratorSummaryView:
+    """Orchestrator summary section of Database Telemetry page to be rendered
+
+    :param selected_orchestrator: Selected Orchestrator
+    :type selected_orchestrator: t.Optional[Orchestrator]
+    :return: View of the summary portion of the DB Telemetry page
+    :rtype: OrchestratorSummaryView
+    """
     with st.expander(label="Orchestrator Summary"):
 
         view = OrchestratorSummaryView(selected_orchestrator)
