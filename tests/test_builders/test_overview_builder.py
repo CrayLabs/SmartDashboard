@@ -27,18 +27,17 @@
 import pytest
 
 from smartdashboard.utils.ManifestReader import ManifestFileReader
-from smartdashboard.view_builders import ens_builder
-from smartdashboard.views import EnsembleView
+from smartdashboard.view_builders import overview_builder
+from smartdashboard.views import OverviewView
 
 
 @pytest.mark.parametrize(
     "json_file, return_type",
     [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", EnsembleView),
-        pytest.param("tests/utils/manifest_files/no_ensembles_manifest.json", EnsembleView),
+        pytest.param("tests/utils/manifest_files/manifesttest.json", OverviewView),
     ],
 )
-def test_ens_builder(json_file, return_type):
+def test_overview_builder(json_file, return_type):
     manifest_file_reader = ManifestFileReader(json_file)
     manifest = manifest_file_reader.get_manifest()
-    assert type(ens_builder(manifest)) == return_type
+    assert type(overview_builder(manifest)) == return_type

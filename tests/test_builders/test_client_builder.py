@@ -27,18 +27,20 @@
 import pytest
 
 from smartdashboard.utils.ManifestReader import ManifestFileReader
-from smartdashboard.view_builders import ens_builder
-from smartdashboard.views import EnsembleView
+from smartdashboard.view_builders import client_view_builder
+from smartdashboard.views import ClientView
 
 
 @pytest.mark.parametrize(
     "json_file, return_type",
     [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", EnsembleView),
-        pytest.param("tests/utils/manifest_files/no_ensembles_manifest.json", EnsembleView),
+        pytest.param("tests/utils/manifest_files/manifesttest.json", ClientView),
+        pytest.param("tests/utils/manifest_files/no_orchestrator_manifest.json", ClientView),
     ],
 )
-def test_ens_builder(json_file, return_type):
+def test_client_builder(json_file, return_type):
     manifest_file_reader = ManifestFileReader(json_file)
     manifest = manifest_file_reader.get_manifest()
-    assert type(ens_builder(manifest)) == return_type
+    orcs = manifest.orcs_with_run_ctx
+    for run_id, orc in orcs:
+        assert type(client_view_builder(orc.shards)) == return_type

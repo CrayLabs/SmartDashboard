@@ -35,6 +35,7 @@ from smartdashboard.views import OrchestratorView
     "json_file, return_type",
     [
         pytest.param("tests/utils/manifest_files/manifesttest.json", OrchestratorView),
+        pytest.param("tests/utils/manifest_files/no_orchestrator_manifest.json", OrchestratorView),
     ],
 )
 def test_orc_builder(json_file, return_type):

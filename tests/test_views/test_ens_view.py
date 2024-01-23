@@ -26,19 +26,22 @@
 
 import pytest
 
-from smartdashboard.utils.ManifestReader import ManifestFileReader
-from smartdashboard.view_builders import ens_builder
 from smartdashboard.views import EnsembleView
+from tests.utils.test_entities import *
 
 
 @pytest.mark.parametrize(
-    "json_file, return_type",
+    "ensemble, member, status_string, member_status_string, out_logs, err_logs",
     [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", EnsembleView),
-        pytest.param("tests/utils/manifest_files/no_ensembles_manifest.json", EnsembleView),
+        pytest.param(ensemble_1, ensemble_1.models[0], "Status: 0 Running, 1 Completed, 0 Failed, 0 Pending, 0 Unknown", "Status: :green[Completed]", model0_out_logs, model0_err_logs),
+        pytest.param(ensemble_2, None, "Status: 0 Running, 0 Completed, 0 Failed, 0 Pending, 0 Unknown", "Status: ", "", ""),
+        pytest.param(ensemble_4, ensemble_4.models[0], "Status: 0 Running, 0 Completed, 2 Failed, 0 Pending, 0 Unknown", "Status: :red[Failed]", model0_out_logs, model0_err_logs),
     ],
 )
-def test_ens_builder(json_file, return_type):
-    manifest_file_reader = ManifestFileReader(json_file)
-    manifest = manifest_file_reader.get_manifest()
-    assert type(ens_builder(manifest)) == return_type
+def test_ensemble_view(ensemble, member, status_string, member_status_string, out_logs, err_logs):
+    view = EnsembleView(ensemble, member)
+    assert view.view_model == member
+    assert view.member_status == member_status_string
+    assert view.status == status_string
+    assert view.out_logs == out_logs
+    assert view.err_logs == err_logs
