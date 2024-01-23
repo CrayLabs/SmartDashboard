@@ -35,7 +35,9 @@ from smartdashboard.views import ApplicationView
     "json_file, return_type",
     [
         pytest.param("tests/utils/manifest_files/manifesttest.json", ApplicationView),
-        pytest.param("tests/utils/manifest_files/no_apps_manifest.json", ApplicationView),
+        pytest.param(
+            "tests/utils/manifest_files/no_apps_manifest.json", ApplicationView
+        ),
     ],
 )
 def test_app_builder(json_file, return_type):

@@ -35,7 +35,9 @@ from smartdashboard.views import TelemetryView
     "json_file, return_type",
     [
         pytest.param("tests/utils/manifest_files/manifesttest.json", TelemetryView),
-        pytest.param("tests/utils/manifest_files/no_orchestrator_manifest.json", TelemetryView),
+        pytest.param(
+            "tests/utils/manifest_files/no_orchestrator_manifest.json", TelemetryView
+        ),
     ],
 )
 def test_db_telem_builder(json_file, return_type):

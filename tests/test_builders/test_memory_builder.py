@@ -35,7 +35,9 @@ from smartdashboard.views import MemoryView
     "json_file, return_type",
     [
         pytest.param("tests/utils/manifest_files/manifesttest.json", MemoryView),
-        pytest.param("tests/utils/manifest_files/no_orchestrator_manifest.json", MemoryView),
+        pytest.param(
+            "tests/utils/manifest_files/no_orchestrator_manifest.json", MemoryView
+        ),
     ],
 )
 def test_memory_builder(json_file, return_type):

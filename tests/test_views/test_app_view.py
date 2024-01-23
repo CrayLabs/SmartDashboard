@@ -33,9 +33,15 @@ from tests.utils.test_entities import *
 @pytest.mark.parametrize(
     "application, status_string, out_logs, err_logs",
     [
-        pytest.param(application_1, "Status: :green[Completed]", model0_out_logs, model0_err_logs),
-        pytest.param(application_2, "Status: :red[Failed]", model1_out_logs, model1_err_logs),
-        pytest.param(application_3, "Status: :green[Running]", model0_out_logs, model0_err_logs),
+        pytest.param(
+            application_1, "Status: :green[Completed]", model0_out_logs, model0_err_logs
+        ),
+        pytest.param(
+            application_2, "Status: :red[Failed]", model1_out_logs, model1_err_logs
+        ),
+        pytest.param(
+            application_3, "Status: :green[Running]", model0_out_logs, model0_err_logs
+        ),
     ],
 )
 def test_app_view(application, status_string, out_logs, err_logs):

@@ -33,12 +33,35 @@ from tests.utils.test_entities import *
 @pytest.mark.parametrize(
     "ensemble, member, status_string, member_status_string, out_logs, err_logs",
     [
-        pytest.param(ensemble_1, ensemble_1.models[0], "Status: 0 Running, 1 Completed, 0 Failed, 0 Pending, 0 Unknown", "Status: :green[Completed]", model0_out_logs, model0_err_logs),
-        pytest.param(ensemble_2, None, "Status: 0 Running, 0 Completed, 0 Failed, 0 Pending, 0 Unknown", "Status: ", "", ""),
-        pytest.param(ensemble_4, ensemble_4.models[0], "Status: 0 Running, 0 Completed, 2 Failed, 0 Pending, 0 Unknown", "Status: :red[Failed]", model0_out_logs, model0_err_logs),
+        pytest.param(
+            ensemble_1,
+            ensemble_1.models[0],
+            "Status: 0 Running, 1 Completed, 0 Failed, 0 Pending, 0 Unknown",
+            "Status: :green[Completed]",
+            model0_out_logs,
+            model0_err_logs,
+        ),
+        pytest.param(
+            ensemble_2,
+            None,
+            "Status: 0 Running, 0 Completed, 0 Failed, 0 Pending, 0 Unknown",
+            "Status: ",
+            "",
+            "",
+        ),
+        pytest.param(
+            ensemble_4,
+            ensemble_4.models[0],
+            "Status: 0 Running, 0 Completed, 2 Failed, 0 Pending, 0 Unknown",
+            "Status: :red[Failed]",
+            model0_out_logs,
+            model0_err_logs,
+        ),
     ],
 )
-def test_ensemble_view(ensemble, member, status_string, member_status_string, out_logs, err_logs):
+def test_ensemble_view(
+    ensemble, member, status_string, member_status_string, out_logs, err_logs
+):
     view = EnsembleView(ensemble, member)
     assert view.view_model == member
     assert view.member_status == member_status_string

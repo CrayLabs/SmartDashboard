@@ -35,7 +35,9 @@ from smartdashboard.views import ClientView
     "json_file, return_type",
     [
         pytest.param("tests/utils/manifest_files/manifesttest.json", ClientView),
-        pytest.param("tests/utils/manifest_files/no_orchestrator_manifest.json", ClientView),
+        pytest.param(
+            "tests/utils/manifest_files/no_orchestrator_manifest.json", ClientView
+        ),
     ],
 )
 def test_client_builder(json_file, return_type):

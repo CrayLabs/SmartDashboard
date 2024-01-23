@@ -34,8 +34,18 @@ from tests.utils.test_entities import model0_err_logs, model0_out_logs
 @pytest.mark.parametrize(
     "json_file, status_string, out_logs, err_logs",
     [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", "Status: :green[Running]", model0_out_logs, model0_err_logs),
-        pytest.param("tests/utils/manifest_files/no_running.json", "Status: Inactive", model0_out_logs, model0_err_logs),
+        pytest.param(
+            "tests/utils/manifest_files/manifesttest.json",
+            "Status: :green[Running]",
+            model0_out_logs,
+            model0_err_logs,
+        ),
+        pytest.param(
+            "tests/utils/manifest_files/no_running.json",
+            "Status: Inactive",
+            model0_out_logs,
+            model0_err_logs,
+        ),
     ],
 )
 def test_exp_view(json_file, status_string, out_logs, err_logs):

@@ -33,9 +33,27 @@ from tests.utils.test_entities import *
 @pytest.mark.parametrize(
     "orc, shard, status_string, out_logs, err_logs",
     [
-        pytest.param(orchestrator_1, orchestrator_1.shards[0], "Status: :red[Unstable] (1 shard(s) failed)", model1_out_logs, model1_err_logs),
-        pytest.param(orchestrator_2, orchestrator_2.shards[1], "Status: :red[Unstable] (1 shard(s) failed)", model1_out_logs, model1_err_logs),
-        pytest.param(no_shards_started, no_shards_started.shards[0], "Status: Pending", model0_out_logs, model0_err_logs),
+        pytest.param(
+            orchestrator_1,
+            orchestrator_1.shards[0],
+            "Status: :red[Unstable] (1 shard(s) failed)",
+            model1_out_logs,
+            model1_err_logs,
+        ),
+        pytest.param(
+            orchestrator_2,
+            orchestrator_2.shards[1],
+            "Status: :red[Unstable] (1 shard(s) failed)",
+            model1_out_logs,
+            model1_err_logs,
+        ),
+        pytest.param(
+            no_shards_started,
+            no_shards_started.shards[0],
+            "Status: Pending",
+            model0_out_logs,
+            model0_err_logs,
+        ),
     ],
 )
 def test_orc_view(orc, shard, status_string, out_logs, err_logs):

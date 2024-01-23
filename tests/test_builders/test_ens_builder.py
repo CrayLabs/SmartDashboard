@@ -35,7 +35,9 @@ from smartdashboard.views import EnsembleView
     "json_file, return_type",
     [
         pytest.param("tests/utils/manifest_files/manifesttest.json", EnsembleView),
-        pytest.param("tests/utils/manifest_files/no_ensembles_manifest.json", EnsembleView),
+        pytest.param(
+            "tests/utils/manifest_files/no_ensembles_manifest.json", EnsembleView
+        ),
     ],
 )
 def test_ens_builder(json_file, return_type):
