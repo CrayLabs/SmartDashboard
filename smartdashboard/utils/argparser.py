@@ -24,23 +24,28 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
-
-from smartdashboard.utils.ManifestReader import ManifestFileReader
-from smartdashboard.view_builders import ens_builder
-from smartdashboard.views import EnsembleView
+import argparse
 
 
-@pytest.mark.parametrize(
-    "json_file, return_type",
-    [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", EnsembleView),
-        pytest.param(
-            "tests/utils/manifest_files/no_ensembles_manifest.json", EnsembleView
-        ),
-    ],
-)
-def test_ens_builder(json_file, return_type):
-    manifest_file_reader = ManifestFileReader(json_file)
-    manifest = manifest_file_reader.get_manifest()
-    assert type(ens_builder(manifest)) == return_type
+def get_parser() -> argparse.ArgumentParser:
+    """Build an argument parser to handle the expected CLI arguments
+
+    :return: Argument parser that handles CLI arguments
+    :rtype: argparse.ArgumentParser
+    """
+    parser = argparse.ArgumentParser("smart-dash", prefix_chars="-")
+    parser.add_argument(
+        "-d",
+        "--directory",
+        help="The path to an experiment to load. Default to current directory",
+        type=str,
+        default=None,
+    )
+    parser.add_argument(
+        "-p",
+        "--port",
+        help="The port to expose the dashboard on",
+        type=int,
+        default=8501,
+    )
+    return parser

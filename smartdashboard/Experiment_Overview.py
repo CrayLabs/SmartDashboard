@@ -24,7 +24,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import argparse
 import os
 import pathlib
 import sys
@@ -34,8 +33,9 @@ from subprocess import run
 
 import streamlit as st
 
+from smartdashboard.utils.argparser import get_parser
 from smartdashboard.utils.errors import SSDashboardError
-from smartdashboard.utils.ManifestReader import load_manifest
+from smartdashboard.utils.ManifestReader import get_manifest_path, load_manifest
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import error_builder, overview_builder
 from smartdashboard.views import EntityView
@@ -71,30 +71,6 @@ def build_app(manifest_path: str) -> None:
                 v.update()
 
             time.sleep(1)
-
-
-def get_parser() -> argparse.ArgumentParser:
-    """Build an argument parser to handle the expected CLI arguments
-
-    :return: Argument parser that handles CLI arguments
-    :rtype: argparse.ArgumentParser
-    """
-    parser = argparse.ArgumentParser("smart-dash", prefix_chars="-")
-    parser.add_argument(
-        "-d",
-        "--directory",
-        help="The path to an experiment to load. Default to current directory",
-        type=str,
-        default=None,
-    )
-    parser.add_argument(
-        "-p",
-        "--port",
-        help="The port to expose the dashboard on",
-        type=int,
-        default=8501,
-    )
-    return parser
 
 
 def run_dash_app(exp_path: str, app_port: int) -> None:
@@ -140,27 +116,9 @@ def cli() -> None:
     run_dash_app(str(exp_path), app_port)
 
 
-def execute(args: t.List[str]) -> None:
-    """Build the dashboard application
-
-    :param args: Passed in arguments
-    :type args: List[str]
-    """
-    arg_parser = get_parser()
-    parsed_args: argparse.Namespace = arg_parser.parse_args(args)
-
-    # default behavior will load a demo manifest from the test samples
-    exp_path = pathlib.Path(__file__).parent.parent
-    manifest_path = exp_path / "tests/utils/manifest_files/manifesttest.json"
-    if parsed_args.directory is not None:
-        exp_path = pathlib.Path(parsed_args.directory)
-        manifest_path = exp_path / ".smartsim/telemetry/manifest.json"
-
-    build_app(str(manifest_path))
-
-
 if __name__ == "__main__":
     # sample direct execution:
     # streamlit run ./smartdashboard/Experiment_Overview.py --
     #       -d <repo_path>/tests/utils/manifest_files/fauxexp
-    execute(sys.argv[1:])
+    PATH = get_manifest_path(sys.argv[1:], pathlib.Path(__file__).parent.parent)
+    build_app(PATH)

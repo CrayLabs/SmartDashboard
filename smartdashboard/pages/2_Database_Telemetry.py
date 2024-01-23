@@ -24,46 +24,17 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import argparse
 import os
 import pathlib
 import sys
 import time
-import typing as t
 
 import streamlit as st
 
-from smartdashboard.Experiment_Overview import get_parser
 from smartdashboard.utils.errors import SSDashboardError
-from smartdashboard.utils.ManifestReader import load_manifest
+from smartdashboard.utils.ManifestReader import get_manifest_path, load_manifest
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import db_telem_builder, error_builder
-
-
-def get_path(args: t.List[str]) -> str:
-    """Get the manifest path using the directory
-    path passed in from the command line arguments.
-
-    This will need to be done if a user refreshes
-    the page from the Database Telemetry page. The directory
-    path is used to load in the morchestrators in the manifest.
-
-    :param args: Passed in arguments
-    :type args: t.List[str]
-    :return: Manifest path
-    :rtype: str
-    """
-    arg_parser = get_parser()
-    parsed_args: argparse.Namespace = arg_parser.parse_args(args)
-
-    # default behavior will load a demo manifest from the test samples
-    exp_path = pathlib.Path(__file__).parent.parent.parent
-    manifest_path = exp_path / "tests/utils/manifest_files/manifesttest.json"
-    if parsed_args.directory is not None:
-        exp_path = pathlib.Path(parsed_args.directory)
-        manifest_path = exp_path / ".smartsim/telemetry/manifest.json"
-
-    return str(manifest_path)
 
 
 def build_telemetry_page() -> None:
@@ -76,18 +47,17 @@ def build_telemetry_page() -> None:
     local_css(str(curr_path / "static/style.css"))
 
     if "manifest" not in st.session_state:
-        manifest_path = get_path(sys.argv[1:])
+        manifest_path = get_manifest_path(
+            sys.argv[1:], pathlib.Path(__file__).parent.parent.parent
+        )
         try:
             manifest = load_manifest(manifest_path)
             st.session_state["manifest"] = manifest
         except SSDashboardError as ex:
             error_builder(ex)
+            return
 
-        else:
-            update_telemetry_page()
-
-    else:
-        update_telemetry_page()
+    update_telemetry_page()
 
 
 def update_telemetry_page() -> None:
@@ -101,4 +71,5 @@ def update_telemetry_page() -> None:
         time.sleep(1)
 
 
-build_telemetry_page()
+if __name__ == "__main__":
+    build_telemetry_page()

@@ -24,9 +24,11 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import argparse
 import io
 import itertools
 import json
+import pathlib
 import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -39,6 +41,7 @@ from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.experiment import Experiment
 from smartdashboard.schemas.orchestrator import Orchestrator
 from smartdashboard.schemas.run import Run
+from smartdashboard.utils.argparser import get_parser
 from smartdashboard.utils.errors import (
     MalformedManifestError,
     ManifestError,
@@ -179,3 +182,26 @@ def load_manifest(path: str) -> Manifest:
             title="Manifest file is malformed.", file=path, exception=val
         ) from val
     return manifest
+
+
+def get_manifest_path(args: t.List[str], default_exp_path: pathlib.Path) -> str:
+    """Get the manifest path using the directory
+    path passed in from the command line arguments.
+
+    :param args: Passed in arguments
+    :type args: t.List[str]
+    :param default_exp_path: Default path portion for testing
+    :type default_exp_path: pathlib.Path
+    :return: Manifest path
+    :rtype: str
+    """
+    arg_parser = get_parser()
+    parsed_args: argparse.Namespace = arg_parser.parse_args(args)
+
+    # default behavior will load a demo manifest from the test samples
+    manifest_path = default_exp_path / "tests/utils/manifest_files/manifesttest.json"
+    if parsed_args.directory is not None:
+        exp_path = pathlib.Path(parsed_args.directory)
+        manifest_path = exp_path / ".smartsim/telemetry/manifest.json"
+
+    return str(manifest_path)
