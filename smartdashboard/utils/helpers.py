@@ -58,6 +58,21 @@ def get_port(orc: t.Optional[Orchestrator]) -> str:
     return ""
 
 
+def format_interfaces(orc: t.Optional[Orchestrator]) -> str:
+    """Format the interfaces of an orchestrator
+
+    :param orc: Orchestrator
+    :type orc: Optional[Orchestrator]
+    :return: Formatted interfaces
+    :rtype: str
+    """
+
+    if orc:
+        return ", ".join(orc.interface)
+
+    return ""
+
+
 def flatten_nested_keyvalue_containers(
     dict_name: str,
     entity: t.Optional[t.Dict[str, t.Any]],

@@ -38,6 +38,7 @@ from smartdashboard.utils.helpers import (
     build_dataframe_loaded_entities,
     flatten_nested_keyvalue_containers,
     format_ensemble_params,
+    format_interfaces,
     get_port,
     render_dataframe,
     shard_log_spacing,
@@ -246,10 +247,7 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
         + (selected_orchestrator.type if selected_orchestrator is not None else "")
     )
     st.write("Port: " + get_port(selected_orchestrator))
-    st.write(
-        "Interface: "
-        + (", ".join(selected_orchestrator.interface) if selected_orchestrator else "")
-    )
+    st.write("Interface: " + format_interfaces(selected_orchestrator))
 
     st.write("")
     with st.expander(label="Database Hosts"):
@@ -586,14 +584,7 @@ def orc_summary_builder(
             + (selected_orchestrator.type if selected_orchestrator is not None else "")
         )
         st.write("Port: " + get_port(selected_orchestrator))
-        st.write(
-            "Interface: "
-            + (
-                ", ".join(selected_orchestrator.interface)
-                if selected_orchestrator
-                else ""
-            )
-        )
+        st.write("Interface: " + format_interfaces(selected_orchestrator))
 
         st.write("")
         data = selected_orchestrator.db_hosts if selected_orchestrator else []
