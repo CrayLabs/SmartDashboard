@@ -136,17 +136,10 @@ def app_builder(manifest: Manifest) -> ApplicationView:
 
     st.write("")
     with st.expander(label="Executable Arguments"):
-        render_dataframe(
-            pd.DataFrame(
-                {
-                    "All Arguments": (
-                        selected_application.exe_args
-                        if selected_application is not None
-                        else []
-                    ),
-                }
-            )
+        arguments = (
+            selected_application.exe_args if selected_application is not None else []
         )
+        render_dataframe(pd.DataFrame(arguments, columns=["All Arguments"]))
 
     st.write("")
     with st.expander(label="Batch and Run Settings"):
@@ -260,15 +253,9 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
 
     st.write("")
     with st.expander(label="Database Hosts"):
-        render_dataframe(
-            pd.DataFrame(
-                {
-                    "Hosts": (
-                        selected_orchestrator.db_hosts if selected_orchestrator else []
-                    ),
-                }
-            )
-        )
+        hosts = selected_orchestrator.db_hosts if selected_orchestrator else []
+        render_dataframe(pd.DataFrame(hosts, columns=["Hosts"]))
+
     st.write("")
     with st.expander(label="Logs"):
         col1, col2 = st.columns([6, 6])
@@ -322,24 +309,16 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
 
     st.write("")
     with st.expander(label="Batch Settings"):
-        render_dataframe(
-            pd.DataFrame(
-                flatten_nested_keyvalue_containers(
-                    "batch_settings",
-                    selected_ensemble.model_dump() if selected_ensemble else {},
-                ),
-                columns=["Name", "Value"],
-            )
+        batch = flatten_nested_keyvalue_containers(
+            "batch_settings",
+            selected_ensemble.model_dump() if selected_ensemble else {},
         )
+        render_dataframe(pd.DataFrame(batch, columns=["Name", "Value"]))
 
     st.write("")
     with st.expander(label="Parameters"):
-        render_dataframe(
-            pd.DataFrame(
-                format_ensemble_params(selected_ensemble),
-                columns=["Name", "Value"],
-            )
-        )
+        params = format_ensemble_params(selected_ensemble)
+        render_dataframe(pd.DataFrame(params, columns=["Name", "Value"]))
 
     st.write("#")
     if selected_ensemble is not None:
@@ -360,11 +339,8 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     st.write("Path: " + (member.path if member else ""))
     st.write("")
     with st.expander(label="Executable Arguments"):
-        render_dataframe(
-            pd.DataFrame(
-                {"All Arguments": member.exe_args if member is not None else []}
-            ),
-        )
+        arguments = member.exe_args if member is not None else []
+        render_dataframe(pd.DataFrame(arguments, columns=["All Arguments"]))
 
     st.write("")
     with st.expander(label="Batch and Run Settings"):
@@ -620,15 +596,7 @@ def orc_summary_builder(
         )
 
         st.write("")
-
-        render_dataframe(
-            pd.DataFrame(
-                {
-                    "Hosts": (
-                        selected_orchestrator.db_hosts if selected_orchestrator else []
-                    ),
-                }
-            )
-        )
+        data = selected_orchestrator.db_hosts if selected_orchestrator else []
+        render_dataframe(pd.DataFrame(data, columns=["Hosts"]))
 
     return view
