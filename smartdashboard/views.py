@@ -402,7 +402,7 @@ class MemoryView(ViewBase):
             .encode(
                 x=alt.X("time:O", axis=alt.Axis(title="Time")),
                 y=alt.Y("Memory (GB):Q", axis=alt.Axis(title="Memory in GB")),
-                color=alt.Color(
+                color=alt.Color(  # type: ignore[no-untyped-call]
                     "Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"
                 ),
                 tooltip=["time:O", "Metric:N", "Memory (GB):Q"],
