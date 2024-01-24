@@ -1,6 +1,6 @@
 /* BSD 2-Clause License
 
-Copyright (c) 2021-2023, Hewlett Packard Enterprise
+Copyright (c) 2021-2024, Hewlett Packard Enterprise
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -52,10 +52,14 @@ div[data-testid="stCodeBlock"] {
 }
 
 /* wrap code lines */
-code {white-space: pre-wrap !important;}
+code {
+    white-space: pre-wrap !important;
+}
 
 /* remove "Made by Streamlit" footer */
-footer {visibility: hidden;}
+footer {
+    visibility: hidden;
+}
 
 /* remove "Running" status widget */
 div[data-testid="stStatusWidget"] {
@@ -65,7 +69,6 @@ div[data-testid="stStatusWidget"] {
 }
 
 /* remove "Deploy" button */
-div[class="stDeployButton"]{
+div[class="stDeployButton"] {
     visibility: hidden;
 }
-
