@@ -52,14 +52,10 @@ div[data-testid="stCodeBlock"] {
 }
 
 /* wrap code lines */
-code {
-    white-space: pre-wrap !important;
-}
+code {white-space: pre-wrap !important;}
 
 /* remove "Made by Streamlit" footer */
-footer {
-    visibility: hidden;
-}
+footer {visibility: hidden;}
 
 /* remove "Running" status widget */
 div[data-testid="stStatusWidget"] {
@@ -69,6 +65,6 @@ div[data-testid="stStatusWidget"] {
 }
 
 /* remove "Deploy" button */
-div[class="stDeployButton"] {
+div[class="stDeployButton"]{
     visibility: hidden;
 }
