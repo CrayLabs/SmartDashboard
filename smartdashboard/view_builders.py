@@ -94,7 +94,7 @@ def exp_builder(manifest: Manifest) -> ExperimentView:
     st.write("Path: " + manifest.experiment.path)
     st.write("Launcher: " + manifest.experiment.launcher)
 
-    with st.expander(label="Logs"):
+    with st.expander(label="Logs", expanded=True):
         col1, col2 = st.columns([6, 6])
         with col1:
             st.write("Output")
@@ -515,15 +515,14 @@ def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
                 format_func=lambda shard: shard.name,
                 key="memory_shard",
             )
-            view = MemoryView(shard)
-            view.memory_table_element = st.empty()
+            memory_table_element = st.empty()
         with col2:
             st.write("")
             st.write("")
             st.write("")
-            view.memory_graph_element = st.empty()
+            memory_graph_element = st.empty()
 
-    return view
+    return MemoryView(shard, memory_table_element, memory_graph_element)
 
 
 def client_view_builder(shards: t.List[Shard]) -> ClientView:
@@ -543,15 +542,14 @@ def client_view_builder(shards: t.List[Shard]) -> ClientView:
                 format_func=lambda shard: shard.name,
                 key="client_shard",
             )
-            view = ClientView(shard)
-            view.client_table_element = st.empty()
+            client_table_element = st.empty()
         with col2:
             st.write("")
             st.write("")
             st.write("")
-            view.client_graph_element = st.empty()
+            client_graph_element = st.empty()
 
-    return view
+    return ClientView(shard, client_table_element, client_graph_element)
 
 
 def orc_summary_builder(

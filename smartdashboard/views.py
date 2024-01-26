@@ -26,6 +26,7 @@
 
 import typing as t
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 import altair as alt
 import pandas as pd
@@ -352,28 +353,19 @@ class OverviewView(ViewBase):
         self.orc_view.update()
 
 
+@dataclass(frozen=True)
 class MemoryView(ViewBase):
     """View class for memory section of the Database Telemetry page"""
 
-    def __init__(self, shard: t.Optional[Shard]) -> None:
-        """Initialize a MemoryView
-
-        :param shard: Selected shard
-        :type shard: t.Optional[Shard]
-        """
-        self._shard = shard
-        self.memory_table_element = DeltaGenerator()
-        self.memory_graph_element = DeltaGenerator()
-
-    @property
-    def shard(self) -> t.Optional[Shard]:
-        return self._shard
+    shard: t.Optional[Shard]
+    memory_table_element: DeltaGenerator
+    memory_graph_element: DeltaGenerator
 
     def update(self) -> None:
         """Update memory table and graph elements for selected shard"""
-        if self._shard is not None:
+        if self.shard is not None:
             try:
-                dframe = pd.read_csv(self._shard.memory_file)
+                dframe = pd.read_csv(self.shard.memory_file)
                 gb_columns = [
                     "Used Memory (GB)",
                     "Used Memory Peak (GB)",
@@ -384,7 +376,7 @@ class MemoryView(ViewBase):
                 self._update_memory_graph(dframe)
             except FileNotFoundError:
                 self.memory_table_element.info(
-                    f"Memory data was not found for {self._shard.name}"
+                    f"Memory data was not found for {self.shard.name}"
                 )
 
     def _update_memory_graph(self, dframe: pd.DataFrame) -> None:
@@ -428,34 +420,25 @@ class MemoryView(ViewBase):
         )
 
 
+@dataclass(frozen=True)
 class ClientView(ViewBase):
     """View class for client section of the Database Telemetry page"""
 
-    def __init__(self, shard: t.Optional[Shard]) -> None:
-        """Initialize a ClientView
-
-        :param shard: Selected shard
-        :type shard: t.Optional[Shard]
-        """
-        self._shard = shard
-        self.client_table_element = DeltaGenerator()
-        self.client_graph_element = DeltaGenerator()
-
-    @property
-    def shard(self) -> t.Optional[Shard]:
-        return self._shard
+    shard: t.Optional[Shard]
+    client_table_element: DeltaGenerator
+    client_graph_element: DeltaGenerator
 
     def update(self) -> None:
         """Update client table and graph elements for selected shard"""
-        if self._shard is not None:
+        if self.shard is not None:
             try:
-                client_df = pd.read_csv(self._shard.client_file)
-                counts_df = pd.read_csv(self._shard.client_count_file)
+                client_df = pd.read_csv(self.shard.client_file)
+                counts_df = pd.read_csv(self.shard.client_count_file)
                 self._update_client_table(client_df)
                 self._update_client_graph(counts_df)
             except FileNotFoundError:
                 self.client_table_element.info(
-                    f"Client data was not found for {self._shard.name}"
+                    f"Client data was not found for {self.shard.name}"
                 )
 
     def _update_client_table(self, dframe: pd.DataFrame) -> None:
