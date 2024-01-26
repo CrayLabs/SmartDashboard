@@ -28,7 +28,6 @@ import os
 import pathlib
 import sys
 import time
-import typing as t
 from subprocess import run
 
 import streamlit as st
@@ -38,7 +37,6 @@ from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.ManifestReader import get_manifest_path, load_manifest
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import error_builder, overview_builder
-from smartdashboard.views import EntityView
 
 
 def build_app(manifest_path: str) -> None:
@@ -59,17 +57,9 @@ def build_app(manifest_path: str) -> None:
         error_builder(ex)
     else:
         views = overview_builder(manifest)
-        to_update: t.Iterable[EntityView[t.Any]] = (
-            views.exp_view,
-            views.app_view,
-            views.orc_view,
-            views.ens_view,
-        )
 
         while True:
-            for v in to_update:
-                v.update()
-
+            views.update()
             time.sleep(1)
 
 
@@ -120,5 +110,13 @@ if __name__ == "__main__":
     # sample direct execution:
     # streamlit run ./smartdashboard/Experiment_Overview.py --
     #       -d <repo_path>/tests/utils/manifest_files/fauxexp
-    PATH = get_manifest_path(sys.argv[1:], pathlib.Path(__file__).parent.parent)
+    cli_args = get_parser().parse_args(sys.argv[1:])
+    directory = (
+        pathlib.Path(cli_args.directory) if cli_args.directory is not None else None
+    )
+    PATH = get_manifest_path(
+        directory,
+        pathlib.Path(__file__).parent.parent
+        / "tests/utils/manifest_files/manifesttest.json",
+    )
     build_app(PATH)

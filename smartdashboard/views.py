@@ -318,7 +318,7 @@ class ErrorView(ViewBase):
     def update(self) -> None: ...
 
 
-class OverviewView:
+class OverviewView(ViewBase):
     """View class for the collection of Experiment Overview views"""
 
     def __init__(
@@ -344,6 +344,13 @@ class OverviewView:
         self.ens_view = ens_view
         self.orc_view = orc_view
 
+    def update(self) -> None:
+        """Update all views within the OverviewView"""
+        self.exp_view.update()
+        self.app_view.update()
+        self.ens_view.update()
+        self.orc_view.update()
+
 
 class MemoryView(ViewBase):
     """View class for memory section of the Database Telemetry page"""
@@ -354,41 +361,33 @@ class MemoryView(ViewBase):
         :param shard: Selected shard
         :type shard: t.Optional[Shard]
         """
-        self.shard = shard
+        self._shard = shard
         self.memory_table_element = DeltaGenerator()
         self.memory_graph_element = DeltaGenerator()
 
-    def update_shard(self, new_shard: t.Optional[Shard]) -> None:
-        """Update selected shard
-
-        This is called after a new shard is selected
-        in the dashboard to keep displayed data in sync.
-
-        :param new_shard: Selected shard
-        :type new_shard: Optional[Shard]
-        """
-        if new_shard is not None:
-            self.shard = new_shard
+    @property
+    def shard(self) -> t.Optional[Shard]:
+        return self._shard
 
     def update(self) -> None:
         """Update memory table and graph elements for selected shard"""
-        if self.shard is not None:
+        if self._shard is not None:
             try:
-                dframe = pd.read_csv(self.shard.memory_file)
+                dframe = pd.read_csv(self._shard.memory_file)
                 gb_columns = [
                     "Used Memory (GB)",
                     "Used Memory Peak (GB)",
                     "Total System Memory (GB)",
                 ]
                 dframe[gb_columns] /= 1024**3
-                self.update_memory_table(dframe)
-                self.update_memory_graph(dframe)
+                self._update_memory_table(dframe)
+                self._update_memory_graph(dframe)
             except FileNotFoundError:
                 self.memory_table_element.info(
-                    f"Memory data was not found for {self.shard.name}"
+                    f"Memory data was not found for {self._shard.name}"
                 )
 
-    def update_memory_graph(self, dframe: pd.DataFrame) -> None:
+    def _update_memory_graph(self, dframe: pd.DataFrame) -> None:
         """Update memory graph for selected shard
 
         :param dframe: DataFrame with memory data
@@ -417,7 +416,7 @@ class MemoryView(ViewBase):
             chart, use_container_width=True, theme="streamlit"
         )
 
-    def update_memory_table(self, dframe: pd.DataFrame) -> None:
+    def _update_memory_table(self, dframe: pd.DataFrame) -> None:
         """Update memory table for selected shard
 
         :param dframe: DataFrame with memory data
@@ -438,36 +437,28 @@ class ClientView(ViewBase):
         :param shard: Selected shard
         :type shard: t.Optional[Shard]
         """
-        self.shard = shard
+        self._shard = shard
         self.client_table_element = DeltaGenerator()
         self.client_graph_element = DeltaGenerator()
 
-    def update_shard(self, new_shard: t.Optional[Shard]) -> None:
-        """Update selected shard
-
-        This is called after a new shard is selected
-        in the dashboard to keep displayed data in sync.
-
-        :param new_shard: Selected shard
-        :type new_shard: Optional[Shard]
-        """
-        if new_shard is not None:
-            self.shard = new_shard
+    @property
+    def shard(self) -> t.Optional[Shard]:
+        return self._shard
 
     def update(self) -> None:
         """Update client table and graph elements for selected shard"""
-        if self.shard is not None:
+        if self._shard is not None:
             try:
-                client_df = pd.read_csv(self.shard.client_file)
-                counts_df = pd.read_csv(self.shard.client_count_file)
-                self.update_client_table(client_df)
-                self.update_client_graph(counts_df)
+                client_df = pd.read_csv(self._shard.client_file)
+                counts_df = pd.read_csv(self._shard.client_count_file)
+                self._update_client_table(client_df)
+                self._update_client_graph(counts_df)
             except FileNotFoundError:
                 self.client_table_element.info(
-                    f"Client data was not found for {self.shard.name}"
+                    f"Client data was not found for {self._shard.name}"
                 )
 
-    def update_client_table(self, dframe: pd.DataFrame) -> None:
+    def _update_client_table(self, dframe: pd.DataFrame) -> None:
         """Update client table for selected shard
 
         :param dframe: DataFrame with client data
@@ -477,7 +468,7 @@ class ClientView(ViewBase):
             dframe, use_container_width=True, hide_index=True
         )
 
-    def update_client_graph(self, dframe: pd.DataFrame) -> None:
+    def _update_client_graph(self, dframe: pd.DataFrame) -> None:
         """Update client graph for selected shard
 
         :param dframe: DataFrame with client data
@@ -522,7 +513,7 @@ class OrchestratorSummaryView(ViewBase):
         self.status_element.write(self.status)
 
 
-class TelemetryView:
+class TelemetryView(ViewBase):
     """View class for the collection of Database Telemetry views"""
 
     def __init__(
@@ -543,3 +534,9 @@ class TelemetryView:
         self.orc_summary_view = orc_summary_view
         self.memory_view = memory_view
         self.client_view = client_view
+
+    def update(self) -> None:
+        """Update all views within the TelemetryView"""
+        self.orc_summary_view.update()
+        self.memory_view.update()
+        self.client_view.update()

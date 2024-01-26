@@ -474,14 +474,11 @@ def db_telem_builder(manifest: Manifest) -> TelemetryView:
 
     if selected_orchestrator_tuple is not None:
         run_id, selected_orchestrator = selected_orchestrator_tuple
-    else:
-        selected_orchestrator = None
-
-    shards = selected_orchestrator.shards if selected_orchestrator else []
-
-    if selected_orchestrator:
+        shards = selected_orchestrator.shards
         st.subheader(f"{selected_orchestrator.name}: Run {run_id} Telemetry")
     else:
+        run_id, selected_orchestrator = None, None
+        shards = []
         st.subheader("No Orchestrator Selected")
 
     st.write("")
@@ -512,14 +509,13 @@ def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
     with st.expander(label="Memory"):
         col1, col2 = st.columns([6, 6])
         with col1:
-            view = MemoryView(shards[0] if shards else None)
             shard = st.selectbox(
                 "Select a shard:",
                 shards,
                 format_func=lambda shard: shard.name,
                 key="memory_shard",
             )
-            view.update_shard(shard)
+            view = MemoryView(shard)
             view.memory_table_element = st.empty()
         with col2:
             st.write("")
@@ -541,14 +537,13 @@ def client_view_builder(shards: t.List[Shard]) -> ClientView:
     with st.expander(label="Clients"):
         col1, col2 = st.columns([6, 6])
         with col1:
-            view = ClientView(shards[0] if shards else None)
             shard = st.selectbox(
                 "Select a shard:",
                 shards,
                 format_func=lambda shard: shard.name,
                 key="client_shard",
             )
-            view.update_shard(shard)
+            view = ClientView(shard)
             view.client_table_element = st.empty()
         with col2:
             st.write("")
@@ -569,9 +564,10 @@ def orc_summary_builder(
     :return: View of the summary portion of the DB Telemetry page
     :rtype: OrchestratorSummaryView
     """
-    with st.expander(label="Orchestrator Summary"):
+    view = OrchestratorSummaryView(selected_orchestrator)
+    data = selected_orchestrator.db_hosts if selected_orchestrator else []
 
-        view = OrchestratorSummaryView(selected_orchestrator)
+    with st.expander(label="Orchestrator Summary"):
 
         st.write("")
         view.status_element = st.empty()
@@ -587,7 +583,7 @@ def orc_summary_builder(
         st.write("Interface: " + format_interfaces(selected_orchestrator))
 
         st.write("")
-        data = selected_orchestrator.db_hosts if selected_orchestrator else []
+
         render_dataframe(pd.DataFrame(data, columns=["Hosts"]))
 
     return view
