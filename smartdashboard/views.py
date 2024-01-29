@@ -364,16 +364,31 @@ class MemoryView(ViewBase):
     def update(self) -> None:
         """Update memory table and graph elements for selected shard"""
         if self.shard is not None:
-            try:
-                dframe = pd.read_csv(self.shard.memory_file)
+
+            def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
                 gb_columns = [
-                    "Used Memory (GB)",
-                    "Used Memory Peak (GB)",
-                    "Total System Memory (GB)",
+                    "used_memory",
+                    "used_memory_peak",
+                    "total_system_memory",
                 ]
                 dframe[gb_columns] /= 1024**3
-                self._update_memory_table(dframe)
-                self._update_memory_graph(dframe)
+                dframe = dframe.rename(
+                    columns={
+                        "used_memory": "Used Memory (GB)",
+                        "used_memory_peak": "Used Peak Memory (GB)",
+                        "total_system_memory": "Total System Memory (GB)",
+                    }
+                )
+                dframe["time"] = dframe["timestamp"] - dframe["timestamp"].min()
+                dframe = dframe.drop(columns=["timestamp"])
+                return dframe
+
+            try:
+                dframe = pd.read_csv(self.shard.memory_file)
+                processed_df = process_dataframe(dframe)
+
+                self._update_memory_table(processed_df)
+                self._update_memory_graph(processed_df)
             except FileNotFoundError:
                 self.memory_table_element.info(
                     f"Memory data was not found for {self.shard.name}"
@@ -391,7 +406,7 @@ class MemoryView(ViewBase):
             alt.Chart(dframe_long)
             .mark_line()
             .encode(
-                x=alt.X("time:O", axis=alt.Axis(title="Time")),
+                x=alt.X("time:O", axis=alt.Axis(title="Timestep", labelAngle=0)),
                 y=alt.Y("Memory (GB):Q", axis=alt.Axis(title="Memory in GB")),
                 color=alt.Color(  # type: ignore[no-untyped-call]
                     "Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"
@@ -434,6 +449,7 @@ class ClientView(ViewBase):
             try:
                 client_df = pd.read_csv(self.shard.client_file)
                 counts_df = pd.read_csv(self.shard.client_count_file)
+
                 self._update_client_table(client_df)
                 self._update_client_graph(counts_df)
             except FileNotFoundError:
@@ -447,8 +463,20 @@ class ClientView(ViewBase):
         :param dframe: DataFrame with client data
         :type dframe: pandas.DataFrame
         """
+
+        def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
+            dframe = dframe.loc[dframe["timestamp"] == dframe["timestamp"].max()]
+            dframe = dframe.drop(columns=["timestamp"])
+            dframe = dframe.rename(
+                columns={
+                    "client_id": "Client ID",
+                    "address": "Address",
+                }
+            )
+            return dframe
+
         self.client_table_element.dataframe(
-            dframe, use_container_width=True, hide_index=True
+            process_dataframe(dframe), use_container_width=True, hide_index=True
         )
 
     def _update_client_graph(self, dframe: pd.DataFrame) -> None:
@@ -457,10 +485,20 @@ class ClientView(ViewBase):
         :param dframe: DataFrame with client data
         :type dframe: pandas.DataFrame
         """
+
+        def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
+            dframe["time"] = dframe["timestamp"] - dframe["timestamp"].min()
+            dframe = dframe.drop(columns=["timestamp"])
+            return dframe
+
         chart = (
-            alt.Chart(dframe)
+            alt.Chart(process_dataframe(dframe))
             .mark_line()
-            .encode(x="Time", y="Client Count", tooltip=["Time", "Client Count"])
+            .encode(
+                x=alt.X("time:Q", axis=alt.Axis(title="Timestep")),
+                y=alt.Y("num_clients:Q", axis=alt.Axis(title="Client Count")),
+                tooltip=["time:Q", "num_clients:Q"],
+            )
             .properties(
                 height=500,
                 title=alt.TitleParams("Total Client Count", anchor="middle"),

@@ -32,7 +32,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smartdashboard"
-version = "0.0.2"
+version = "0.0.3"
 requires-python = ">=3.8,<3.11"
 authors = [
   {name = "CrayLabs: a Hewlett Packard Enterprise OSS Organization", email = "craylabs@hpe.com"},
