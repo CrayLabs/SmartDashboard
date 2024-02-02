@@ -522,7 +522,9 @@ def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
             st.write("")
             memory_graph_element = st.empty()
 
-    return MemoryView(shard, memory_table_element, memory_graph_element)
+    view = MemoryView(shard, memory_table_element, memory_graph_element)
+    view.initialize_data()
+    return view
 
 
 def client_view_builder(shards: t.List[Shard]) -> ClientView:
@@ -549,7 +551,9 @@ def client_view_builder(shards: t.List[Shard]) -> ClientView:
             st.write("")
             client_graph_element = st.empty()
 
-    return ClientView(shard, client_table_element, client_graph_element)
+    view = ClientView(shard, client_table_element, client_graph_element)
+    view.initialize_data()
+    return view
 
 
 def orc_summary_builder(

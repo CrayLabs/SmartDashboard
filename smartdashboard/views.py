@@ -27,6 +27,7 @@
 import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+import pathlib
 
 import altair as alt
 import pandas as pd
@@ -316,7 +317,8 @@ class ErrorView(ViewBase):
     information.
     """
 
-    def update(self) -> None: ...
+    def update(self) -> None:
+        ...
 
 
 class OverviewView(ViewBase):
@@ -353,111 +355,268 @@ class OverviewView(ViewBase):
         self.orc_view.update()
 
 
-@dataclass(frozen=True)
-class MemoryView(ViewBase):
-    """View class for memory section of the Database Telemetry page"""
+@dataclass
+class DataContext:
+    path: pathlib.Path = pathlib.Path()
+    dframe: pd.DataFrame = pd.DataFrame()
+    cols: pd.Index = None
+    index: int = 0
+    min: int = 0
 
+    @property
+    def max_records(self) -> int:
+        return 1000
+
+
+@dataclass
+class DualView(ViewBase):
     shard: t.Optional[Shard]
-    memory_table_element: DeltaGenerator
-    memory_graph_element: DeltaGenerator
+    table_element: DeltaGenerator
+    graph_element: DeltaGenerator
+    chart: t.Optional[DeltaGenerator] = None
+    data_ctx = DataContext()
+
+    @property
+    def _metric_path(self) -> str:
+        # return self.shard.memory_file
+        ...
+
+    @property
+    def metric_path(self) -> str:
+        # return self.shard.memory_file
+        return self._metric_path
+
+    def initialize_data(self) -> None:
+        if self.shard is not None:
+            self.data_ctx = DataContext()
+
+            self.data_ctx.path = pathlib.Path(self.metric_path)
+
+            self.data_ctx.dframe = _load_data(
+                self.data_ctx.path, 0, self.data_ctx.max_records
+            )
+            self.data_ctx.cols = self.data_ctx.dframe.columns
+            self.data_ctx.index = 0
+            self.data_ctx.min = self.data_ctx.dframe.timestamp.min()
+
+    def _update_table(self) -> str:
+        ...
+
+    def _update_graph(self) -> str:
+        ...
 
     def update(self) -> None:
         """Update memory table and graph elements for selected shard"""
         if self.shard is not None:
-
-            def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
-                gb_columns = [
-                    "used_memory",
-                    "used_memory_peak",
-                    "total_system_memory",
-                ]
-                dframe[gb_columns] /= 1024**3
-                dframe = dframe.rename(
-                    columns={
-                        "used_memory": "Used Memory (GB)",
-                        "used_memory_peak": "Used Peak Memory (GB)",
-                        "total_system_memory": "Total System Memory (GB)",
-                    }
+            if self.data_ctx.dframe is None:
+                self.data_ctx.dframe = _load_data(
+                    self.data_ctx.path,
+                    self.data_ctx.index,
+                    self.data_ctx.max_records,
                 )
-                dframe["time"] = dframe["timestamp"] - dframe["timestamp"].min()
-                dframe = dframe.drop(columns=["timestamp"])
-                return dframe
 
             try:
-                dframe = pd.read_csv(self.shard.memory_file)
-                processed_df = process_dataframe(dframe)
+                self.data_ctx.dframe.columns = self.data_ctx.cols
+                self._update_table(self.data_ctx.dframe)
+                self.data_ctx.dframe, temp_idx = load_data(
+                    self.data_ctx.path, self.data_ctx.index, self.data_ctx.max_records
+                )
+                self._update_graph(self.data_ctx.dframe)
+                if temp_idx == 0:
+                    self.data_ctx.dframe = None
+                else:
+                    self.data_ctx.index = temp_idx
 
-                self._update_memory_table(processed_df)
-                self._update_memory_graph(processed_df)
             except FileNotFoundError:
-                self.memory_table_element.info(
+                self.table_element.info(
                     f"Memory data was not found for {self.shard.name}"
                 )
 
-    def _update_memory_graph(self, dframe: pd.DataFrame) -> None:
+
+# @dataclass(frozen=True)
+@dataclass
+class MemoryView(DualView):
+    """View class for memory section of the Database Telemetry page"""
+
+    @property
+    def _metric_path(self) -> str:
+        return self.shard.memory_file
+
+    def _update_graph(self, dframe: pd.DataFrame) -> None:
         """Update memory graph for selected shard
 
         :param dframe: DataFrame with memory data
         :type dframe: pandas.DataFrame
         """
+
+        def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
+            gb_columns = [
+                "used_memory",
+                "used_memory_peak",
+                "total_system_memory",
+            ]
+            dframe[gb_columns] /= 1024**3
+            dframe = dframe.rename(
+                columns={
+                    "used_memory": "Used Memory (GB)",
+                    "used_memory_peak": "Used Peak Memory (GB)",
+                    "total_system_memory": "Total System Memory (GB)",
+                }
+            )
+            dframe["timestamp"] = dframe["timestamp"] - self.data_ctx.min
+            return dframe
+
+        dframe = process_dataframe(dframe)
         dframe = dframe.drop(columns=["Total System Memory (GB)"])
-        dframe_long = dframe.melt("time", var_name="Metric", value_name="Memory (GB)")
-        chart = (
-            alt.Chart(dframe_long)
-            .mark_line()
-            .encode(
-                x=alt.X("time:O", axis=alt.Axis(title="Timestep", labelAngle=0)),
-                y=alt.Y("Memory (GB):Q", axis=alt.Axis(title="Memory in GB")),
-                color=alt.Color(  # type: ignore[no-untyped-call]
-                    "Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"
-                ),
-                tooltip=["time:O", "Metric:N", "Memory (GB):Q"],
-            )
-            .properties(
-                height=500, title=alt.TitleParams("Memory Usage", anchor="middle")
-            )
-            .configure_legend(orient="bottom")
+        dframe_long = dframe.melt(
+            "timestamp", var_name="Metric", value_name="Memory (GB)"
         )
+        if self.chart is None:
+            self.chart = (
+                alt.Chart(dframe_long)
+                .mark_line()
+                .encode(
+                    x=alt.X(
+                        "timestamp:O",
+                        axis=alt.Axis(title="Time in seconds", labelAngle=0),
+                    ),
+                    y=alt.Y("Memory (GB):Q", axis=alt.Axis(title="Memory in GB")),
+                    color=alt.Color(  # type: ignore[no-untyped-call]
+                        "Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"
+                    ),
+                    tooltip=["time:O", "Metric:N", "Memory (GB):Q"],
+                )
+                .properties(
+                    height=500, title=alt.TitleParams("Memory Usage", anchor="middle")
+                )
+                .configure_legend(orient="bottom")
+            )
+            self.graph_element.altair_chart(
+                self.chart, use_container_width=True, theme="streamlit"
+            )
 
-        self.memory_graph_element.altair_chart(
-            chart, use_container_width=True, theme="streamlit"
-        )
+        else:
+            self.graph_element.add_rows(dframe_long)
 
-    def _update_memory_table(self, dframe: pd.DataFrame) -> None:
+    def _update_table(self, dframe: pd.DataFrame) -> None:
         """Update memory table for selected shard
 
         :param dframe: DataFrame with memory data
         :type dframe: pandas.DataFrame
         """
-        dframe = dframe.drop(columns=["time"])
-        self.memory_table_element.dataframe(
+
+        def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
+            gb_columns = [
+                "used_memory",
+                "used_memory_peak",
+                "total_system_memory",
+            ]
+            dframe[gb_columns] /= 1024**3
+            dframe = dframe.rename(
+                columns={
+                    "used_memory": "Used Memory (GB)",
+                    "used_memory_peak": "Used Peak Memory (GB)",
+                    "total_system_memory": "Total System Memory (GB)",
+                }
+            )
+            dframe = dframe.drop(columns=["timestamp"])
+            return dframe
+
+        dframe = process_dataframe(dframe)
+        self.table_element.dataframe(
             dframe.tail(1), use_container_width=True, hide_index=True
         )
 
 
-@dataclass(frozen=True)
-class ClientView(ViewBase):
+def _load_data(
+    csv_path: pathlib.Path,
+    start_idx: int,
+    num_rows: int,
+    has_header: bool = True,
+) -> t.Optional[pd.DataFrame]:
+    if not csv_path.exists():
+        raise ValueError("The supplied data file does not exist.")
+
+    try:
+        # skip_header = start_idx > 0
+        header_row = 0 if has_header else None
+        # num_extra_skips = 1 if header_row is not None else 0
+        # if skip_header:
+        #     header_row = None
+
+        dframe = pd.read_csv(
+            csv_path,
+            header=header_row,
+            skiprows=start_idx,  # + num_extra_skips,
+            nrows=num_rows,
+        )
+    except pd.errors.EmptyDataError:
+        dframe = None
+
+    return dframe
+
+
+def load_data(
+    csv_path: pathlib.Path, start_index: int, num_rows: int = 1000
+) -> t.Tuple[pd.DataFrame, int]:
+    last_index = start_index + num_rows
+    dframe = _load_data(csv_path, start_index, num_rows)
+    next_index = last_index
+
+    if dframe is None:
+        next_index = 0
+    elif dframe.shape[0] < num_rows:
+        next_index = 0
+
+    return dframe, next_index
+
+
+# @dataclass(frozen=True)
+@dataclass
+class ClientView(DualView):
     """View class for client section of the Database Telemetry page"""
 
-    shard: t.Optional[Shard]
-    client_table_element: DeltaGenerator
-    client_graph_element: DeltaGenerator
+    @property
+    def _metric_path(self) -> str:
+        return self.shard.client_file
 
-    def update(self) -> None:
-        """Update client table and graph elements for selected shard"""
-        if self.shard is not None:
-            try:
-                client_df = pd.read_csv(self.shard.client_file)
-                counts_df = pd.read_csv(self.shard.client_count_file)
+    def _update_graph(self, dframe: pd.DataFrame) -> None:
+        """Update client graph for selected shard
 
-                self._update_client_table(client_df)
-                self._update_client_graph(counts_df)
-            except FileNotFoundError:
-                self.client_table_element.info(
-                    f"Client data was not found for {self.shard.name}"
+        :param dframe: DataFrame with client data
+        :type dframe: pandas.DataFrame
+        """
+
+        def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
+            # when we update, the group by is going to give us 1....N as the timestamp again
+            # we need to add the last timestamp to each new batch...
+            # ctx.min - 1
+            mod = dframe.copy(deep=True).groupby("timestamp").count()
+            mod["timestamp"] = range(mod.shape[0])
+            mod.columns = ["trash", "num_clients", "timestamp"]
+            # mod = mod.set_index("timestamp")
+            return mod
+
+        if not self.chart:
+            self.chart = (
+                alt.Chart(process_dataframe(dframe))
+                .mark_line()
+                .encode(
+                    x=alt.X("timestamp:Q", axis=alt.Axis(title="Time in seconds")),
+                    y=alt.Y("num_clients:Q", axis=alt.Axis(title="Client Count")),
+                    tooltip=["time:Q", "num_clients:Q"],
                 )
+                .properties(
+                    height=500,
+                    title=alt.TitleParams("Total Client Count", anchor="middle"),
+                )
+            )
+            self.graph_element.altair_chart(self.chart, use_container_width=True)
 
-    def _update_client_table(self, dframe: pd.DataFrame) -> None:
+        else:
+            self.graph_element.add_rows(process_dataframe(dframe))
+
+    def _update_table(self, dframe: pd.DataFrame) -> None:
         """Update client table for selected shard
 
         :param dframe: DataFrame with client data
@@ -475,37 +634,9 @@ class ClientView(ViewBase):
             )
             return dframe
 
-        self.client_table_element.dataframe(
+        self.table_element.dataframe(
             process_dataframe(dframe), use_container_width=True, hide_index=True
         )
-
-    def _update_client_graph(self, dframe: pd.DataFrame) -> None:
-        """Update client graph for selected shard
-
-        :param dframe: DataFrame with client data
-        :type dframe: pandas.DataFrame
-        """
-
-        def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
-            dframe["time"] = dframe["timestamp"] - dframe["timestamp"].min()
-            dframe = dframe.drop(columns=["timestamp"])
-            return dframe
-
-        chart = (
-            alt.Chart(process_dataframe(dframe))
-            .mark_line()
-            .encode(
-                x=alt.X("time:Q", axis=alt.Axis(title="Timestep")),
-                y=alt.Y("num_clients:Q", axis=alt.Axis(title="Client Count")),
-                tooltip=["time:Q", "num_clients:Q"],
-            )
-            .properties(
-                height=500,
-                title=alt.TitleParams("Total Client Count", anchor="middle"),
-            )
-        )
-
-        self.client_graph_element.altair_chart(chart, use_container_width=True)
 
 
 class OrchestratorSummaryView(ViewBase):

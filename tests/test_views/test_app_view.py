@@ -27,7 +27,17 @@
 import pytest
 
 from smartdashboard.views import ApplicationView
-from tests.utils.test_entities import *
+
+from tests.utils.test_entities import (
+    model0_err_logs,
+    model0_out_logs,
+    model1_err_logs,
+    model1_out_logs,
+    application_1,
+    application_2,
+    application_3,
+    application_4,
+)
 
 
 @pytest.mark.parametrize(
