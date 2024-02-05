@@ -358,8 +358,8 @@ class OverviewView(ViewBase):
 @dataclass
 class DataContext:
     path: pathlib.Path = pathlib.Path()
-    dframe: pd.DataFrame = pd.DataFrame()
-    cols: pd.Index = None
+    dframe: t.Optional[pd.DataFrame] = pd.DataFrame()
+    cols: pd.Index = pd.Index([])
     index: int = 0
     min: int = 0
 
@@ -373,74 +373,101 @@ class DualView(ViewBase):
     shard: t.Optional[Shard]
     table_element: DeltaGenerator
     graph_element: DeltaGenerator
-    chart: t.Optional[DeltaGenerator] = None
+    chart: t.Optional[alt.Chart] = None
     data_ctx = DataContext()
 
     @property
+    @abstractmethod
     def _metric_path(self) -> str:
-        # return self.shard.memory_file
         ...
 
     @property
     def metric_path(self) -> str:
-        # return self.shard.memory_file
         return self._metric_path
 
     def initialize_data(self) -> None:
         if self.shard is not None:
-            self.data_ctx = DataContext()
+            try:
+                self.data_ctx = DataContext()
 
-            self.data_ctx.path = pathlib.Path(self.metric_path)
+                self.data_ctx.path = pathlib.Path(self.metric_path)
 
-            self.data_ctx.dframe = _load_data(
-                self.data_ctx.path, 0, self.data_ctx.max_records
-            )
-            self.data_ctx.cols = self.data_ctx.dframe.columns
-            self.data_ctx.index = 0
-            self.data_ctx.min = self.data_ctx.dframe.timestamp.min()
+                # self.data_ctx.dframe = _load_data(
+                #     self.data_ctx.path, 0, self.data_ctx.max_records
+                # )
 
-    def _update_table(self) -> str:
+                _, self.data_ctx.dframe = _load_data(
+                    self.data_ctx.path, 0, self.data_ctx.max_records, None
+                )
+                if self.data_ctx.dframe is not None:
+                    self.data_ctx.cols = self.data_ctx.dframe.columns
+                    self.data_ctx.index = 0
+                    # self.data_ctx.index = self.data_ctx.max_records - subtract_from_index
+                    self.data_ctx.min = self.data_ctx.dframe.timestamp.min()
+
+            except ValueError:
+                self.table_element.info(
+                    f"Telemetry information could not be found for {self.shard.name}."
+                )
+                return
+
+    @abstractmethod
+    def _update_table(self, dframe: pd.DataFrame) -> None:
         ...
 
-    def _update_graph(self) -> str:
+    @abstractmethod
+    def _update_graph(self, dframe: pd.DataFrame) -> None:
         ...
 
     def update(self) -> None:
         """Update memory table and graph elements for selected shard"""
         if self.shard is not None:
             if self.data_ctx.dframe is None:
-                self.data_ctx.dframe = _load_data(
+                # self.data_ctx.dframe = _load_data(
+                #     self.data_ctx.path,
+                #     self.data_ctx.index,
+                #     self.data_ctx.max_records,
+
+                # )
+
+                subtract_from_index, self.data_ctx.dframe = _load_data(
                     self.data_ctx.path,
                     self.data_ctx.index,
                     self.data_ctx.max_records,
+                    self.data_ctx.cols
                 )
-
-            try:
-                self.data_ctx.dframe.columns = self.data_ctx.cols
-                self._update_table(self.data_ctx.dframe)
-                self.data_ctx.dframe, temp_idx = load_data(
-                    self.data_ctx.path, self.data_ctx.index, self.data_ctx.max_records
-                )
-                self._update_graph(self.data_ctx.dframe)
-                if temp_idx == 0:
-                    self.data_ctx.dframe = None
-                else:
-                    self.data_ctx.index = temp_idx
-
-            except FileNotFoundError:
-                self.table_element.info(
-                    f"Memory data was not found for {self.shard.name}"
-                )
+                self.data_ctx.index -= subtract_from_index
 
 
-# @dataclass(frozen=True)
+            self.data_ctx.dframe.columns = self.data_ctx.cols
+            # self._update_table(self.data_ctx.dframe)
+            # self.data_ctx.dframe, temp_idx = load_data(
+            #     self.data_ctx.path, self.data_ctx.index, self.data_ctx.max_records
+            # )
+            self.data_ctx.dframe, temp_idx = load_data(
+                self.data_ctx.path, self.data_ctx.index, self.data_ctx.max_records, self.data_ctx.cols
+            )
+
+            self._update_table(self.data_ctx.dframe.copy(deep=True))
+            self._update_graph(self.data_ctx.dframe)
+            if temp_idx == 0:
+                self.data_ctx.dframe = None
+            else:
+                self.data_ctx.index = temp_idx
+
+            print(self.data_ctx.index)
+
+
+
 @dataclass
 class MemoryView(DualView):
     """View class for memory section of the Database Telemetry page"""
 
     @property
     def _metric_path(self) -> str:
-        return self.shard.memory_file
+        if self.shard is not None:
+            return self.shard.memory_file
+        return ""
 
     def _update_graph(self, dframe: pd.DataFrame) -> None:
         """Update memory graph for selected shard
@@ -466,6 +493,7 @@ class MemoryView(DualView):
             dframe["timestamp"] = dframe["timestamp"] - self.data_ctx.min
             return dframe
 
+        dframe.columns = self.data_ctx.cols
         dframe = process_dataframe(dframe)
         dframe = dframe.drop(columns=["Total System Memory (GB)"])
         dframe_long = dframe.melt(
@@ -484,7 +512,7 @@ class MemoryView(DualView):
                     color=alt.Color(  # type: ignore[no-untyped-call]
                         "Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"
                     ),
-                    tooltip=["time:O", "Metric:N", "Memory (GB):Q"],
+                    tooltip=["timestamp:O", "Metric:N", "Memory (GB):Q"],
                 )
                 .properties(
                     height=500, title=alt.TitleParams("Memory Usage", anchor="middle")
@@ -522,6 +550,7 @@ class MemoryView(DualView):
             dframe = dframe.drop(columns=["timestamp"])
             return dframe
 
+        dframe.columns = self.data_ctx.cols
         dframe = process_dataframe(dframe)
         self.table_element.dataframe(
             dframe.tail(1), use_container_width=True, hide_index=True
@@ -532,6 +561,7 @@ def _load_data(
     csv_path: pathlib.Path,
     start_idx: int,
     num_rows: int,
+    headers:t.Optional[pd.Index],
     has_header: bool = True,
 ) -> t.Optional[pd.DataFrame]:
     if not csv_path.exists():
@@ -550,35 +580,49 @@ def _load_data(
             skiprows=start_idx,  # + num_extra_skips,
             nrows=num_rows,
         )
+
+        max_index = dframe.shape[0]
+        subtract_from_index=0
+        if headers is not None:
+            dframe.columns = headers
+        dframe = dframe[dframe["timestamp"] < dframe["timestamp"].max()]
+        subtract_from_index = max_index-dframe.shape[0]
+
     except pd.errors.EmptyDataError:
         dframe = None
+        subtract_from_index = 0
 
-    return dframe
+    # return dframe
+    return subtract_from_index, dframe
 
 
 def load_data(
-    csv_path: pathlib.Path, start_index: int, num_rows: int = 1000
-) -> t.Tuple[pd.DataFrame, int]:
+    csv_path: pathlib.Path, start_index: int, num_rows: int = 1000, headers: t.Optional[pd.Index] = None,
+) -> t.Tuple[t.Optional[pd.DataFrame], int]:
     last_index = start_index + num_rows
-    dframe = _load_data(csv_path, start_index, num_rows)
-    next_index = last_index
+    subtract_from_index, dframe = _load_data(csv_path, start_index, num_rows, headers)
+    next_index = last_index - subtract_from_index
+    # dframe = _load_data(csv_path, start_index, num_rows)
+    # next_index = last_index
 
     if dframe is None:
         next_index = 0
-    elif dframe.shape[0] < num_rows:
-        next_index = 0
+    # elif dframe.shape[0] < num_rows:
+    #     next_index = 0
 
     return dframe, next_index
 
 
-# @dataclass(frozen=True)
+
 @dataclass
 class ClientView(DualView):
     """View class for client section of the Database Telemetry page"""
 
     @property
     def _metric_path(self) -> str:
-        return self.shard.client_file
+        if self.shard is not None:
+            return self.shard.client_file
+        return ""
 
     def _update_graph(self, dframe: pd.DataFrame) -> None:
         """Update client graph for selected shard
@@ -588,23 +632,32 @@ class ClientView(DualView):
         """
 
         def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
-            # when we update, the group by is going to give us 1....N as the timestamp again
+            # when we update, the group by is going to give us 1....N
+            # as the timestamp again
             # we need to add the last timestamp to each new batch...
             # ctx.min - 1
-            mod = dframe.copy(deep=True).groupby("timestamp").count()
-            mod["timestamp"] = range(mod.shape[0])
-            mod.columns = ["trash", "num_clients", "timestamp"]
+            # mod = dframe.copy(deep=True).groupby("timestamp").count()
+            # mod["timestamp"] = range(mod.shape[0])
+            # mod.columns = ["trash", "num_clients", "timestamp"]
             # mod = mod.set_index("timestamp")
+            mod = (
+                dframe.copy(deep=True)
+                .groupby("timestamp")
+                .size()
+                .reset_index(name="num_clients")
+            )
+            mod["timestamp"] = mod["timestamp"] - self.data_ctx.min
             return mod
 
-        if not self.chart:
+        if self.chart is None:
+            dframe.columns = self.data_ctx.cols
             self.chart = (
                 alt.Chart(process_dataframe(dframe))
                 .mark_line()
                 .encode(
                     x=alt.X("timestamp:Q", axis=alt.Axis(title="Time in seconds")),
                     y=alt.Y("num_clients:Q", axis=alt.Axis(title="Client Count")),
-                    tooltip=["time:Q", "num_clients:Q"],
+                    tooltip=["timestamp:Q", "num_clients:Q"],
                 )
                 .properties(
                     height=500,
@@ -614,6 +667,7 @@ class ClientView(DualView):
             self.graph_element.altair_chart(self.chart, use_container_width=True)
 
         else:
+            dframe.columns = self.data_ctx.cols
             self.graph_element.add_rows(process_dataframe(dframe))
 
     def _update_table(self, dframe: pd.DataFrame) -> None:
@@ -634,6 +688,7 @@ class ClientView(DualView):
             )
             return dframe
 
+        dframe.columns = self.data_ctx.cols
         self.table_element.dataframe(
             process_dataframe(dframe), use_container_width=True, hide_index=True
         )
