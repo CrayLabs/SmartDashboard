@@ -313,8 +313,7 @@ class ErrorView(ViewBase):
     information.
     """
 
-    def update(self) -> None:
-        ...
+    def update(self) -> None: ...
 
 
 class OverviewView:
