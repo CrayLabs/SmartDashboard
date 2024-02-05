@@ -99,9 +99,9 @@ class ManifestFileReader(ManifestReader):
                 "Version data is malformed.", file=self._file_path, exception=key
             ) from key
 
-        if version != "0.0.2":
+        if version not in ("0.0.2", "0.0.3"):
             version_exception = Exception(
-                "SmartDashboard version 0.0.2 is unable to parse manifest "
+                "SmartDashboard version 0.0.3 is unable to parse manifest "
                 f"file at version {version}."
             )
             raise VersionIncompatibilityError(

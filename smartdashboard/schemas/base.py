@@ -34,8 +34,8 @@ class HasName(BaseModel):
 
 
 class HasOutErrFiles(BaseModel):
-    out_file: str
-    err_file: str
+    out_file: str = ""
+    err_file: str = ""
 
 
 class HasTelemetryMetaData(BaseModel):

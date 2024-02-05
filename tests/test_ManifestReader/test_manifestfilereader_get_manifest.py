@@ -69,6 +69,14 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
             0,
             Manifest,
         ),
+        pytest.param(
+            "tests/utils/manifest_files/0.0.2_manifest.json",
+            2,
+            4,
+            3,
+            3,
+            Manifest,
+        ),
     ],
 )
 def test_get_manifest(
