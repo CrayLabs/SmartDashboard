@@ -49,16 +49,10 @@ from ..utils.test_entities import *
         pytest.param(orchestrator_1.shards[0], f"Status: {GREEN_RUNNING}"),
         pytest.param(orchestrator_1.shards[1], f"Status: {RED_FAILED}"),
         pytest.param(pending_shard, f"Status: {StatusEnum.UNKNOWN.value}"),
-        pytest.param(
-            malformed_status_dir_shard, f"Status: {StatusEnum.MALFORMED.value}"
-        ),
+        pytest.param(no_return_code_shard, f"Status: {StatusEnum.MALFORMED.value}"),
     ],
 )
 def test_get_status(entity: t.Dict[str, t.Any], expected_status):
-    try:
-        status_dir = entity.telemetry_metadata["status_dir"]
-        status = format_status(get_status(status_dir))
-    except KeyError:
-        assert expected_status == f"Status: {StatusEnum.MALFORMED.value}"
-        return
+    status_dir = entity.telemetry_metadata["status_dir"]
+    status = format_status(get_status(status_dir))
     assert status == expected_status

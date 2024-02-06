@@ -45,20 +45,10 @@ from ..utils.test_entities import *
         pytest.param(orchestrator_1.shards[0], StatusData(StatusEnum.RUNNING, None)),
         pytest.param(orchestrator_1.shards[1], StatusData(StatusEnum.FAILED, 1)),
         pytest.param(pending_shard, StatusData(StatusEnum.UNKNOWN, None)),
-        pytest.param(
-            malformed_status_dir_shard, StatusData(StatusEnum.MALFORMED, None)
-        ),
         pytest.param(no_return_code_shard, StatusData(StatusEnum.MALFORMED, None)),
     ],
 )
 def test_get_status(entity: EntityWithNameTelemetryMetaDataErrOut, expected_status):
-    try:
-        status_dir = entity.telemetry_metadata["status_dir"]
-        status = get_status(status_dir)
-    except MalformedManifestError:
-        assert expected_status == MalformedManifestError
-        return
-    except KeyError:
-        assert expected_status == StatusData(StatusEnum.MALFORMED, None)
-        return
+    status_dir = entity.telemetry_metadata["status_dir"]
+    status = get_status(status_dir)
     assert status == expected_status
