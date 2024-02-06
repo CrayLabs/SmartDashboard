@@ -31,7 +31,7 @@ class StatusEnum(Enum):
     RUNNING = "Running"
     COMPLETED = "Completed"
     FAILED = "Failed"
-    PENDING = "Pending"
+    MALFORMED = "Malformed"
     INACTIVE = "Inactive"
     UNSTABLE = "Unstable"
     UNKNOWN = "Unknown"

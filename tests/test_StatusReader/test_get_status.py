@@ -44,9 +44,11 @@ from ..utils.test_entities import *
         pytest.param(application_4, StatusData(StatusEnum.COMPLETED, 0)),
         pytest.param(orchestrator_1.shards[0], StatusData(StatusEnum.RUNNING, None)),
         pytest.param(orchestrator_1.shards[1], StatusData(StatusEnum.FAILED, 1)),
-        pytest.param(pending_shard, StatusData(StatusEnum.PENDING, None)),
-        pytest.param(malformed_status_dir_shard, StatusData(StatusEnum.UNKNOWN, None)),
-        pytest.param(no_return_code_shard, StatusData(StatusEnum.UNKNOWN, None)),
+        pytest.param(pending_shard, StatusData(StatusEnum.UNKNOWN, None)),
+        pytest.param(
+            malformed_status_dir_shard, StatusData(StatusEnum.MALFORMED, None)
+        ),
+        pytest.param(no_return_code_shard, StatusData(StatusEnum.MALFORMED, None)),
     ],
 )
 def test_get_status(entity: EntityWithNameTelemetryMetaDataErrOut, expected_status):
@@ -57,6 +59,6 @@ def test_get_status(entity: EntityWithNameTelemetryMetaDataErrOut, expected_stat
         assert expected_status == MalformedManifestError
         return
     except KeyError:
-        assert expected_status == StatusData(StatusEnum.UNKNOWN, None)
+        assert expected_status == StatusData(StatusEnum.MALFORMED, None)
         return
     assert status == expected_status
