@@ -1,0 +1,338 @@
+{
+    "schema info": {
+        "schema_name": "entity manifest",
+        "version": "0.0.3"
+    },
+    "experiment": {
+        "name": "my-experiment",
+        "path": "experiment/path",
+        "launcher": "local",
+        "out_file": "tests/utils/log_files/model_0.out",
+        "err_file": "tests/utils/log_files/model_0.err"
+    },
+    "runs": [
+        {
+            "run_id": "2",
+            "model": [],
+            "orchestrator": [
+                {
+                    "name": "orchestrator_2",
+                    "type": "redis",
+                    "interface": [
+                        "lo"
+                    ],
+                    "shards": [
+                        {
+                            "name": "orc 2 shard 1",
+                            "hostname": "shard1_host",
+                            "port": 22222,
+                            "out_file": "tests/utils/log_files/model_1.out",
+                            "err_file": "tests/utils/log_files/model_1.err",
+                            "conf_file": "/path/to/conf_file",
+                            "telemetry_metadata": {
+                                "status_dir": "tests/utils/status_files/telem_disabled",
+                                "job_id": "111",
+                                "step_id": "111"
+                            }
+                        },
+                        {
+                            "name": "orc 2 shard 2",
+                            "hostname": "shard2_host",
+                            "port": 22222,
+                            "out_file": "tests/utils/log_files/model_0.out",
+                            "err_file": "tests/utils/log_files/model_0.err",
+                            "conf_file": "/path/to/conf_file",
+                            "telemetry_metadata": {
+                                "status_dir": "tests/utils/status_files/telem_disabled",
+                                "job_id": "111",
+                                "step_id": "111"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "ensemble": [
+                {
+                    "name": "ensemble_2",
+                    "perm_strat": "all-perm",
+                    "batch_settings": {
+                        "string": "Any1"
+                    },
+                    "params": {
+                        "string": [
+                            "Any1",
+                            "Any2",
+                            "Any3"
+                        ]
+                    },
+                    "models": [
+                        {
+                            "name": "ensemble_3_member_11",
+                            "path": "member 1 path",
+                            "exe_args": [
+                                "string"
+                            ],
+                            "batch_settings": {
+                                "batch_cmd": "command",
+                                "batch_args": {
+                                    "arg1": "string1",
+                                    "arg2": null
+                                }
+                            },
+                            "run_settings": {
+                                "exe": "echo",
+                                "run_command": "srun",
+                                "run_args": {
+                                    "arg1": "string1",
+                                    "arg2": null
+                                }
+                            },
+                            "params": {
+                                "string": "Any"
+                            },
+                            "files": {
+                                "Symlink": [
+                                    "file1",
+                                    "file2"
+                                ],
+                                "Configure": [
+                                    "file3"
+                                ],
+                                "Copy": [
+                                    "file4",
+                                    "file5"
+                                ]
+                            },
+                            "colocated_db": {
+                                "settings": {
+                                    "protocol": "TCP/IP",
+                                    "port": 1111,
+                                    "interface": "lo",
+                                    "db_cpus": 1,
+                                    "limit_app_cpus": "True",
+                                    "debug": "False"
+                                },
+                                "scripts": [
+                                    {
+                                        "script1": {
+                                            "backend": "script1_torch",
+                                            "device": "script1_cpu"
+                                        }
+                                    },
+                                    {
+                                        "script2": {
+                                            "backend": "script2_torch",
+                                            "device": "script2_gpu"
+                                        }
+                                    }
+                                ],
+                                "models": [
+                                    {
+                                        "model1": {
+                                            "backend": "model1_tf",
+                                            "device": "model1_cpu"
+                                        }
+                                    },
+                                    {
+                                        "model2": {
+                                            "backend": "model2_tf",
+                                            "device": "model2_cpu"
+                                        }
+                                    }
+                                ]
+                            },
+                            "telemetry_metadata": {
+                                "status_dir": "tests/utils/status_files/telem_disabled",
+                                "job_id": "111",
+                                "step_id": "111"
+                            },
+                            "out_file": "tests/utils/log_files/model_0.out",
+                            "err_file": "tests/utils/log_files/model_0.err"
+                        }
+                    ]
+                },
+                {
+                    "name": "ensemble_3",
+                    "perm_strat": "string2",
+                    "batch_settings": {
+                        "string": "Any1"
+                    },
+                    "params": {
+                        "string": [
+                            "Any1",
+                            "Any2",
+                            "Any3"
+                        ]
+                    },
+                    "models": [
+                        {
+                            "name": "ensemble_3_member_1",
+                            "path": "member 1 path",
+                            "exe_args": [
+                                "string"
+                            ],
+                            "batch_settings": {
+                                "batch_cmd": "command",
+                                "batch_args": {
+                                    "arg1": "string1",
+                                    "arg2": null
+                                }
+                            },
+                            "run_settings": {
+                                "exe": "echo",
+                                "run_command": "srun",
+                                "run_args": {
+                                    "arg1": "string1",
+                                    "arg2": null
+                                }
+                            },
+                            "params": {
+                                "string": "Any"
+                            },
+                            "files": {
+                                "Symlink": [
+                                    "file1",
+                                    "file2"
+                                ],
+                                "Configure": [
+                                    "file3"
+                                ],
+                                "Copy": [
+                                    "file4",
+                                    "file5"
+                                ]
+                            },
+                            "colocated_db": {
+                                "settings": {
+                                    "protocol": "TCP/IP",
+                                    "port": 1111,
+                                    "interface": "lo",
+                                    "db_cpus": 1,
+                                    "limit_app_cpus": "True",
+                                    "debug": "False"
+                                },
+                                "scripts": [
+                                    {
+                                        "script1": {
+                                            "backend": "script1_torch",
+                                            "device": "script1_cpu"
+                                        }
+                                    },
+                                    {
+                                        "script2": {
+                                            "backend": "script2_torch",
+                                            "device": "script2_gpu"
+                                        }
+                                    }
+                                ],
+                                "models": [
+                                    {
+                                        "model1": {
+                                            "backend": "model1_tf",
+                                            "device": "model1_cpu"
+                                        }
+                                    },
+                                    {
+                                        "model2": {
+                                            "backend": "model2_tf",
+                                            "device": "model2_cpu"
+                                        }
+                                    }
+                                ]
+                            },
+                            "telemetry_metadata": {
+                                "status_dir": "tests/utils/status_files/telem_disabled",
+                                "job_id": "111",
+                                "step_id": "111"
+                            },
+                            "out_file": "tests/utils/log_files/model_0.out",
+                            "err_file": "tests/utils/log_files/model_0.err"
+                        },
+                        {
+                            "name": "ensemble_3_member_2",
+                            "path": "member 2 path",
+                            "exe_args": [
+                                "string"
+                            ],
+                            "batch_settings": {
+                                "batch_cmd": "command",
+                                "batch_args": {
+                                    "arg1": "string1"
+                                }
+                            },
+                            "run_settings": {
+                                "exe": "echo",
+                                "run_command": "srun",
+                                "run_args": {
+                                    "arg1": "string1",
+                                    "arg2": null
+                                }
+                            },
+                            "params": {
+                                "string": "Any"
+                            },
+                            "files": {
+                                "Symlink": [
+                                    "file1",
+                                    "file2"
+                                ],
+                                "Configure": [
+                                    "file3"
+                                ],
+                                "Copy": [
+                                    "file4",
+                                    "file5"
+                                ]
+                            },
+                            "colocated_db": {
+                                "settings": {
+                                    "protocol": "TCP/IP",
+                                    "port": 1111,
+                                    "interface": "lo",
+                                    "db_cpus": 1,
+                                    "limit_app_cpus": "True",
+                                    "debug": "False"
+                                },
+                                "scripts": [
+                                    {
+                                        "script1": {
+                                            "backend": "script1_torch",
+                                            "device": "script1_cpu"
+                                        }
+                                    },
+                                    {
+                                        "script2": {
+                                            "backend": "script2_torch",
+                                            "device": "script2_gpu"
+                                        }
+                                    }
+                                ],
+                                "models": [
+                                    {
+                                        "model1": {
+                                            "backend": "model1_tf",
+                                            "device": "model1_cpu"
+                                        }
+                                    },
+                                    {
+                                        "model2": {
+                                            "backend": "model2_tf",
+                                            "device": "model2_cpu"
+                                        }
+                                    }
+                                ]
+                            },
+                            "telemetry_metadata": {
+                                "status_dir": "tests/utils/status_files/telem_disabled",
+                                "job_id": "111",
+                                "step_id": "111"
+                            },
+                            "out_file": "tests/utils/log_files/model_1.out",
+                            "err_file": "tests/utils/log_files/model_1.err"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
