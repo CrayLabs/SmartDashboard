@@ -2,6 +2,12 @@
 
 SmartDashboard is an add-on to SmartSim that provides a dashboard to help users understand and monitor their SmartSim experiments in a visual way. Configuration, status, and logs are available for all launched entities within an experiment for easy inspection.
 
+A ``Telemetry Monitor`` is a new background process that is launched along with the experiment
+that helps SmartDashboard properly display data. The ``Telemetry Monitor`` can be disabled by
+adding !!!!!!!FINDOUTFINALAPI!!!!!!!!! to the driver script. Experiment metadata is also stored in
+the ``.smartsim`` directory, a hidden folder for internal api use and used by the dashboard.
+Deletion of the experiment folder will remove all experiment metadata.
+
 ## Installation
 
 It's important to note that SmartDashboard only works while using SmartSim, so SmartSim will need to be installed as well.
@@ -9,7 +15,7 @@ SmartSim installation docs can be found [here](https://www.craylabs.org/docs/ins
 
 ### User Install
 
-Run `pip install git+https://github.com/CrayLabs/SmartDashboard.git` to install SmartDashboard without cloning the repository.
+Run `pip install smartdashboard` to install SmartDashboard without cloning the repository.
 
 ### Developer Install
 
@@ -88,6 +94,6 @@ The dashboard is also persistent, meaning that a user can still launch and use t
 
 Once the dashboard is launched, a browser will open to `http://localhost:<port>`. SmartDashboard currently has two tabs on the left hand side.
   
-`Experiment Overview:` This tab is where configuration information, statuses, and logs are located for each launched entity of the experiment. The `Experiment` section displays configuaration information for the overall experiment. In the `Applications` section, also known as SmartSim `Models`, select a launched application to see its status, what it was configured with, and its logs. The `Orchestrators` section also provides configuration and status information, as well as logs per shard for a selected orchestrator. Finally, in the `Ensembles` section, select an ensemble to see its status and configuration. Then select any of its members to see its status, configuration, and logs.
+`Experiment Overview:` This tab is where configuration information, statuses, and logs are located for each launched entity of the experiment. The `Experiment` section displays configuration information for the overall experiment and its logs. In the `Applications` section, also known as SmartSim `Models`, select a launched application to see its status, what it was configured with, and its logs. The `Orchestrators` section also provides configuration and status information, as well as logs per shard for a selected orchestrator. Finally, in the `Ensembles` section, select an ensemble to see its status and configuration. Then select any of its members to see its status, configuration, and logs.
   
 `Help:` This tab links to SmartSim documentation and provides a SmartSim contact for support.

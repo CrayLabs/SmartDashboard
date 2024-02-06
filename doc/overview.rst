@@ -8,7 +8,8 @@ and monitor their SmartSim experiments in a visual way. Configuration, status, a
 are available for all launched entities within an experiment for easy inspection.
 
 A ``Telemetry Monitor`` is a new background process that is launched along with the experiment
-that helps ``SmartDashboard`` properly display data. Experiment metadata is also stored in
+that helps ``SmartDashboard`` properly display data. The ``Telemetry Monitor`` can be disabled by
+adding !!!!!!!FINDOUTFINALAPI!!!!!!!!! to the driver script. Experiment metadata is also stored in
 the ``.smartsim`` directory, a hidden folder for internal api use and used by the dashboard.
 Deletion of the experiment folder will remove all experiment metadata.
 
@@ -24,7 +25,7 @@ found `here <https://www.craylabs.org/docs/installation_instructions/basic.html>
 
 User Install:
 
-Run ``pip install git+https://github.com/CrayLabs/SmartDashboard.git`` to install
+Run ``pip install smartdashboard`` to install
 SmartDashboard without cloning the repository.
 
 Developer Install:
@@ -124,7 +125,7 @@ Once displayed in the browser, SmartDashboard currently has two tabs on the left
   
 ``Experiment Overview:`` This tab is where configuration information, statuses, and 
 logs are located for each launched entity of the experiment. The ``Experiment`` 
-section displays configuaration information for the overall experiment. In the ``Applications`` 
+section displays configuration information for the overall experiment and its logs. In the ``Applications`` 
 section, also known as SmartSim ``Models``, select a launched application to see its status, 
 what it was configured with, and its logs. The ``Orchestrators`` section also provides 
 configuration and status information, as well as logs per shard for a selected orchestrator. 
