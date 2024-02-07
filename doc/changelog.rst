@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.0.3
+-----
+
+Release TBD
+
+Description
+
+- Added defined schemas for entity objects.
+- Added experiment level logs to the dashboard.
+
+
+
 0.0.2
 -----
 
