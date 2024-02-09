@@ -7,8 +7,8 @@ SmartDashboard
 and monitor their SmartSim experiments in a visual way. Configuration, status, and logs
 are available for all launched entities within an experiment for easy inspection.
 
-A ``Telemetry Monitor`` is a new background process that is launched along with the experiment
-that helps SmartDashboard properly display data. The ``Telemetry Monitor`` can be disabled by
+A ``Telemetry Monitor`` is a background process that is launched along with the experiment
+that produces the data displayed by SmartDashboard. The ``Telemetry Monitor`` can be disabled by
 adding ``export SMARTSIM_TELEMETRY_ENABLE=0`` as an environment variable. When disabled, SmartDashboard
 will not display any data. To re-enable, set the ``SMARTSIM_TELEMETRY_ENABLE`` environment variable to ``1``
 with ``export SMARTSIM_TELEMETRY_ENABLE=1``.

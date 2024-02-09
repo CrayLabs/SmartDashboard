@@ -8,8 +8,11 @@ Release TBD
 
 Description
 
-- Added defined schemas for entity objects.
-- Added experiment level logs to the dashboard.
+- Added defined schemas for entity objects. (SmartDashboard-PR31_)
+- Added experiment level logs to the dashboard. (SmartDashboard-PR37_)
+
+.. _SmartDashboard-PR31: https://github.com/CrayLabs/SmartDashboard/pull/31
+.. _SmartDashboard-PR37: https://github.com/CrayLabs/SmartDashboard/pull/37
 
 
 
