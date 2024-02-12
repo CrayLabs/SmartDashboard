@@ -419,6 +419,9 @@ class DualView(ViewBase):
     def _update_graph(self, dframe: pd.DataFrame) -> None:
         ...
 
+    @abstractmethod
+    def update(self) -> None:
+        ...
     def update(self) -> None:
         """Update memory table and graph elements for selected shard"""
         if self.shard is not None:
