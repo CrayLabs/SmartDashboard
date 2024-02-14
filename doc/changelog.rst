@@ -4,7 +4,7 @@ Changelog
 0.0.3
 -----
 
-Release TBD
+Released on 15 February 2024
 
 Description
 
