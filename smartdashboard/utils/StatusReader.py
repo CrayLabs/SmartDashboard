@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,12 @@ import json
 import os
 import typing as t
 from dataclasses import dataclass
+
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.orchestrator import Orchestrator
+from smartdashboard.schemas.run import Run
+from smartdashboard.schemas.shard import Shard
 
 from .status import GREEN_COMPLETED, GREEN_RUNNING, RED_FAILED, RED_UNSTABLE, StatusEnum
 
@@ -69,7 +75,7 @@ def get_status(dir_path: str) -> StatusData:
                 with open(stop_json_path, "r", encoding="utf-8") as stop_json_file:
                     stop_data = json.load(stop_json_file)
             except json.JSONDecodeError:
-                return StatusData(StatusEnum.UNKNOWN, None)
+                return StatusData(StatusEnum.MALFORMED, None)
 
             try:
                 status = (
@@ -79,30 +85,30 @@ def get_status(dir_path: str) -> StatusData:
                 )
 
             except KeyError:
-                status = StatusData(StatusEnum.UNKNOWN, None)
+                status = StatusData(StatusEnum.MALFORMED, None)
 
             return status
 
         return StatusData(StatusEnum.RUNNING, None)
 
-    return StatusData(StatusEnum.PENDING, None)
+    return StatusData(StatusEnum.UNKNOWN, None)
 
 
-def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str:
+def get_ensemble_status_summary(ensemble: t.Optional[Ensemble]) -> str:
     """Get the status summary of an ensemble
 
     Gets the status of each member and returns
     a summary of the overall ensemble.
 
     :param ensemble: Ensemble
-    :type ensemble: t.Optional[t.Dict[str, t.Any]]
+    :type ensemble: Optional[Ensemble]
     :return: Status summary
     :rtype: str
     """
     status_str = "Status: "
 
     if ensemble:
-        status_counts = status_mapping(ensemble.get("models", []))
+        status_counts = status_mapping(ensemble.models)
 
         formatted_counts = [
             f"{count} {status.value}" for status, count in status_counts.items()
@@ -115,32 +121,30 @@ def get_ensemble_status_summary(ensemble: t.Optional[t.Dict[str, t.Any]]) -> str
     return status_str
 
 
-def get_orchestrator_status_summary(
-    orchestrator: t.Optional[t.Dict[str, t.Any]]
-) -> str:
+def get_orchestrator_status_summary(orchestrator: t.Optional[Orchestrator]) -> str:
     """Get the status summary of an orchestrator
 
     Gets the status of each shard and returns
     a summary of the overall orchestrator.
 
     :param orchestrator: Orchestrator
-    :type orchestrator: t.Optional[t.Dict[str, t.Any]]
+    :type orchestrator: Optional[Orchestrator]
     :return: Status summary
     :rtype: str
     """
     status_str = "Status: "
 
     if orchestrator:
-        status_counts = status_mapping(orchestrator.get("shards", []))
+        status_counts = status_mapping(orchestrator.shards)
 
         if status_counts[StatusEnum.COMPLETED] == sum(status_counts.values()):
             return f"{status_str}{StatusEnum.INACTIVE.value} (all shards completed)"
 
-        if status_counts[StatusEnum.PENDING] == sum(status_counts.values()):
-            return f"{status_str}{StatusEnum.PENDING.value}"
+        if status_counts[StatusEnum.UNKNOWN] == sum(status_counts.values()):
+            return f"{status_str}{StatusEnum.UNKNOWN.value}"
 
-        if status_counts[StatusEnum.UNKNOWN] > 0:
-            return f"{status_str}{StatusEnum.UNKNOWN.value}. Malformed status found."
+        if status_counts[StatusEnum.MALFORMED] > 0:
+            return f"{status_str}{StatusEnum.MALFORMED.value} status found."
 
         if status_counts[StatusEnum.FAILED] > 0:
             return (
@@ -153,44 +157,46 @@ def get_orchestrator_status_summary(
     return status_str
 
 
-def get_experiment_status_summary(runs: t.Optional[t.List[t.Dict[str, t.Any]]]) -> str:
+def get_experiment_status_summary(runs: t.Optional[t.List[Run]]) -> str:
     """Get the status summary of an experiment
 
     Gets the status of each entity and returns
     a summary of the overall experiment.
 
     :param runs: Runs of an experiment
-    :type runs: t.Optional[t.List[t.Dict[str, t.Any]]]
+    :type runs: Optional[List[Run]]
     :return: Status summary
     :rtype: str
     """
     status_str = "Status: "
 
     if runs:
-        apps = [app for run in runs for app in run.get("model", [])]
-        ensembles = [ensemble for run in runs for ensemble in run.get("ensemble", [])]
-        ens_members = [
-            member for ensemble in ensembles for member in ensemble.get("models", [])
-        ]
-        orcs = [orch for run in runs for orch in run.get("orchestrator", [])]
-        shards = [shard for orc in orcs for shard in orc.get("shards", [])]
+        apps = [app for run in runs for app in run.model]
+        ensembles = [ensemble for run in runs for ensemble in run.ensemble]
+        ens_members = [member for ensemble in ensembles for member in ensemble.models]
+        orcs = [orch for run in runs for orch in run.orchestrator]
+        shards = [shard for orc in orcs for shard in orc.shards]
 
+        unknown_counter = 0
         for entity in itertools.chain(apps, ens_members, shards):
-            unknown_counter = 0
             try:
-                entity_status = get_status(entity["telemetry_metadata"]["status_dir"])
+                entity_status = get_status(entity.telemetry_metadata["status_dir"])
             except KeyError:
-                entity_status = StatusData(StatusEnum.UNKNOWN, None)
-                unknown_counter += 1
+                return f"{status_str}{StatusEnum.MALFORMED.value} status found."
 
-            if entity_status in (
-                StatusData(StatusEnum.RUNNING, None),
-                StatusData(StatusEnum.PENDING, None),
-            ):
+            if entity_status == StatusData(StatusEnum.RUNNING, None):
                 return f"{status_str}{GREEN_RUNNING}"
 
-        if unknown_counter > 0:
-            return f"{status_str}{StatusEnum.UNKNOWN.value}. Malformed status found."
+            if entity_status == StatusData(StatusEnum.UNKNOWN, None):
+                unknown_counter += 1
+
+        # if every single entity status is UNKNOWN, it's likely that experiment
+        # telemetry was disabled
+        if unknown_counter == len(list(itertools.chain(apps, ens_members, shards))):
+            return (
+                f"{status_str}{StatusEnum.UNKNOWN.value}. "
+                + "Experiment telemetry may have been disabled."
+            )
 
         return f"{status_str}{StatusEnum.INACTIVE.value}"
 
@@ -211,35 +217,37 @@ def format_status(status: StatusData) -> str:
         return f"{status_str}{GREEN_RUNNING}"
     if status.status == StatusEnum.COMPLETED:
         return f"{status_str}{GREEN_COMPLETED}"
-    if status.status == StatusEnum.PENDING:
-        return f"{status_str}{StatusEnum.PENDING.value}"
+    if status.status == StatusEnum.UNKNOWN:
+        return f"{status_str}{StatusEnum.UNKNOWN.value}"
     if status.status == StatusEnum.FAILED:
         return f"{status_str}{RED_FAILED}"
 
-    return f"{status_str}{StatusEnum.UNKNOWN.value}"
+    return f"{status_str}{StatusEnum.MALFORMED.value}"
 
 
-def status_mapping(entities: t.List[t.Dict[str, t.Any]]) -> t.Dict[StatusEnum, int]:
+def status_mapping(
+    entities: t.Union[t.List[Application], t.List[Shard]]
+) -> t.Dict[StatusEnum, int]:
     """Map statuses for formatting
 
     :param entities: List of entities to map
-    :type entities: t.List
+    :type entities: Union[List[Application], List[Shard]]
     :return: The status map
-    :rtype: t.Dict[StatusEnum, int]
+    :rtype: Dict[StatusEnum, int]
     """
     status_counts = {
         StatusEnum.RUNNING: 0,
         StatusEnum.COMPLETED: 0,
         StatusEnum.FAILED: 0,
-        StatusEnum.PENDING: 0,
         StatusEnum.UNKNOWN: 0,
+        StatusEnum.MALFORMED: 0,
     }
 
     for e in entities:
         try:
-            entity_status = get_status(e["telemetry_metadata"]["status_dir"])
+            entity_status = get_status(e.telemetry_metadata["status_dir"])
         except KeyError:
-            entity_status = StatusData(StatusEnum.UNKNOWN, None)
+            entity_status = StatusData(StatusEnum.MALFORMED, None)
 
         status_counts[entity_status.status] += 1
 

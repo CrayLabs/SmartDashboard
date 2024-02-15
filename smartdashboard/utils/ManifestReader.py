@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,11 +25,20 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import io
+import itertools
 import json
+import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
+from pydantic import ValidationError
+
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.experiment import Experiment
+from smartdashboard.schemas.orchestrator import Orchestrator
+from smartdashboard.schemas.run import Run
 from smartdashboard.utils.errors import (
     MalformedManifestError,
     ManifestError,
@@ -42,22 +51,25 @@ class Manifest:
     """Data class representing a manifest
 
     :param experiment: Experiment
-    :type experiment: Dict[str, Any]
+    :type experiment: Experiment
     :param runs: Runs of an experiment
-    :type runs: List[Dict[str, Any]]
-    :param applications: All applications across all runs
-    :type applications: List[Dict[str, Any]]
-    :param orchestrators: All orchestrators across all runs
-    :type orchestrators: List[Dict[str, Any]]
-    :param ensembles: All ensembles across all runs
-    :type ensembles: List[Dict[str, Any]]
+    :type runs: List[Run]
     """
 
-    experiment: Dict[str, Any]
-    runs: List[Dict[str, Any]]
-    applications: List[Dict[str, Any]]
-    orchestrators: List[Dict[str, Any]]
-    ensembles: List[Dict[str, Any]]
+    experiment: Experiment
+    runs: List[Run]
+
+    @property
+    def apps_with_run_ctx(self) -> t.Iterable[t.Tuple[str, Application]]:
+        return itertools.chain.from_iterable(run.apps_with_ctx for run in self.runs)
+
+    @property
+    def orcs_with_run_ctx(self) -> t.Iterable[t.Tuple[str, Orchestrator]]:
+        return itertools.chain.from_iterable(run.orcs_with_ctx for run in self.runs)
+
+    @property
+    def ensemble_with_run_ctx(self) -> t.Iterable[t.Tuple[str, Ensemble]]:
+        return itertools.chain.from_iterable(run.ensemble_with_ctx for run in self.runs)
 
 
 class ManifestReader(ABC):
@@ -87,9 +99,9 @@ class ManifestFileReader(ManifestReader):
                 "Version data is malformed.", file=self._file_path, exception=key
             ) from key
 
-        if version != "0.0.2":
+        if version not in ("0.0.2", "0.0.3"):
             version_exception = Exception(
-                "SmartDashboard version 0.0.2 is unable to parse manifest "
+                "SmartDashboard version 0.0.3 is unable to parse manifest "
                 f"file at version {version}."
             )
             raise VersionIncompatibilityError(
@@ -104,50 +116,14 @@ class ManifestFileReader(ManifestReader):
         :return: Manifest
         :rtype: Manifest
         """
-        experiment = self._data.get("experiment", {})
-        runs = self._data.get("runs", [])
-        try:
-            apps = [
-                {**app, "run_id": run["run_id"]}
-                for run in runs
-                for app in run.get("model", None)
-                if app
-            ]
-        except Exception as exc:
-            raise MalformedManifestError(
-                "Applications are malformed.", file=self._file_path, exception=exc
-            ) from exc
+        experiment = Experiment(**self._data.get("experiment", {}))
+        runs_data = self._data.get("runs", [])
 
-        try:
-            orcs = [
-                {**orch, "run_id": run["run_id"]}
-                for run in runs
-                for orch in run.get("orchestrator", None)
-                if orch
-            ]
-        except Exception as exc:
-            raise MalformedManifestError(
-                "Orchestrators are malformed.", file=self._file_path, exception=exc
-            ) from exc
-
-        try:
-            ensembles = [
-                {**ensemble, "run_id": run["run_id"]}
-                for run in runs
-                for ensemble in run.get("ensemble", None)
-                if ensemble
-            ]
-        except Exception as exc:
-            raise MalformedManifestError(
-                "Ensembles are malformed.", file=self._file_path, exception=exc
-            ) from exc
+        runs = [Run(**run_data) for run_data in runs_data]
 
         return Manifest(
             experiment=experiment,
             runs=runs,
-            applications=apps,
-            orchestrators=orcs,
-            ensembles=ensembles,
         )
 
     @classmethod
@@ -198,4 +174,8 @@ def load_manifest(path: str) -> Manifest:
         raise ManifestError(
             title="Manifest file could not be decoded.", file=path, exception=jde
         ) from jde
+    except ValidationError as val:
+        raise MalformedManifestError(
+            title="Manifest file is malformed.", file=path, exception=val
+        ) from val
     return manifest

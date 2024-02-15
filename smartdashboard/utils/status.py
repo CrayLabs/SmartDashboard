@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@ class StatusEnum(Enum):
     RUNNING = "Running"
     COMPLETED = "Completed"
     FAILED = "Failed"
-    PENDING = "Pending"
+    MALFORMED = "Malformed"
     INACTIVE = "Inactive"
     UNSTABLE = "Unstable"
     UNKNOWN = "Unknown"

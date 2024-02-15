@@ -1,7 +1,7 @@
 {
     "schema info": {
         "schema_name": "entity manifest",
-        "version": "0.0.2"
+        "version": "0.0.3"
     },
     "experiment": {
         "name": "my-experiment",
@@ -12,7 +12,7 @@
     },
     "runs": [
         {
-            "run_id": 2,
+            "run_id": "2",
             "model": [],
             "orchestrator": [
                 {
@@ -24,7 +24,7 @@
                     "shards": [
                         {
                             "name": "orc 2 shard 1",
-                            "host": "shard1_host",
+                            "hostname": "shard1_host",
                             "port": 22222,
                             "out_file": "tests/utils/log_files/model_1.out",
                             "err_file": "tests/utils/log_files/model_1.err",
@@ -32,12 +32,12 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_1",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         },
                         {
                             "name": "orc 2 shard 2",
-                            "host": "shard2_host",
+                            "hostname": "shard2_host",
                             "port": 22222,
                             "out_file": "tests/utils/log_files/model_0.out",
                             "err_file": "tests/utils/log_files/model_0.err",
@@ -45,7 +45,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_1",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         }
                     ]
@@ -144,7 +144,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_1",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             },
                             "out_file": "tests/utils/log_files/model_0.out",
                             "err_file": "tests/utils/log_files/model_0.err"
@@ -243,7 +243,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_1",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             },
                             "out_file": "tests/utils/log_files/model_0.out",
                             "err_file": "tests/utils/log_files/model_0.err"
@@ -325,7 +325,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_1",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             },
                             "out_file": "tests/utils/log_files/model_1.out",
                             "err_file": "tests/utils/log_files/model_1.err"

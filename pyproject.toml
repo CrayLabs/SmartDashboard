@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smartdashboard"
-version = "0.0.2"
+version = "0.0.3"
 requires-python = ">=3.8,<3.11"
 authors = [
   {name = "CrayLabs: a Hewlett Packard Enterprise OSS Organization", email = "craylabs@hpe.com"},
@@ -51,7 +51,8 @@ classifiers = [
 readme = "README.md"
 dependencies = [
     "pandas>=2.0.0",
-    "streamlit>=1.27.1",
+    "pydantic>=2.5.2",
+    "streamlit>=1.28.0",
     "watchdog>=3.0.0",
 ]
 

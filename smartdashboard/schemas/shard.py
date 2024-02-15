@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,22 +24,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
+import typing as t
 
-from smartdashboard.utils.helpers import get_ensemble_members
-
-from ..utils.test_entities import *
+from smartdashboard.schemas.base import EntityWithNameTelemetryMetaDataErrOut
 
 
-@pytest.mark.parametrize(
-    "ensemble, expected_length, expected_value",
-    [
-        pytest.param(ensemble_1, 1, ensemble_1.get("models")),
-        pytest.param(ensemble_2, 0, ensemble_2.get("models")),
-        pytest.param(None, 0, []),
-    ],
-)
-def test_get_ensemble_members(ensemble, expected_length, expected_value):
-    val = get_ensemble_members(ensemble)
-    assert len(val) == expected_length
-    assert val == expected_value
+class Shard(EntityWithNameTelemetryMetaDataErrOut):
+    hostname: str
+    port: int
+    conf_file: t.Optional[str]

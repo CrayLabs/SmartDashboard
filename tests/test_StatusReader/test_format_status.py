@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -46,12 +46,13 @@ from ..utils.test_entities import *
         pytest.param(application_2, f"Status: {RED_FAILED}"),
         pytest.param(application_3, f"Status: {GREEN_RUNNING}"),
         pytest.param(application_4, f"Status: {GREEN_COMPLETED}"),
-        pytest.param(orch_1_shard_1, f"Status: {GREEN_RUNNING}"),
-        pytest.param(orch_1_shard_2, f"Status: {RED_FAILED}"),
-        pytest.param(pending_shard, f"Status: {StatusEnum.PENDING.value}"),
+        pytest.param(orchestrator_1.shards[0], f"Status: {GREEN_RUNNING}"),
+        pytest.param(orchestrator_1.shards[1], f"Status: {RED_FAILED}"),
+        pytest.param(pending_shard, f"Status: {StatusEnum.UNKNOWN.value}"),
+        pytest.param(no_return_code_shard, f"Status: {StatusEnum.MALFORMED.value}"),
     ],
 )
 def test_get_status(entity: t.Dict[str, t.Any], expected_status):
-    status_dir = entity["telemetry_metadata"]["status_dir"]
+    status_dir = entity.telemetry_metadata["status_dir"]
     status = format_status(get_status(status_dir))
     assert status == expected_status

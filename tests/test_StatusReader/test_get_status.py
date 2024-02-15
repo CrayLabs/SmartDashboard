@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,10 +24,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import typing as t
 
 import pytest
 
+from smartdashboard.schemas.base import EntityWithNameTelemetryMetaDataErrOut
 from smartdashboard.utils.errors import MalformedManifestError
 from smartdashboard.utils.status import StatusEnum
 from smartdashboard.utils.StatusReader import StatusData, get_status
@@ -42,24 +42,13 @@ from ..utils.test_entities import *
         pytest.param(application_2, StatusData(StatusEnum.FAILED, 1)),
         pytest.param(application_3, StatusData(StatusEnum.RUNNING, None)),
         pytest.param(application_4, StatusData(StatusEnum.COMPLETED, 0)),
-        pytest.param(orch_1_shard_1, StatusData(StatusEnum.RUNNING, None)),
-        pytest.param(orch_1_shard_2, StatusData(StatusEnum.FAILED, 1)),
-        pytest.param(pending_shard, StatusData(StatusEnum.PENDING, None)),
-        pytest.param(malformed_status_dir_shard, StatusData(StatusEnum.UNKNOWN, None)),
-        pytest.param(no_return_code_shard, StatusData(StatusEnum.UNKNOWN, None)),
-        pytest.param(
-            JSONDecoderError_status_shard, StatusData(StatusEnum.UNKNOWN, None)
-        ),
+        pytest.param(orchestrator_1.shards[0], StatusData(StatusEnum.RUNNING, None)),
+        pytest.param(orchestrator_1.shards[1], StatusData(StatusEnum.FAILED, 1)),
+        pytest.param(pending_shard, StatusData(StatusEnum.UNKNOWN, None)),
+        pytest.param(no_return_code_shard, StatusData(StatusEnum.MALFORMED, None)),
     ],
 )
-def test_get_status(entity: t.Dict[str, t.Any], expected_status):
-    try:
-        status_dir = entity["telemetry_metadata"]["status_dir"]
-        status = get_status(status_dir)
-    except MalformedManifestError:
-        assert expected_status == MalformedManifestError
-        return
-    except KeyError:
-        assert expected_status == StatusData(StatusEnum.UNKNOWN, None)
-        return
+def test_get_status(entity: EntityWithNameTelemetryMetaDataErrOut, expected_status):
+    status_dir = entity.telemetry_metadata["status_dir"]
+    status = get_status(status_dir)
     assert status == expected_status

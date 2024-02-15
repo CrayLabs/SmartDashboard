@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,21 +24,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
+import typing as t
 
-from smartdashboard.utils.helpers import get_exe_args
-
-from ..utils.test_entities import *
+from pydantic import BaseModel
 
 
-@pytest.mark.parametrize(
-    "entity, expected_value",
-    [
-        pytest.param(application_1, ["string"]),
-        pytest.param(application_2, ["string1", "string2", "string3"]),
-        pytest.param(None, []),
-    ],
-)
-def test_get_exe_args(entity, expected_value):
-    val = get_exe_args(entity)
-    assert val == expected_value
+class Files(BaseModel):
+    Symlink: t.List[str] = []
+    Configure: t.List[str] = []
+    Copy: t.List[str] = []

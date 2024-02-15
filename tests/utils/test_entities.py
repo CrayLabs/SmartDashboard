@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,27 +24,33 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-application_1 = {
-    "name": "app1",
-    "run_id": 1,
-    "path": "app/1/path",
-    "exe_args": ["string"],
-    "batch_settings": {
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.orchestrator import Orchestrator
+from smartdashboard.schemas.run import Run
+from smartdashboard.schemas.shard import Shard
+
+application_1 = Application(
+    name="app1",
+    run_id="1",
+    path="app/1/path",
+    exe_args=["string"],
+    batch_settings={
         "batch_cmd": "command",
         "batch_args": {"arg1": "string1", "arg2": None},
     },
-    "run_settings": {
+    run_settings={
         "exe": "echo",
         "run_command": "srun",
         "run_args": {"arg1": "string1", "arg2": None},
     },
-    "params": {"param": "param value"},
-    "files": {
+    params={"param": "param value"},
+    files={
         "Symlink": ["file1", "file2"],
         "Configure": ["file3"],
         "Copy": ["file4", "file5"],
     },
-    "colocated_db": {
+    colocated_db={
         "settings": {
             "protocol": "TCP/IP",
             "port": 1111,
@@ -62,36 +68,36 @@ application_1 = {
             {"model2": {"backend": "model2_tf", "device": "model2_cpu"}},
         ],
     },
-    "telemetry_metadata": {
+    telemetry_metadata={
         "status_dir": "tests/utils/status_files/model_0",
         "job_id": "111",
-        "step_id": 111,
+        "step_id": "111",
     },
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-}
+    out_file="tests/utils/log_files/model_0.out",
+    err_file="tests/utils/log_files/model_0.err",
+)
 
-application_2 = {
-    "name": "app2",
-    "run_id": 1,
-    "path": "app/2/path",
-    "exe_args": ["string1", "string2", "string3"],
-    "batch_settings": {
+application_2 = Application(
+    name="app2",
+    run_id="1",
+    path="app/2/path",
+    exe_args=["string1", "string2", "string3"],
+    batch_settings={
         "batch_cmd": "command",
         "batch_args": {"arg1": "string1", "arg2": None},
     },
-    "run_settings": {
+    run_settings={
         "exe": "echo",
         "run_command": "srun",
         "run_args": {"arg1": "string1", "arg2": None},
     },
-    "params": {"string": ["Any"]},
-    "files": {
+    params={"string": ["Any"]},
+    files={
         "Symlink": ["file1", "file2"],
         "Configure": ["file3"],
         "Copy": ["file4", "file5"],
     },
-    "colocated_db": {
+    colocated_db={
         "settings": {
             "protocol": "TCP/IP",
             "port": 1111,
@@ -109,36 +115,36 @@ application_2 = {
             {"model2": {"backend": "model2_tf", "device": "model2_cpu"}},
         ],
     },
-    "telemetry_metadata": {
+    telemetry_metadata={
         "status_dir": "tests/utils/status_files/model_1",
         "job_id": "111",
-        "step_id": 111,
+        "step_id": "111",
     },
-    "out_file": "tests/utils/log_files/model_1.out",
-    "err_file": "tests/utils/log_files/model_1.err",
-}
+    out_file="tests/utils/log_files/model_1.out",
+    err_file="tests/utils/log_files/model_1.err",
+)
 
-application_3 = {
-    "name": "app3",
-    "run_id": 2,
-    "path": "app/3/path",
-    "exe_args": ["string"],
-    "batch_settings": {
+application_3 = Application(
+    name="app3",
+    run_id="2",
+    path="app/3/path",
+    exe_args=["string"],
+    batch_settings={
         "batch_cmd": "command",
         "batch_args": {"arg1": "string1", "arg2": None},
     },
-    "run_settings": {
+    run_settings={
         "exe": "echo",
         "run_command": "srun",
         "run_args": {"arg1": "string1", "arg2": None},
     },
-    "params": {"string": "Any"},
-    "files": {
+    params={"string": "Any"},
+    files={
         "Symlink": ["file1", "file2"],
         "Configure": ["file3"],
         "Copy": ["file4", "file5"],
     },
-    "colocated_db": {
+    colocated_db={
         "settings": {
             "protocol": "TCP/IP",
             "port": 1111,
@@ -153,34 +159,35 @@ application_3 = {
             {"model2": {"backend": "model2_tf", "device": "model2_cpu"}},
         ],
     },
-    "telemetry_metadata": {
+    telemetry_metadata={
         "status_dir": "tests/utils/status_files/model_3",
         "job_id": "111",
-        "step_id": 111,
+        "step_id": "111",
     },
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-}
-application_4 = {
-    "name": "app3",
-    "path": "app/3/path",
-    "exe_args": ["string"],
-    "batch_settings": {
+    out_file="tests/utils/log_files/model_0.out",
+    err_file="tests/utils/log_files/model_0.err",
+)
+
+application_4 = Application(
+    name="app3",
+    path="app/3/path",
+    exe_args=["string"],
+    batch_settings={
         "batch_cmd": "command",
         "batch_args": {"arg1": "string1", "arg2": None},
     },
-    "run_settings": {
+    run_settings={
         "exe": "echo",
         "run_command": "srun",
         "run_args": {"arg1": "string1", "arg2": None},
     },
-    "params": {"string": "Any"},
-    "files": {
+    params={"string": "Any"},
+    files={
         "Symlink": ["file1", "file2"],
         "Configure": ["file3"],
         "Copy": ["file4", "file5"],
     },
-    "colocated_db": {
+    colocated_db={
         "settings": {
             "protocol": "TCP/IP",
             "port": 1111,
@@ -195,21 +202,21 @@ application_4 = {
         ],
         "models": [],
     },
-    "telemetry_metadata": {
+    telemetry_metadata={
         "status_dir": "tests/utils/status_files/model_0",
         "job_id": "111",
-        "step_id": 111,
+        "step_id": "111",
     },
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-}
+    out_file="tests/utils/log_files/model_0.out",
+    err_file="tests/utils/log_files/model_0.err",
+)
 
-orchestrator_1 = {
-    "name": "orchestrator_1",
-    "run_id": 1,
-    "type": "redis",
-    "interface": ["lo", "lo2"],
-    "shards": [
+orchestrator_1 = Orchestrator(
+    name="orchestrator_1",
+    run_id="1",
+    type="redis",
+    interface=["lo", "lo2"],
+    shards=[
         {
             "name": "shard 1",
             "hostname": "shard1_host",
@@ -220,7 +227,7 @@ orchestrator_1 = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_3",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
         },
         {
@@ -233,60 +240,19 @@ orchestrator_1 = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_1",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
         },
     ],
-}
+)
 
-orch_1_shard_1 = {
-    "name": "shard 1",
-    "hostname": "shard1_host",
-    "port": "11111",
-    "out_file": "tests/utils/log_files/model_1.out",
-    "err_file": "tests/utils/log_files/model_1.err",
-    "conf_file": "/path/to/conf_file",
-    "telemetry_metadata": {
-        "status_dir": "tests/utils/status_files/model_3",
-        "job_id": "111",
-        "step_id": 111,
-    },
-}
 
-orch_1_shard_2 = {
-    "name": "shard 2",
-    "hostname": "shard2_host",
-    "port": "11111",
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-    "conf_file": "/path/to/conf_file",
-    "telemetry_metadata": {
-        "status_dir": "tests/utils/status_files/model_1",
-        "job_id": "111",
-        "step_id": 111,
-    },
-}
-
-orch_1_shard_2 = {
-    "name": "shard 2",
-    "hostname": "shard2_host",
-    "port": "11111",
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-    "conf_file": "/path/to/conf_file",
-    "telemetry_metadata": {
-        "status_dir": "tests/utils/status_files/model_1",
-        "job_id": "111",
-        "step_id": 111,
-    },
-}
-
-orchestrator_2 = {
-    "name": "orchestrator_2",
-    "run_id": 2,
-    "type": "redis",
-    "interface": ["lo"],
-    "shards": [
+orchestrator_2 = Orchestrator(
+    name="orchestrator_2",
+    run_id="2",
+    type="redis",
+    interface=["lo"],
+    shards=[
         {
             "name": "orc 2 shard 1",
             "hostname": "shard1_host",
@@ -297,7 +263,7 @@ orchestrator_2 = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_0",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
         },
         {
@@ -310,18 +276,40 @@ orchestrator_2 = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_1",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
         },
     ],
-}
+)
 
-orchestrator_3 = {
-    "name": "orchestrator_3",
-    "run_id": 2,
-    "type": "redis",
-    "interface": "lo",
-    "shards": [
+orchestrator_3 = Orchestrator(
+    name="orchestrator_3",
+    run_id="2",
+    type="redis",
+    interface="lo",
+    shards=[
+        Shard(
+            name="orc 3 shard 1",
+            hostname="shard1_host",
+            port="12345",
+            out_file="tests/utils/log_files/orchestrator_0.out",
+            err_file="tests/utils/log_files/orchestrator_0.err",
+            conf_file="/path/to/conf_file",
+            telemetry_metadata={
+                "status_dir": "tests/utils/status_files/model_3",
+                "job_id": "111",
+                "step_id": "111",
+            },
+        )
+    ],
+)
+
+orchestrator_4 = Orchestrator(
+    name="orchestrator_4",
+    run_id="2",
+    type="redis",
+    interface="lo",
+    shards=[
         {
             "name": "orc 3 shard 1",
             "hostname": "shard1_host",
@@ -330,43 +318,23 @@ orchestrator_3 = {
             "err_file": "tests/utils/log_files/orchestrator_0.err",
             "conf_file": "/path/to/conf_file",
             "telemetry_metadata": {
-                "status_dir": "tests/utils/status_files/model_3",
-                "job_id": "111",
-                "step_id": 111,
-            },
-        }
-    ],
-}
-
-orchestrator_4 = {
-    "name": "orchestrator_4",
-    "type": "redis",
-    "interface": "lo",
-    "shards": [
-        {
-            "name": "orc 3 shard 1",
-            "host": "shard1_host",
-            "port": "12345",
-            "out_file": "tests/utils/log_files/orchestrator_0.out",
-            "err_file": "tests/utils/log_files/orchestrator_0.err",
-            "conf_file": "/path/to/conf_file",
-            "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_0",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
         }
     ],
-}
+)
 
-no_shards_started = {
-    "name": "orchestrator_2",
-    "type": "redis",
-    "interface": ["lo"],
-    "shards": [
+no_shards_started = Orchestrator(
+    name="orchestrator_2",
+    type="redis",
+    run_id="2",
+    interface=["lo"],
+    shards=[
         {
             "name": "orc 2 shard 1",
-            "host": "shard1_host",
+            "hostname": "shard1_host",
             "port": 22222,
             "out_file": "tests/utils/log_files/model_0.out",
             "err_file": "tests/utils/log_files/model_0.err",
@@ -374,12 +342,12 @@ no_shards_started = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_2",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
         },
         {
             "name": "orc 2 shard 2",
-            "host": "shard2_host",
+            "hostname": "shard2_host",
             "port": 22222,
             "out_file": "tests/utils/log_files/model_1.out",
             "err_file": "tests/utils/log_files/model_1.err",
@@ -387,17 +355,18 @@ no_shards_started = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_2",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
         },
     ],
-}
+)
 
-mismatched_port_orchestrator = {
-    "name": "orchestrator_1",
-    "type": "redis",
-    "interface": ["lo", "lo2"],
-    "shards": [
+mismatched_port_orchestrator = Orchestrator(
+    name="orchestrator_1",
+    type="redis",
+    run_id="2",
+    interface=["lo", "lo2"],
+    shards=[
         {
             "name": "shard 1",
             "hostname": "shard1_host",
@@ -408,7 +377,7 @@ mismatched_port_orchestrator = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_1",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
         },
         {
@@ -421,82 +390,83 @@ mismatched_port_orchestrator = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_1us/dir",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
         },
     ],
-}
+)
 
-no_shards_orchestrator = {
-    "name": "orchestrator_1",
-    "type": "redis",
-    "interface": ["lo", "lo2"],
-    "shards": [],
-}
+no_shards_orchestrator = Orchestrator(
+    name="orchestrator_1",
+    type="redis",
+    run_id="2",
+    interface=["lo", "lo2"],
+    shards=[],
+)
 
-pending_shard = {
-    "name": "shard 2",
-    "host": "shard2_host",
-    "port": "11111",
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-    "conf_file": "/path/to/conf_file",
-    "telemetry_metadata": {
+pending_shard = Shard(
+    name="shard 2",
+    hostname="shard2_host",
+    port="11111",
+    out_file="tests/utils/log_files/model_0.out",
+    err_file="tests/utils/log_files/model_0.err",
+    conf_file="/path/to/conf_file",
+    telemetry_metadata={
         "status_dir": "tests/utils/status_files/model_2",
         "job_id": "111",
-        "step_id": 111,
+        "step_id": "111",
     },
-}
+)
 
-no_return_code_shard = {
-    "name": "shard 2",
-    "host": "shard2_host",
-    "port": "11111",
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-    "conf_file": "/path/to/conf_file",
-    "telemetry_metadata": {
+no_return_code_shard = Shard(
+    name="shard 2",
+    hostname="shard2_host",
+    port="11111",
+    out_file="tests/utils/log_files/model_0.out",
+    err_file="tests/utils/log_files/model_0.err",
+    conf_file="/path/to/conf_file",
+    telemetry_metadata={
         "status_dir": "tests/utils/status_files/model_4",
         "job_id": "111",
-        "step_id": 111,
+        "step_id": "111",
     },
-}
+)
 
-malformed_status_dir_shard = {
-    "name": "shard 2",
-    "host": "shard2_host",
-    "port": "11111",
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-    "conf_file": "/path/to/conf_file",
-    "teldata": {
-        "status_dir": "tests/utils/status_files/model_3",
+malformed_status_dir_shard = Shard(
+    name="shard 2",
+    hostname="shard2_host",
+    port="11111",
+    out_file="tests/utils/log_files/model_0.out",
+    err_file="tests/utils/log_files/model_0.err",
+    conf_file="/path/to/conf_file",
+    telemetry_metadata={
+        "statdir": "tests/utils/status_files/model_3",
         "job_id": "111",
-        "step_id": 111,
+        "step_id": "111",
     },
-}
+)
 
-JSONDecoderError_status_shard = {
-    "name": "shard 2",
-    "host": "shard2_host",
-    "port": "11111",
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-    "conf_file": "/path/to/conf_file",
-    "teldata": {
+JSONDecoderError_status_shard = Shard(
+    name="shard 2",
+    hostname="shard2_host",
+    port="11111",
+    out_file="tests/utils/log_files/model_0.out",
+    err_file="tests/utils/log_files/model_0.err",
+    conf_file="/path/to/conf_file",
+    telemetry_metadata={
         "status_dir": "tests/utils/manifest_files/JSONDecodererror.json",
         "job_id": "111",
-        "step_id": 111,
+        "step_id": "111",
     },
-}
+)
 
-ensemble_1 = {
-    "name": "ensemble_1",
-    "run_id": 1,
-    "perm_strat": "string0",
-    "batch_settings": {"string": "Any0"},
-    "params": {"string": ["Any1", "Any3"]},
-    "models": [
+ensemble_1 = Ensemble(
+    name="ensemble_1",
+    run_id="1",
+    perm_strat="string0",
+    batch_settings={"string": "Any0"},
+    params={"string": ["Any1", "Any3"]},
+    models=[
         {
             "name": "ensemble_1_member_1",
             "path": "string",
@@ -526,8 +496,18 @@ ensemble_1 = {
                     "debug": "False",
                 },
                 "scripts": [
-                    {"script1": {"backend": "script1_torch", "device": "script1_cpu"}},
-                    {"script2": {"backend": "script2_torch", "device": "script2_gpu"}},
+                    {
+                        "script1": {
+                            "backend": "script1_torch",
+                            "device": "script1_cpu",
+                        }
+                    },
+                    {
+                        "script2": {
+                            "backend": "script2_torch",
+                            "device": "script2_gpu",
+                        }
+                    },
                 ],
                 "models": [
                     {"model1": {"backend": "model1_tf", "device": "model1_cpu"}},
@@ -537,76 +517,31 @@ ensemble_1 = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_0",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
             "out_file": "tests/utils/log_files/model_0.out",
             "err_file": "tests/utils/log_files/model_0.err",
         }
     ],
-}
+)
 
 
-ensemble_1_member_1 = {
-    "name": "ensemble_1_member_1",
-    "path": "string",
-    "exe_args": ["string"],
-    "batch_settings": {
-        "batch_cmd": "command",
-        "batch_args": {"arg1": "string1", "arg2": None},
-    },
-    "run_settings": {
-        "exe": "echo",
-        "run_command": "srun",
-        "run_args": {"arg1": "string1", "arg2": None},
-    },
-    "params": {"string": "Any"},
-    "files": {
-        "Symlink": ["file1", "file2"],
-        "Configure": ["file3"],
-        "Copy": ["file4", "file5"],
-    },
-    "colocated_db": {
-        "settings": {
-            "protocol": "TCP/IP",
-            "port": 1111,
-            "interface": "lo",
-            "db_cpus": 1,
-            "limit_app_cpus": "True",
-            "debug": "False",
-        },
-        "scripts": [
-            {"script1": {"backend": "script1_torch", "device": "script1_cpu"}},
-            {"script2": {"backend": "script2_torch", "device": "script2_gpu"}},
-        ],
-        "models": [
-            {"model1": {"backend": "model1_tf", "device": "model1_cpu"}},
-            {"model2": {"backend": "model2_tf", "device": "model2_cpu"}},
-        ],
-    },
-    "telemetry_metadata": {
-        "status_dir": "tests/utils/status_files/model_0",
-        "job_id": "111",
-        "step_id": 111,
-    },
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-}
+ensemble_2 = Ensemble(
+    name="ensemble_2",
+    run_id="1",
+    perm_strat="all-perm",
+    batch_settings={"string": "Any1"},
+    params={"string": ["Any1", "Any2", "Any3"]},
+    models=[],
+)
 
-ensemble_2 = {
-    "name": "ensemble_2",
-    "perm_strat": "all-perm",
-    "batch_settings": {"string": "Any1"},
-    "params": {"string": ["Any1", "Any2", "Any3"]},
-    "models": [],
-}
-
-ensemble_3 = {
-    "name": "ensemble_3",
-    "run_id": 2,
-    "perm_strat": "string2",
-    "batch_settings": {"string": "Any1"},
-    "params": {"string": ["Any1", "Any2", "Any3"]},
-    "models": [
+ensemble_3 = Ensemble(
+    name="ensemble_3",
+    run_id="2",
+    perm_strat="string2",
+    batch_settings={"string": "Any1"},
+    params={"string": ["Any1", "Any2", "Any3"]},
+    models=[
         {
             "name": "ensemble_3_member_1",
             "path": "member 1 path",
@@ -636,8 +571,18 @@ ensemble_3 = {
                     "debug": "False",
                 },
                 "scripts": [
-                    {"script1": {"backend": "script1_torch", "device": "script1_cpu"}},
-                    {"script2": {"backend": "script2_torch", "device": "script2_gpu"}},
+                    {
+                        "script1": {
+                            "backend": "script1_torch",
+                            "device": "script1_cpu",
+                        }
+                    },
+                    {
+                        "script2": {
+                            "backend": "script2_torch",
+                            "device": "script2_gpu",
+                        }
+                    },
                 ],
                 "models": [
                     {"model1": {"backend": "model1_tf", "device": "model1_cpu"}},
@@ -647,7 +592,7 @@ ensemble_3 = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_3",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
             "out_file": "tests/utils/log_files/model_0.out",
             "err_file": "tests/utils/log_files/model_0.err",
@@ -681,8 +626,18 @@ ensemble_3 = {
                     "debug": "False",
                 },
                 "scripts": [
-                    {"script1": {"backend": "script1_torch", "device": "script1_cpu"}},
-                    {"script2": {"backend": "script2_torch", "device": "script2_gpu"}},
+                    {
+                        "script1": {
+                            "backend": "script1_torch",
+                            "device": "script1_cpu",
+                        }
+                    },
+                    {
+                        "script2": {
+                            "backend": "script2_torch",
+                            "device": "script2_gpu",
+                        }
+                    },
                 ],
                 "models": [
                     {"model1": {"backend": "model1_tf", "device": "model1_cpu"}},
@@ -692,109 +647,22 @@ ensemble_3 = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_1",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
             "out_file": "tests/utils/log_files/model_1.out",
             "err_file": "tests/utils/log_files/model_1.err",
         },
     ],
-}
+)
 
-ensemble_3_member_1 = {
-    "name": "ensemble_3_member_1",
-    "path": "member 1 path",
-    "exe_args": ["string"],
-    "batch_settings": {
-        "batch_cmd": "command",
-        "batch_args": {"arg1": "string1", "arg2": None},
-    },
-    "run_settings": {
-        "exe": "echo",
-        "run_command": "srun",
-        "run_args": {"arg1": "string1", "arg2": None},
-    },
-    "params": {"string": "Any"},
-    "files": {
-        "Symlink": ["file1", "file2"],
-        "Configure": ["file3"],
-        "Copy": ["file4", "file5"],
-    },
-    "colocated_db": {
-        "settings": {
-            "protocol": "TCP/IP",
-            "port": 1111,
-            "interface": "lo",
-            "db_cpus": 1,
-            "limit_app_cpus": "True",
-            "debug": "False",
-        },
-        "scripts": [
-            {"script1": {"backend": "script1_torch", "device": "script1_cpu"}},
-            {"script2": {"backend": "script2_torch", "device": "script2_gpu"}},
-        ],
-        "models": [
-            {"model1": {"backend": "model1_tf", "device": "model1_cpu"}},
-            {"model2": {"backend": "model2_tf", "device": "model2_cpu"}},
-        ],
-    },
-    "telemetry_metadata": {
-        "status_dir": "tests/utils/status_files/model_3",
-        "job_id": "111",
-        "step_id": 111,
-    },
-    "out_file": "tests/utils/log_files/model_0.out",
-    "err_file": "tests/utils/log_files/model_0.err",
-}
 
-ensemble_3_member_2 = {
-    "name": "ensemble_3_member_2",
-    "path": "member 2 path",
-    "exe_args": ["string"],
-    "batch_settings": {"batch_cmd": "command", "batch_args": {"arg1": "string1"}},
-    "run_settings": {
-        "exe": "echo",
-        "run_command": "srun",
-        "run_args": {"arg1": "string1", "arg2": None},
-    },
-    "params": {"string": "Any"},
-    "files": {
-        "Symlink": ["file1", "file2"],
-        "Configure": ["file3"],
-        "Copy": ["file4", "file5"],
-    },
-    "colocated_db": {
-        "settings": {
-            "protocol": "TCP/IP",
-            "port": 1111,
-            "interface": "lo",
-            "db_cpus": 1,
-            "limit_app_cpus": "True",
-            "debug": "False",
-        },
-        "scripts": [
-            {"script1": {"backend": "script1_torch", "device": "script1_cpu"}},
-            {"script2": {"backend": "script2_torch", "device": "script2_gpu"}},
-        ],
-        "models": [
-            {"model1": {"backend": "model1_tf", "device": "model1_cpu"}},
-            {"model2": {"backend": "model2_tf", "device": "model2_cpu"}},
-        ],
-    },
-    "telemetry_metadata": {
-        "status_dir": "tests/utils/status_files/model_1",
-        "job_id": "111",
-        "step_id": 111,
-    },
-    "out_file": "tests/utils/log_files/model_1.out",
-    "err_file": "tests/utils/log_files/model_1.err",
-}
-
-ensemble_4 = {
-    "name": "ensemble_3",
-    "perm_strat": "string2",
-    "batch_settings": {"string": "Any1"},
-    "params": {"string": ["Any1", "Any2", "Any3"]},
-    "models": [
+ensemble_4 = Ensemble(
+    name="ensemble_3",
+    perm_strat="string2",
+    run_id="2",
+    batch_settings={"string": "Any1"},
+    params={"string": ["Any1", "Any2", "Any3"]},
+    models=[
         {
             "name": "ensemble_3_member_1",
             "path": "member 1 path",
@@ -824,8 +692,18 @@ ensemble_4 = {
                     "debug": "False",
                 },
                 "scripts": [
-                    {"script1": {"backend": "script1_torch", "device": "script1_cpu"}},
-                    {"script2": {"backend": "script2_torch", "device": "script2_gpu"}},
+                    {
+                        "script1": {
+                            "backend": "script1_torch",
+                            "device": "script1_cpu",
+                        }
+                    },
+                    {
+                        "script2": {
+                            "backend": "script2_torch",
+                            "device": "script2_gpu",
+                        }
+                    },
                 ],
                 "models": [
                     {"model1": {"backend": "model1_tf", "device": "model1_cpu"}},
@@ -835,7 +713,7 @@ ensemble_4 = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_1",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
             "out_file": "tests/utils/log_files/model_0.out",
             "err_file": "tests/utils/log_files/model_0.err",
@@ -869,8 +747,18 @@ ensemble_4 = {
                     "debug": "False",
                 },
                 "scripts": [
-                    {"script1": {"backend": "script1_torch", "device": "script1_cpu"}},
-                    {"script2": {"backend": "script2_torch", "device": "script2_gpu"}},
+                    {
+                        "script1": {
+                            "backend": "script1_torch",
+                            "device": "script1_cpu",
+                        }
+                    },
+                    {
+                        "script2": {
+                            "backend": "script2_torch",
+                            "device": "script2_gpu",
+                        }
+                    },
                 ],
                 "models": [
                     {"model1": {"backend": "model1_tf", "device": "model1_cpu"}},
@@ -880,31 +768,151 @@ ensemble_4 = {
             "telemetry_metadata": {
                 "status_dir": "tests/utils/status_files/model_1",
                 "job_id": "111",
-                "step_id": 111,
+                "step_id": "111",
             },
             "out_file": "tests/utils/log_files/model_1.out",
             "err_file": "tests/utils/log_files/model_1.err",
         },
     ],
-}
+)
 
-no_db_scripts_or_models = {
-    "name": "no scripts or models",
-    "path": "member 2 path",
-    "exe_args": ["string"],
-    "batch_settings": {"batch_cmd": "command", "batch_args": {"arg1": "string1"}},
-    "run_settings": {
+ensemble_5 = Ensemble(
+    name="ensemble_5",
+    perm_strat="string2",
+    run_id="2",
+    batch_settings={"string": "Any1"},
+    params={"string": ["Any1", "Any2", "Any3"]},
+    models=[
+        {
+            "name": "ensemble_3_member_1",
+            "path": "member 1 path",
+            "exe_args": ["string"],
+            "batch_settings": {
+                "batch_cmd": "command",
+                "batch_args": {"arg1": "string1", "arg2": None},
+            },
+            "run_settings": {
+                "exe": "echo",
+                "run_command": "srun",
+                "run_args": {"arg1": "string1", "arg2": None},
+            },
+            "params": {"string": "Any"},
+            "files": {
+                "Symlink": ["file1", "file2"],
+                "Configure": ["file3"],
+                "Copy": ["file4", "file5"],
+            },
+            "colocated_db": {
+                "settings": {
+                    "protocol": "TCP/IP",
+                    "port": 1111,
+                    "interface": "lo",
+                    "db_cpus": 1,
+                    "limit_app_cpus": "True",
+                    "debug": "False",
+                },
+                "scripts": [
+                    {
+                        "script1": {
+                            "backend": "script1_torch",
+                            "device": "script1_cpu",
+                        }
+                    },
+                    {
+                        "script2": {
+                            "backend": "script2_torch",
+                            "device": "script2_gpu",
+                        }
+                    },
+                ],
+                "models": [
+                    {"model1": {"backend": "model1_tf", "device": "model1_cpu"}},
+                    {"model2": {"backend": "model2_tf", "device": "model2_cpu"}},
+                ],
+            },
+            "telemetry_metadata": {
+                "status_dir": "tests/utils/status_files/telem_disabled",
+                "job_id": "111",
+                "step_id": "111",
+            },
+            "out_file": "tests/utils/log_files/model_0.out",
+            "err_file": "tests/utils/log_files/model_0.err",
+        },
+        {
+            "name": "ensemble_3_member_2",
+            "path": "member 2 path",
+            "exe_args": ["string"],
+            "batch_settings": {
+                "batch_cmd": "command",
+                "batch_args": {"arg1": "string1"},
+            },
+            "run_settings": {
+                "exe": "echo",
+                "run_command": "srun",
+                "run_args": {"arg1": "string1", "arg2": None},
+            },
+            "params": {"string": "Any"},
+            "files": {
+                "Symlink": ["file1", "file2"],
+                "Configure": ["file3"],
+                "Copy": ["file4", "file5"],
+            },
+            "colocated_db": {
+                "settings": {
+                    "protocol": "TCP/IP",
+                    "port": 1111,
+                    "interface": "lo",
+                    "db_cpus": 1,
+                    "limit_app_cpus": "True",
+                    "debug": "False",
+                },
+                "scripts": [
+                    {
+                        "script1": {
+                            "backend": "script1_torch",
+                            "device": "script1_cpu",
+                        }
+                    },
+                    {
+                        "script2": {
+                            "backend": "script2_torch",
+                            "device": "script2_gpu",
+                        }
+                    },
+                ],
+                "models": [
+                    {"model1": {"backend": "model1_tf", "device": "model1_cpu"}},
+                    {"model2": {"backend": "model2_tf", "device": "model2_cpu"}},
+                ],
+            },
+            "telemetry_metadata": {
+                "status_dir": "tests/utils/status_files/telem_disabled",
+                "job_id": "111",
+                "step_id": "111",
+            },
+            "out_file": "tests/utils/log_files/model_1.out",
+            "err_file": "tests/utils/log_files/model_1.err",
+        },
+    ],
+)
+
+no_db_scripts_or_models = Application(
+    name="no scripts or models",
+    path="member 2 path",
+    exe_args=["string"],
+    batch_settings={"batch_cmd": "command", "batch_args": {"arg1": "string1"}},
+    run_settings={
         "exe": "echo",
         "run_command": "srun",
         "run_args": {"arg1": "string1", "arg2": None},
     },
-    "params": {"string": "Any"},
-    "files": {
+    params={"string": "Any"},
+    files={
         "Symlink": ["file1", "file2"],
         "Configure": ["file3"],
         "Copy": ["file4", "file5"],
     },
-    "colocated_db": {
+    colocated_db={
         "settings": {
             "protocol": "TCP/IP",
             "port": 1111,
@@ -916,14 +924,14 @@ no_db_scripts_or_models = {
         "scripts": [],
         "models": [],
     },
-    "telemetry_metadata": {
+    telemetry_metadata={
         "status_dir": "tests/utils/status_files/model_1",
         "job_id": "111",
-        "step_id": 111,
+        "step_id": "111",
     },
-    "out_file": "tests/utils/log_files/model_1.out",
-    "err_file": "tests/utils/log_files/model_1.err",
-}
+    out_file="tests/utils/log_files/model_1.out",
+    err_file="tests/utils/log_files/model_1.err",
+)
 
 model0_out_logs = """SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_FILE is not set. Defaulting to stdout
 SmartRedis Library@16-04-21:WARNING: Environment variable SR_LOG_LEVEL is not set. Defaulting to INFO

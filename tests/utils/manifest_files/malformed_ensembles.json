@@ -1,7 +1,7 @@
 {
     "schema info": {
         "schema_name": "entity manifest",
-        "version": "0.0.2"
+        "version": "0.0.3"
     },
     "experiment": {
         "name": "my-experiment",
@@ -33,7 +33,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_1us/dir",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         },
                         {
@@ -46,7 +46,7 @@
                             "telemetry_metadata": {
                                 "status_dir": "tests/utils/status_files/model_1us/dir",
                                 "job_id": "111",
-                                "step_id": 111
+                                "step_id": "111"
                             }
                         }
                     ]

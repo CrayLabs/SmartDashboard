@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,8 @@ from smartdashboard.utils.StatusReader import get_experiment_status_summary
             f"Status: {StatusEnum.INACTIVE.value}",
         ),
         pytest.param(
-            "tests/utils/manifest_files/no_experiment_manifest.json", "Status: "
+            "tests/utils/manifest_files/exp_telem_disabled_manifest.json",
+            f"Status: {StatusEnum.UNKNOWN.value}. Experiment telemetry may have been disabled.",
         ),
     ],
 )

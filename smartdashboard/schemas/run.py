@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,22 +24,29 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
+import typing as t
 
-from smartdashboard.utils.helpers import get_shard
+from pydantic import BaseModel
 
-from ..utils.test_entities import *
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.ensemble import Ensemble
+from smartdashboard.schemas.orchestrator import Orchestrator
 
 
-@pytest.mark.parametrize(
-    "shard_name, orc, shard",
-    [
-        pytest.param("shard 1", orchestrator_1, orch_1_shard_1),
-        pytest.param("shard 2", orchestrator_1, orch_1_shard_2),
-        pytest.param("shard doesnt_exist", orchestrator_1, None),
-        pytest.param("shard 1", None, None),
-    ],
-)
-def test_get_shard(shard_name, orc, shard):
-    sh = get_shard(shard_name, orc)
-    assert sh == shard
+class Run(BaseModel):
+    run_id: str
+    model: t.List[Application] = []
+    orchestrator: t.List[Orchestrator] = []
+    ensemble: t.List[Ensemble] = []
+
+    @property
+    def apps_with_ctx(self) -> t.Tuple[t.Tuple[str, Application], ...]:
+        return tuple((self.run_id, app) for app in self.model)
+
+    @property
+    def orcs_with_ctx(self) -> t.Tuple[t.Tuple[str, Orchestrator], ...]:
+        return tuple((self.run_id, orc) for orc in self.orchestrator)
+
+    @property
+    def ensemble_with_ctx(self) -> t.Tuple[t.Tuple[str, Ensemble], ...]:
+        return tuple((self.run_id, ens) for ens in self.ensemble)

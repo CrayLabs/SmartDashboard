@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@ from smartdashboard.utils.ManifestReader import Manifest, load_manifest
     "json_file, result_type",
     [
         pytest.param("tests/utils/manifest_files/manifesttest.json", Manifest),
+        pytest.param("tests/utils/manifest_files/0.0.2_manifest.json", Manifest),
         pytest.param("tests/utils/manifest_files/no_apps_manifest.json", Manifest),
         pytest.param("file_doesn't_exist.json", ManifestError),
         pytest.param("tests/utils/manifest_files/JSONDecodererror.json", ManifestError),

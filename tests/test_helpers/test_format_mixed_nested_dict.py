@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,12 +36,12 @@ from ..utils.test_entities import *
     [
         pytest.param(
             "batch_settings",
-            application_1,
+            application_1.model_dump(),
             [("batch_cmd", "command"), ("arg1", "string1"), ("arg2", "None")],
         ),
         pytest.param(
             "run_settings",
-            application_1,
+            application_1.model_dump(),
             [
                 ("exe", "echo"),
                 ("run_command", "srun"),
@@ -49,10 +49,10 @@ from ..utils.test_entities import *
                 ("arg2", "None"),
             ],
         ),
-        pytest.param("params", ensemble_1_member_1, [("string", "Any")]),
+        pytest.param("params", ensemble_1.models[0].model_dump(), [("string", "Any")]),
         pytest.param(
             "files",
-            application_2,
+            application_2.model_dump(),
             [
                 ("Symlink", "file1"),
                 ("Symlink", "file2"),
@@ -63,7 +63,7 @@ from ..utils.test_entities import *
         ),
         pytest.param(
             "settings",
-            ensemble_1_member_1.get("colocated_db"),
+            ensemble_1.models[0].colocated_db,
             [
                 ("protocol", "TCP/IP"),
                 ("port", "1111"),
@@ -73,7 +73,7 @@ from ..utils.test_entities import *
                 ("debug", "False"),
             ],
         ),
-        pytest.param("doesnt_exist", ensemble_1_member_1, []),
+        pytest.param("doesnt_exist", ensemble_1.models[0].model_dump(), []),
         pytest.param("batch_settings", None, []),
     ],
 )

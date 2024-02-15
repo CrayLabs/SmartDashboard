@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@ import pytest
 
 from smartdashboard.utils.helpers import format_ensemble_params
 
-from ..utils.test_entities import ensemble_1, ensemble_2, ensemble_3, orchestrator_1
+from ..utils.test_entities import ensemble_1, ensemble_2, ensemble_3
 
 
 @pytest.mark.parametrize(
@@ -38,7 +38,6 @@ from ..utils.test_entities import ensemble_1, ensemble_2, ensemble_3, orchestrat
         pytest.param(ensemble_2, [("string", "Any1, Any2, Any3")]),
         pytest.param(ensemble_3, [("string", "Any1, Any2, Any3")]),
         pytest.param(None, []),
-        pytest.param(orchestrator_1, []),
     ],
 )
 def test_format_ensemble_params(entity, expected_key_value_list):

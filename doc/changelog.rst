@@ -1,28 +1,27 @@
 Changelog
 =========
 
-Development branch
-------------------
+0.0.3
+-----
 
-Work in progress
+Released on 15 February 2024
 
 Description
 
-- n / a
+- Added defined schemas for entity objects. (SmartDashboard-PR31_)
+- Added experiment level logs to the dashboard. (SmartDashboard-PR37_)
 
+.. _SmartDashboard-PR31: https://github.com/CrayLabs/SmartDashboard/pull/31
+.. _SmartDashboard-PR37: https://github.com/CrayLabs/SmartDashboard/pull/37
 
-Detailed Notes
-
-- n / a
-
-.. _PRXXX: https://github.com/CrayLabs/SmartDashboard/pull/XXX
 
 
 0.0.2
 -----
 
-Released on *TBD*, 2023
+Released on 14 December 2023
 
 Description
 
-- Initial release of SmartDashboard
+- The initial release of SmartDashboard includes capabilities for viewing 
+  experiment entity properties and statuses.

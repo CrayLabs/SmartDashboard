@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.ManifestReader import load_manifest
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import error_builder, overview_builder
+from smartdashboard.views import EntityView
 
 
 def build_app(manifest_path: str) -> None:
@@ -55,9 +56,15 @@ def build_app(manifest_path: str) -> None:
         error_builder(ex)
     else:
         views = overview_builder(manifest)
+        to_update: t.Iterable[EntityView[t.Any]] = (
+            views.exp_view,
+            views.app_view,
+            views.orc_view,
+            views.ens_view,
+        )
 
         while True:
-            for v in [views.exp_view, views.app_view, views.orc_view, views.ens_view]:
+            for v in to_update:
                 v.update()
 
             time.sleep(1)

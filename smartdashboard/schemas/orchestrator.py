@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,23 +24,31 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
+import typing as t
 
-from smartdashboard.utils.helpers import get_all_shards
+from pydantic import field_validator
 
-from ..utils.test_entities import *
+from smartdashboard.schemas.base import HasName
+from smartdashboard.schemas.shard import Shard
 
 
-@pytest.mark.parametrize(
-    "orc, expected_length, expected_value",
-    [
-        pytest.param(orchestrator_1, 2, orchestrator_1.get("shards")),
-        pytest.param(orchestrator_2, 2, orchestrator_2.get("shards")),
-        pytest.param(orchestrator_3, 1, orchestrator_3.get("shards")),
-        pytest.param(None, 0, []),
-    ],
-)
-def test_get_all_shards(orc, expected_length, expected_value):
-    val = get_all_shards(orc)
-    assert len(val) == expected_length
-    assert val == expected_value
+class Orchestrator(HasName):
+    type: str
+    interface: t.List[str] = []
+    shards: t.List[Shard] = []
+
+    @field_validator("interface", mode="before")
+    @classmethod
+    def convert_interface(cls, value: t.Union[str, t.List[str]]) -> t.List[str]:
+        if isinstance(value, str):
+            return [value]
+
+        return value
+
+    @property
+    def ports(self) -> t.Sequence[int]:
+        return tuple({shard.port for shard in self.shards})
+
+    @property
+    def db_hosts(self) -> t.Sequence[str]:
+        return tuple(sorted({shard.hostname for shard in self.shards}))

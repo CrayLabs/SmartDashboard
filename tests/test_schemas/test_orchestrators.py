@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,21 +26,44 @@
 
 import pytest
 
-from smartdashboard.utils.helpers import get_interfaces
+from tests.utils.test_entities import *
 
-from ..utils.test_entities import *
+
+@pytest.mark.parametrize(
+    "orchestrator, expected_value",
+    [
+        pytest.param(orchestrator_1, ("shard1_host", "shard2_host")),
+        pytest.param(orchestrator_2, ("shard1_host", "shard2_host")),
+        pytest.param(orchestrator_3, ("shard1_host",)),
+        pytest.param(no_shards_orchestrator, ()),
+    ],
+)
+def test_get_db_hosts(orchestrator: Orchestrator, expected_value):
+    hosts = orchestrator.db_hosts
+    assert hosts == expected_value
 
 
 @pytest.mark.parametrize(
     "entity, expected_value",
     [
-        pytest.param(orchestrator_1, "lo, lo2"),
-        pytest.param(orchestrator_2, "lo"),
-        pytest.param(orchestrator_3, "lo"),
-        pytest.param(application_1, ""),
-        pytest.param(None, ""),
+        pytest.param(orchestrator_1, ["lo", "lo2"]),
+        pytest.param(orchestrator_2, ["lo"]),
+        pytest.param(orchestrator_3, ["lo"]),
     ],
 )
-def test_get_interfaces(entity, expected_value):
-    val = get_interfaces(entity)
+def test_get_interfaces(entity: Orchestrator, expected_value):
+    val = entity.interface
     assert val == expected_value
+
+
+@pytest.mark.parametrize(
+    "orc, expected_length",
+    [
+        pytest.param(orchestrator_1, 2),
+        pytest.param(orchestrator_2, 2),
+        pytest.param(orchestrator_3, 1),
+    ],
+)
+def test_get_all_shards(orc: Orchestrator, expected_length):
+    val = orc.shards
+    assert len(val) == expected_length

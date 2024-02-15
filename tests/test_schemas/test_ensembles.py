@@ -24,5 +24,18 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include smartdashboard/static/*.png
-include smartdashboard/static/*.css
+import pytest
+
+from tests.utils.test_entities import *
+
+
+@pytest.mark.parametrize(
+    "ensemble, expected_length",
+    [
+        pytest.param(ensemble_1, 1),
+        pytest.param(ensemble_2, 0),
+    ],
+)
+def test_get_ensemble_members(ensemble: Ensemble, expected_length):
+    val = ensemble.models
+    assert len(val) == expected_length

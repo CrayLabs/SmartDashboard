@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ from ..utils.test_entities import *
             orchestrator_4,
             f"Status: {StatusEnum.INACTIVE.value} (all shards completed)",
         ),
-        pytest.param(no_shards_started, f"Status: {StatusEnum.PENDING.value}"),
+        pytest.param(no_shards_started, f"Status: {StatusEnum.UNKNOWN.value}"),
         pytest.param(None, "Status: "),
     ],
 )

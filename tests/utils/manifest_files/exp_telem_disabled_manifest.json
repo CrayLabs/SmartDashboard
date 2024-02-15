@@ -12,39 +12,38 @@
     },
     "runs": [
         {
-            "run_id": "1",
+            "run_id": "2",
             "model": [],
             "orchestrator": [
                 {
-                    "name": "orchestrator_1",
+                    "name": "orchestrator_2",
                     "type": "redis",
                     "interface": [
-                        "lo",
-                        "lo2"
+                        "lo"
                     ],
                     "shards": [
                         {
-                            "name": "shard 1",
+                            "name": "orc 2 shard 1",
                             "hostname": "shard1_host",
-                            "port": "11111",
-                            "out_file": "tests/utils/log_files/model_0.out",
-                            "err_file": "tests/utils/log_files/model_0.err",
+                            "port": 22222,
+                            "out_file": "tests/utils/log_files/model_1.out",
+                            "err_file": "tests/utils/log_files/model_1.err",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir": "tests/utils/status_files/model_3",
+                                "status_dir": "tests/utils/status_files/telem_disabled",
                                 "job_id": "111",
                                 "step_id": "111"
                             }
                         },
                         {
-                            "name": "shard 2",
+                            "name": "orc 2 shard 2",
                             "hostname": "shard2_host",
-                            "port": "11111",
-                            "out_file": "tests/utils/log_files/model_1.out",
-                            "err_file": "tests/utils/log_files/model_1.err",
+                            "port": 22222,
+                            "out_file": "tests/utils/log_files/model_0.out",
+                            "err_file": "tests/utils/log_files/model_0.err",
                             "conf_file": "/path/to/conf_file",
                             "telemetry_metadata": {
-                                "status_dir": "tests/utils/status_files/model_3",
+                                "status_dir": "tests/utils/status_files/telem_disabled",
                                 "job_id": "111",
                                 "step_id": "111"
                             }
@@ -54,21 +53,22 @@
             ],
             "ensemble": [
                 {
-                    "name": "ensemble_1",
-                    "perm_strat": "string0",
+                    "name": "ensemble_2",
+                    "perm_strat": "all-perm",
                     "batch_settings": {
-                        "string": "Any0"
+                        "string": "Any1"
                     },
                     "params": {
                         "string": [
                             "Any1",
+                            "Any2",
                             "Any3"
                         ]
                     },
                     "models": [
                         {
-                            "name": "ensemble_1_member_1",
-                            "path": "string",
+                            "name": "ensemble_3_member_11",
+                            "path": "member 1 path",
                             "exe_args": [
                                 "string"
                             ],
@@ -142,148 +142,12 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir": "tests/utils/status_files/model_3",
+                                "status_dir": "tests/utils/status_files/telem_disabled",
                                 "job_id": "111",
                                 "step_id": "111"
                             },
                             "out_file": "tests/utils/log_files/model_0.out",
                             "err_file": "tests/utils/log_files/model_0.err"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "run_id": "2",
-            "model": [],
-            "orchestrator": [
-                {
-                    "name": "orchestrator_2",
-                    "type": "redis",
-                    "interface": [
-                        "lo"
-                    ],
-                    "shards": [
-                        {
-                            "name": "orc 2 shard 1",
-                            "hostname": "shard1_host",
-                            "port": 22222,
-                            "out_file": "tests/utils/log_files/model_1.out",
-                            "err_file": "tests/utils/log_files/model_1.err",
-                            "conf_file": "/path/to/conf_file",
-                            "telemetry_metadata": {
-                                "status_dir": "tests/utils/status_files/model_3",
-                                "job_id": "111",
-                                "step_id": "111"
-                            }
-                        },
-                        {
-                            "name": "orc 2 shard 2",
-                            "hostname": "shard2_host",
-                            "port": 22222,
-                            "out_file": "tests/utils/log_files/model_0.out",
-                            "err_file": "tests/utils/log_files/model_0.err",
-                            "conf_file": "/path/to/conf_file",
-                            "telemetry_metadata": {
-                                "status_dir": "tests/utils/status_files/model_3",
-                                "job_id": "111",
-                                "step_id": "111"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "orchestrator_3",
-                    "type": "redis",
-                    "interface": "lo",
-                    "shards": [
-                        {
-                            "name": "orc 3 shard 1",
-                            "hostname": "shard1_host",
-                            "port": "12345",
-                            "out_file": "tests/utils/log_files/model_0.out",
-                            "err_file": "tests/utils/log_files/model_0.err",
-                            "conf_file": "/path/to/conf_file",
-                            "telemetry_metadata": {
-                                "status_dir": "tests/utils/status_files/model_3",
-                                "job_id": "111",
-                                "step_id": "111"
-                            }
-                        }
-                    ]
-                }
-            ],
-            "ensemble": [
-                {
-                    "name": "ensemble_2",
-                    "perm_strat": "all-perm",
-                    "batch_settings": {
-                        "string": "Any1"
-                    },
-                    "params": {
-                        "string": [
-                            "Any1",
-                            "Any2",
-                            "Any3"
-                        ]
-                    },
-                    "models": [
-                        {
-                            "name": "ensemble_2_member_1",
-                            "path": "string",
-                            "exe_args": [
-                                "string"
-                            ],
-                            "batch_settings": {
-                                "batch_cmd": "command",
-                                "batch_args": {
-                                    "arg1": "string1",
-                                    "arg2": null
-                                }
-                            },
-                            "run_settings": {
-                                "exe": "echo",
-                                "run_command": "srun",
-                                "run_args": {
-                                    "arg1": "string1",
-                                    "arg2": null
-                                }
-                            },
-                            "params": {
-                                "string": "Any"
-                            },
-                            "files": {
-                                "Symlink": [
-                                    "file1",
-                                    "file2"
-                                ],
-                                "Configure": [
-                                    "file3"
-                                ],
-                                "Copy": [
-                                    "file4",
-                                    "file5"
-                                ]
-                            },
-                            "colocated_db": {
-                                "settings": {
-                                    "protocol": "TCP/IP",
-                                    "port": 1111,
-                                    "interface": "lo",
-                                    "db_cpus": 1,
-                                    "limit_app_cpus": "True",
-                                    "debug": "False"
-                                },
-                                "scripts": [],
-                                "models": []
-                            },
-                            "telemetry_metadata": {
-                                "status_dir": "tests/utils/status_files/model_3",
-                                "job_id": "111",
-                                "step_id": "111"
-                            },
-                            "out_file": "tests/utils/log_files/model_1.out",
-                            "err_file": "tests/utils/log_files/model_1.err"
                         }
                     ]
                 },
@@ -377,7 +241,7 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir": "tests/utils/status_files/model_3",
+                                "status_dir": "tests/utils/status_files/telem_disabled",
                                 "job_id": "111",
                                 "step_id": "111"
                             },
@@ -459,7 +323,7 @@
                                 ]
                             },
                             "telemetry_metadata": {
-                                "status_dir": "tests/utils/status_files/model_3",
+                                "status_dir": "tests/utils/status_files/telem_disabled",
                                 "job_id": "111",
                                 "step_id": "111"
                             },

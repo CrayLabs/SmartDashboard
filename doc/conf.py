@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'SmartDashboard'
-copyright = '2021-2023, Hewlett Packard Enterprise'
+copyright = '2021-2024, Hewlett Packard Enterprise'
 author = 'Hewlett Packard Enterprise'
 
 # The full version, including alpha/beta/rc tags
-version = "0.0.2"
+version = "0.0.3"
 
 # The full version, including alpha/beta/rc tags
 release = version

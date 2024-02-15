@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -23,24 +23,3 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-import pytest
-
-from smartdashboard.utils.helpers import get_db_hosts
-
-from ..utils.test_entities import *
-
-
-@pytest.mark.parametrize(
-    "orchestrator, expected_value",
-    [
-        pytest.param(orchestrator_1, ["shard1_host", "shard2_host"]),
-        pytest.param(orchestrator_2, ["shard1_host", "shard2_host"]),
-        pytest.param(orchestrator_3, ["shard1_host"]),
-        pytest.param(application_1, []),
-        pytest.param(no_shards_orchestrator, []),
-    ],
-)
-def test_get_db_hosts(orchestrator, expected_value):
-    hosts = get_db_hosts(orchestrator)
-    assert hosts == expected_value

@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2021-2023, Hewlett Packard Enterprise
+# Copyright (c) 2021-2024, Hewlett Packard Enterprise
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import pytest
+from pydantic import ValidationError
 
-from smartdashboard.utils.errors import MalformedManifestError, SSDashboardError
+from smartdashboard.utils.errors import MalformedManifestError
 from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
 
 
@@ -42,7 +43,7 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
             0,
             0,
             0,
-            Manifest,
+            MalformedManifestError,
         ),
         pytest.param(
             "tests/utils/manifest_files/no_apps_manifest.json",
@@ -69,28 +70,12 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
             Manifest,
         ),
         pytest.param(
-            "tests/utils/manifest_files/malformed_apps.json",
-            0,
-            0,
-            0,
-            0,
-            MalformedManifestError,
-        ),
-        pytest.param(
-            "tests/utils/manifest_files/malformed_orcs.json",
-            0,
-            0,
-            0,
-            0,
-            MalformedManifestError,
-        ),
-        pytest.param(
-            "tests/utils/manifest_files/malformed_ensembles.json",
-            0,
-            0,
-            0,
-            0,
-            MalformedManifestError,
+            "tests/utils/manifest_files/0.0.2_manifest.json",
+            2,
+            4,
+            3,
+            3,
+            Manifest,
         ),
     ],
 )
@@ -100,11 +85,11 @@ def test_get_manifest(
     try:
         manifest_file_reader = ManifestFileReader(json_file)
         manifest = manifest_file_reader.get_manifest()
-    except SSDashboardError as m:
+    except ValidationError as v:
         assert return_type == MalformedManifestError
         return
-    assert len(manifest.runs) == runs_length
-    assert len(manifest.applications) == app_length
-    assert len(manifest.orchestrators) == orc_length
-    assert len(manifest.ensembles) == ens_length
+    assert len(list(manifest.runs)) == runs_length
+    assert len(list(manifest.apps_with_run_ctx)) == app_length
+    assert len(list(manifest.orcs_with_run_ctx)) == orc_length
+    assert len(list(manifest.ensemble_with_run_ctx)) == ens_length
     assert type(manifest) == return_type

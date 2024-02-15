@@ -24,5 +24,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include smartdashboard/static/*.png
-include smartdashboard/static/*.css
+import typing as t
+
+from smartdashboard.schemas.application import Application
+from smartdashboard.schemas.base import HasName
+
+
+class Ensemble(HasName):
+    params: t.Dict[str, t.Any]
+    batch_settings: t.Dict[str, t.Any]
+    models: t.List[Application]
