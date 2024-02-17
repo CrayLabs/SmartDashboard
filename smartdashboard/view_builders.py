@@ -506,8 +506,9 @@ def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
     :return: View of the memory portion of the DB Telemetry page
     :rtype: MemoryView
     """
+
     with st.expander(label="Memory"):
-        col1, col2 = st.columns([6, 6])
+        col1, col2 = st.columns([.4, .5])
         with col1:
             shard = st.selectbox(
                 "Select a shard:",
@@ -521,10 +522,11 @@ def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
             st.write("")
             st.write("")
             memory_graph_element = st.empty()
+            cola, colb, colc = st.columns([3, 2, 3])
+            with colb:
+                export_button = st.empty()
 
-    view = MemoryView(shard, memory_table_element, memory_graph_element)
-    view.initialize_data()
-    return view
+    return MemoryView(shard, memory_table_element, memory_graph_element, export_button)
 
 
 def client_view_builder(shards: t.List[Shard]) -> ClientView:
@@ -535,6 +537,9 @@ def client_view_builder(shards: t.List[Shard]) -> ClientView:
     :return: View of the client portion of the DB Telemetry page
     :rtype: ClientView
     """
+
+    CLIENT_KEY_SLIDER = "client_slider"
+
     with st.expander(label="Clients"):
         col1, col2 = st.columns([6, 6])
         with col1:
@@ -550,9 +555,38 @@ def client_view_builder(shards: t.List[Shard]) -> ClientView:
             st.write("")
             st.write("")
             client_graph_element = st.empty()
+            manual_element = st.empty()
+            slider_element = st.empty()
+            sample_element = st.empty()
 
-    view = ClientView(shard, client_table_element, client_graph_element)
-    view.initialize_data()
+    view = ClientView(shard, client_table_element, client_graph_element, manual_element, slider_element, sample_element)
+
+    view._manual = manual_element.checkbox("Manual mode", on_change=view.manual_switch)
+    # view.min, view.max = slider_element.slider("Data View", on_change=view.manual_switch)
+    view.slider_element.slider(
+                "Data Slider",
+                view.min,
+                view.max,
+                value=[
+                    max(0, view.min),
+                    view.max,
+                ],
+                key=CLIENT_KEY_SLIDER,
+            )
+    # view.slider_element.slider(
+    #     "Timeline Adjustment",
+    #     min_value=0,
+    #     max_value=view.xmax,
+    #     key=KEY_SLIDER,
+    #     step=view.window_size,
+    #     value=view._pos(),
+    #     on_change=view.on_slider,
+    # )
+    # view.slider_element = st.slider("Data Slider")
+    # view.initialize_data()
+    # blah = st.toggle("CLIENTS VISIBLE", on_change=view.change_visibility)
+    # view.is_visible = blah
+    # print("after toggle" + str(view.is_visible))
     return view
 
 
