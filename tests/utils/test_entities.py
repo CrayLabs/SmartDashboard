@@ -468,6 +468,40 @@ no_return_code_shard = Shard(
     memory_file="tests/utils/memory/memory.csv",
 )
 
+telemetry_off_shard = Shard(
+    name="shard 2",
+    hostname="shard2_host",
+    port="11111",
+    out_file="tests/utils/log_files/model_0.out",
+    err_file="tests/utils/log_files/model_0.err",
+    conf_file="/path/to/conf_file",
+    telemetry_metadata={
+        "status_dir": "tests/utils/status_files/model_1",
+        "job_id": "111",
+        "step_id": "111",
+    },
+    client_file="",
+    client_count_file="",
+    memory_file="",
+)
+
+telemetry_files_not_found = Shard(
+    name="shard 2",
+    hostname="shard2_host",
+    port="11111",
+    out_file="tests/utils/log_files/model_0.out",
+    err_file="tests/utils/log_files/model_0.err",
+    conf_file="/path/to/conf_file",
+    telemetry_metadata={
+        "status_dir": "tests/utils/status_files/model_1",
+        "job_id": "111",
+        "step_id": "111",
+    },
+    client_file="not_real",
+    client_count_file="bad_file",
+    memory_file="worse_file",
+)
+
 malformed_status_dir_shard = Shard(
     name="shard 2",
     hostname="shard2_host",

@@ -29,8 +29,6 @@ import pathlib
 import sys
 import time
 import typing as t
-import datetime
-import logging
 
 import streamlit as st
 
@@ -77,10 +75,7 @@ def update_telemetry_page(manifest: Manifest) -> t.NoReturn:
     views = db_telem_builder(manifest)
 
     while True:
-        ts = datetime.datetime.now(); 
-        # print(f"starting load at {ts}...")
         views.update()
-        # print(f"load complete in {(datetime.datetime.now() - ts).total_seconds()}")
         time.sleep(1)
 
 

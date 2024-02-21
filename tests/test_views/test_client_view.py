@@ -25,36 +25,38 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import pytest
+import streamlit as st
 
-from smartdashboard.views import ApplicationView
-from tests.utils.test_entities import (
-    application_1,
-    application_2,
-    application_3,
-    application_4,
-    model0_err_logs,
-    model0_out_logs,
-    model1_err_logs,
-    model1_out_logs,
-)
+from smartdashboard.views import ClientView
+from tests.utils.test_entities import *
 
 
 @pytest.mark.parametrize(
-    "application, status_string, out_logs, err_logs",
+    "shard, csv_length, telem_bool",
     [
         pytest.param(
-            application_1, "Status: :green[Completed]", model0_out_logs, model0_err_logs
+            orchestrator_2.shards[0], 300, True
         ),
         pytest.param(
-            application_2, "Status: :red[Failed]", model1_out_logs, model1_err_logs
+            telemetry_off_shard, 0, False
         ),
         pytest.param(
-            application_3, "Status: :green[Running]", model0_out_logs, model0_err_logs
+            telemetry_files_not_found, 0, False
         ),
     ],
 )
-def test_app_view(application, status_string, out_logs, err_logs):
-    view = ApplicationView(application)
-    assert view.status == status_string
-    assert view.out_logs == out_logs
-    assert view.err_logs == err_logs
+def test_client_view(
+    shard, csv_length, telem_bool
+):
+    view = ClientView(shard, client_table_element=st.empty(), client_graph_element=st.empty(), export_button=st.empty())
+    assert view.telemetry == telem_bool
+    if telem_bool:
+        assert view.client_counts_df.shape[0] == csv_length
+        
+        assert list(view.client_counts_df.columns)==[
+                'timestamp',
+                "num_clients",
+            ]
+        assert view._get_data_file() != ""
+    else:
+        assert view._get_data_file() == ""

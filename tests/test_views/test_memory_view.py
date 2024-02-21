@@ -25,36 +25,50 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import pytest
+import streamlit as st
+import pandas as pd
 
-from smartdashboard.views import ApplicationView
-from tests.utils.test_entities import (
-    application_1,
-    application_2,
-    application_3,
-    application_4,
-    model0_err_logs,
-    model0_out_logs,
-    model1_err_logs,
-    model1_out_logs,
-)
+from smartdashboard.views import MemoryView
+from tests.utils.test_entities import *
 
 
 @pytest.mark.parametrize(
-    "application, status_string, out_logs, err_logs",
+    "shard, csv_length, telem_bool",
     [
         pytest.param(
-            application_1, "Status: :green[Completed]", model0_out_logs, model0_err_logs
+            orchestrator_2.shards[0], 300, True
         ),
         pytest.param(
-            application_2, "Status: :red[Failed]", model1_out_logs, model1_err_logs
+            telemetry_off_shard, 0, False
         ),
         pytest.param(
-            application_3, "Status: :green[Running]", model0_out_logs, model0_err_logs
+            telemetry_files_not_found, 0, False
         ),
     ],
 )
-def test_app_view(application, status_string, out_logs, err_logs):
-    view = ApplicationView(application)
-    assert view.status == status_string
-    assert view.out_logs == out_logs
-    assert view.err_logs == err_logs
+def test_memory_view(
+    shard, csv_length, telem_bool
+):
+    view = MemoryView(shard, memory_table_element=st.empty(), memory_graph_element=st.empty(), export_button=st.empty())
+    assert view.telemetry == telem_bool
+    if telem_bool:
+        assert view.memory_df.shape[0] == csv_length
+        
+        assert list(view.memory_df.columns)==[
+                'timestamp',
+                "used_memory",
+                "used_memory_peak",
+                "total_system_memory",
+            ]
+        assert list(view.process_dataframe(view.memory_df).columns)==[
+                'timestamp',
+                "Used Memory (GB)",
+                "Used Memory Peak (GB)",
+                "Total System Memory (GB)",
+            ]
+        assert view._get_data_file() != ""
+        assert view.load_data_update(skiprows=view.memory_df.shape[0] + 1).empty
+    else:
+        assert view._get_data_file() == ""
+        
+
