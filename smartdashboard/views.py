@@ -374,7 +374,7 @@ class MemoryView(ViewBase):
         if self.shard is not None:
             if self.shard.memory_file != "":
                 try:
-                    self.memory_df = self.load_data()
+                    self.memory_df = self._load_data()
                 except Exception:
                     self.memory_table_element.info(
                         f"Memory information could not be found for {self.shard.name}"
@@ -408,6 +408,7 @@ class MemoryView(ViewBase):
             self._handle_data()
 
     def _handle_data(self) -> None:
+        """Updates the table and graph with appropriate dataframes"""
         table_df = self.memory_df.copy(deep=True)
         graph_df: pd.DataFrame = self.memory_df.copy(deep=True)
         if self.memory_df.copy(deep=True).shape[0] >= self.window_size:
@@ -417,6 +418,11 @@ class MemoryView(ViewBase):
         self._update_graph(self.process_dataframe(graph_df))
 
     def _get_data_file(self) -> str:
+        """On click event to return csv data for the export button
+
+        :return: CSV data
+        :rtype: str
+        """
         if self.shard is not None:
             try:
                 return pd.read_csv(self.shard.memory_file).to_csv()
@@ -427,14 +433,26 @@ class MemoryView(ViewBase):
                 self.telemetry = False
         return ""
 
-    def load_data(self) -> pd.DataFrame:
+    def _load_data(self) -> pd.DataFrame:
+        """Load initial data
+
+        :return: Initial dataframe
+        :rtype: pandas.DataFrame
+        """
         if self.shard is not None and self.telemetry:
             memory_df = pd.read_csv(self.shard.memory_file)
             return memory_df
 
         return pd.DataFrame()
 
-    def load_data_update(self, skiprows: int) -> pd.DataFrame:
+    def _load_data_update(self, skiprows: int) -> pd.DataFrame:
+        """Load new data to append to existing dataframe
+
+        :param skiprows: Number of rows to skip in the CSV
+        :type skiprows: int
+        :return: Data to be appended
+        :rtype: pandas.DataFrame
+        """
         if self.shard is not None and self.telemetry:
             try:
                 delta_df = pd.read_csv(
@@ -449,6 +467,14 @@ class MemoryView(ViewBase):
         return pd.DataFrame()
 
     def process_dataframe(self, dframe: pd.DataFrame) -> pd.DataFrame:
+        """Processes the dataframe by changing the headers, dividing
+        converting to GB, and adjusting the timestamp
+
+        :param dframe: Dataframe to be processed
+        :type dframe: pandas.DataFrame
+        :return: Processed dataframe
+        :rtype: pandas.DataFrame
+        """
         gb_columns = [
             "used_memory",
             "used_memory_peak",
@@ -466,10 +492,14 @@ class MemoryView(ViewBase):
         return dframe
 
     def update(self) -> None:
+        """Checks for new data and calls to update the table
+        and graph if there is new data"""
         if self.shard is not None and self.telemetry:
-            df_delta = self.load_data_update(skiprows=self.memory_df.shape[0] + 1)
+            df_delta = self._load_data_update(skiprows=self.memory_df.shape[0] + 1)
             if not df_delta.empty:
-                self.memory_df = pd.concat((self.memory_df, df_delta), axis=0)
+                self.memory_df = pd.concat(
+                    (self.memory_df, df_delta), axis=0, ignore_index=True
+                )
                 self._handle_data()
 
     def _update_graph(self, dframe: pd.DataFrame) -> None:
@@ -543,7 +573,7 @@ class ClientView(ViewBase):
         if self.shard is not None:
             if self.shard.client_count_file != "" and self.shard.client_file != "":
                 try:
-                    self.client_counts_df = self.load_data()
+                    self.client_counts_df = self._load_data()
                 except Exception:
                     self.client_table_element.info(
                         f"Client information could not be found for {self.shard.name}"
@@ -577,6 +607,7 @@ class ClientView(ViewBase):
             self._handle_data()
 
     def _handle_data(self) -> None:
+        """Updates the table and graph with appropriate dataframes"""
         if self.shard is not None:
             try:
                 table_df = pd.read_csv(self.shard.client_file)
@@ -592,6 +623,11 @@ class ClientView(ViewBase):
             self._update_graph(graph_df)
 
     def _get_data_file(self) -> str:
+        """On click event to return csv data for the export button
+
+        :return: CSV data
+        :rtype: str
+        """
         if self.shard is not None:
             try:
                 return pd.read_csv(self.shard.client_count_file).to_csv()
@@ -602,14 +638,26 @@ class ClientView(ViewBase):
                 self.telemetry = False
         return ""
 
-    def load_data(self) -> pd.DataFrame:
+    def _load_data(self) -> pd.DataFrame:
+        """Load initial data
+
+        :return: Initial dataframe
+        :rtype: pandas.DataFrame
+        """
         if self.shard is not None and self.telemetry:
             counts_df = pd.read_csv(self.shard.client_count_file)
             return counts_df
 
         return pd.DataFrame()
 
-    def load_data_update(self, skiprows: int) -> pd.DataFrame:
+    def _load_data_update(self, skiprows: int) -> pd.DataFrame:
+        """Load new data to append to existing dataframe
+
+        :param skiprows: Number of rows to skip in the CSV
+        :type skiprows: int
+        :return: Data to be appended
+        :rtype: pandas.DataFrame
+        """
         if self.shard is not None and self.telemetry:
             try:
                 delta_df = pd.read_csv(
@@ -624,13 +672,15 @@ class ClientView(ViewBase):
         return pd.DataFrame()
 
     def update(self) -> None:
+        """Checks for new data and calls to update the table
+        and graph if there is new data"""
         if self.shard is not None and self.telemetry:
-            df_delta = self.load_data_update(
+            df_delta = self._load_data_update(
                 skiprows=self.client_counts_df.shape[0] + 1
             )
             if not df_delta.empty:
                 self.client_counts_df = pd.concat(
-                    (self.client_counts_df, df_delta), axis=0
+                    (self.client_counts_df, df_delta), axis=0, ignore_index=True
                 )
                 self._handle_data()
 

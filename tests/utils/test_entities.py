@@ -289,7 +289,7 @@ orchestrator_2 = Orchestrator(
             },
             "client_file": "tests/utils/clients/client.csv",
             "client_count_file": "tests/utils/clients/client_counts.csv",
-            "memory_file": "tests/utils/memory/memory.csv",
+            "memory_file": "tests/utils/memory/memory_2.csv",
         },
     ],
 )
