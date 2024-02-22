@@ -426,7 +426,6 @@ class DualView(ViewBase):
                 skiprows=self.telemetry_df.shape[0] + 1
             )
             if len(self.graph_delta_df) > 1:
-                print(self.graph_delta_df)
                 self.telemetry_df = pd.concat(
                     (self.telemetry_df, self.graph_delta_df), axis=0, ignore_index=True
                 )
