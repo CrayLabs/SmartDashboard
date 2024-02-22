@@ -668,7 +668,7 @@ class ClientView(DualView):
             alt.Chart(process_dataframe(dframe))
             .mark_line()
             .encode(
-                x=alt.X("timestamp:Q", axis=alt.Axis(title="Timestep")),
+                x=alt.X("timestamp:Q", axis=alt.Axis(title="Timestep in seconds")),
                 y=alt.Y("num_clients:Q", axis=alt.Axis(title="Client Count")),
                 tooltip=["timestamp:Q", "num_clients:Q"],
             )
