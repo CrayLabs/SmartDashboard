@@ -370,6 +370,9 @@ class DualView(ViewBase):
         self.window_size = 10000
         self.files = self._get_files()
         self.message = self._get_message()
+        self.chart: t.Optional[alt.Chart] = None
+        self.columns = self.get_columns()
+        self.graph_delta_df = pd.DataFrame(columns=self.columns)
 
         if self.shard is not None:
             if self.files[0] != "" and self.files[1] != "":
@@ -387,24 +390,47 @@ class DualView(ViewBase):
 
         if self.shard is not None and self.telemetry:
             self.timestamp_min = self.telemetry_df["timestamp"].min()
-            self._handle_data()
+            self.initial_load()
 
         self.enable_export_button()
 
     @abstractmethod
-    def enable_export_button(self) -> None: ...
+    def enable_export_button(self) -> None:
+        """Create an export data button"""
 
     @abstractmethod
-    def _get_files(self) -> t.Tuple[str, str]: ...
+    def _get_files(self) -> t.Tuple[str, str]:
+        """Returns a tuple of the files used for telemetry"""
 
     @abstractmethod
-    def _get_message(self) -> str: ...
+    def _get_message(self) -> str:
+        """Returns the error message if files cannot be found"""
 
     @abstractmethod
-    def _handle_data(self) -> None: ...
+    def _handle_data(self) -> None:
+        """Updates the table and graph with appropriate dataframes"""
 
     @abstractmethod
-    def update(self) -> None: ...
+    def initial_load(self) -> None:
+        """Updates the table and graph with initial dataframes"""
+
+    @abstractmethod
+    def get_columns(self) -> t.List[str]:
+        """Returns columns for the graph dataframe"""
+
+    def update(self) -> None:
+        """Checks for new data and calls to update the table
+        and graph if there is new data"""
+        if self.shard is not None and self.telemetry:
+            self.graph_delta_df = self._load_data_update(
+                skiprows=self.telemetry_df.shape[0] + 1
+            )
+            if len(self.graph_delta_df) > 1:
+                print(self.graph_delta_df)
+                self.telemetry_df = pd.concat(
+                    (self.telemetry_df, self.graph_delta_df), axis=0, ignore_index=True
+                )
+                self._handle_data()
 
     def _load_data_update(self, skiprows: int) -> pd.DataFrame:
         """Load new data to append to existing dataframe
@@ -421,7 +447,7 @@ class DualView(ViewBase):
             except FileNotFoundError:
                 self.table_element.info(self.message)
                 return pd.DataFrame()
-        return pd.DataFrame()
+        return pd.DataFrame(columns=self.columns)
 
     def _get_data_file(self) -> str:
         """On click event to return csv data for the export button
@@ -447,13 +473,14 @@ class DualView(ViewBase):
             telem_df = pd.read_csv(self.files[0])
             return telem_df
 
-        return pd.DataFrame()
+        return pd.DataFrame(columns=self.columns)
 
 
 class MemoryView(DualView):
     """View class for memory section of the Database Telemetry page"""
 
     def enable_export_button(self) -> None:
+        """Create an export data button"""
         if self.shard is not None and self.telemetry:
             try:
                 self.export_button.download_button(
@@ -469,29 +496,47 @@ class MemoryView(DualView):
             self.export_button.empty()
 
     def _get_files(self) -> t.Tuple[str, str]:
+        """Returns a tuple of the files used for telemetry"""
         if self.shard is not None:
             return self.shard.memory_file, self.shard.memory_file
 
         return ("", "")
 
     def _get_message(self) -> str:
+        """Returns the error message if files cannot be found"""
         if self.shard is not None:
             return f"Memory information could not be found for {self.shard.name}"
 
         return ""
 
-    def _handle_data(self) -> None:
-        """Updates the table and graph with appropriate dataframes"""
+    def get_columns(self) -> t.List[str]:
+        """Returns columns for the graph dataframe"""
+        return ["timestamp", "used_memory", "used_memory_peak", "total_system_memory"]
+
+    def initial_load(self) -> None:
+        """Updates the table and graph with initial dataframes"""
         table_df = self.telemetry_df.copy(deep=True)
         graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
         if self.telemetry_df.copy(deep=True).shape[0] >= self.window_size:
             graph_df = graph_df.sample(self.window_size)
 
-        self._update_table(self.process_dataframe(table_df))
         self._update_graph(self.process_dataframe(graph_df))
+        self._update_table(self.process_dataframe(table_df))
+
+    def _handle_data(self) -> None:
+        """Updates the table and graph with appropriate dataframes"""
+        table_df = self.telemetry_df.copy(deep=True)
+        graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
+        if graph_df.shape[0] >= self.window_size:
+            graph_df = graph_df.sample(self.window_size)
+            self.chart = None
+            self._update_graph(self.process_dataframe(graph_df))
+        else:
+            self._update_graph(self.process_dataframe(self.graph_delta_df))
+        self._update_table(self.process_dataframe(table_df))
 
     def process_dataframe(self, dframe: pd.DataFrame) -> pd.DataFrame:
-        """Processes the dataframe by changing the headers, dividing
+        """Processes the dataframe by changing the headers,
         converting to GB, and adjusting the timestamp
 
         :param dframe: Dataframe to be processed
@@ -515,17 +560,6 @@ class MemoryView(DualView):
         dframe["timestamp"] = dframe["timestamp"] - self.timestamp_min
         return dframe
 
-    def update(self) -> None:
-        """Checks for new data and calls to update the table
-        and graph if there is new data"""
-        if self.shard is not None and self.telemetry:
-            df_delta = self._load_data_update(skiprows=self.telemetry_df.shape[0] + 1)
-            if not df_delta.empty:
-                self.telemetry_df = pd.concat(
-                    (self.telemetry_df, df_delta), axis=0, ignore_index=True
-                )
-                self._handle_data()
-
     def _update_graph(self, dframe: pd.DataFrame) -> None:
         """Update memory graph for selected shard
 
@@ -537,31 +571,34 @@ class MemoryView(DualView):
         dframe_long = dframe.melt(
             "timestamp", var_name="Metric", value_name="Memory (GB)"
         )
-
-        chart = (
-            alt.Chart(dframe_long)
-            .mark_line()
-            .encode(
-                x=alt.X(
-                    "timestamp:Q",
-                    axis=alt.Axis(title="Timestep in seconds", labelAngle=0),
-                ),
-                y=alt.Y("Memory (GB):Q", axis=alt.Axis(title="Memory in GB")),
-                color=alt.Color(  # type: ignore[no-untyped-call]
-                    "Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"
-                ),
-                tooltip=["timestamp:Q", "Metric:N", "Memory (GB):Q"],
+        if self.chart is None:
+            self.chart = (
+                alt.Chart(dframe_long)
+                .mark_line()
+                .encode(
+                    x=alt.X(
+                        "timestamp:Q",
+                        axis=alt.Axis(title="Timestep in seconds", labelAngle=0),
+                    ),
+                    y=alt.Y("Memory (GB):Q", axis=alt.Axis(title="Memory in GB")),
+                    color=alt.Color(  # type: ignore[no-untyped-call]
+                        "Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"
+                    ),
+                    tooltip=["timestamp:Q", "Metric:N", "Memory (GB):Q"],
+                )
+                .interactive()
+                .properties(
+                    height=500, title=alt.TitleParams("Memory Usage", anchor="middle")
+                )
+                .configure_legend(orient="bottom")
             )
-            .interactive()
-            .properties(
-                height=500, title=alt.TitleParams("Memory Usage", anchor="middle")
-            )
-            .configure_legend(orient="bottom")
-        )
 
-        self.graph_element.altair_chart(
-            chart, use_container_width=True, theme="streamlit"
-        )
+            self.graph_element.altair_chart(
+                self.chart, use_container_width=True, theme="streamlit"
+            )
+
+        else:
+            self.graph_element.add_rows(dframe_long)
 
     def _update_table(self, dframe: pd.DataFrame) -> None:
         """Update memory table for selected shard
@@ -580,6 +617,7 @@ class ClientView(DualView):
     """View class for client section of the Database Telemetry page"""
 
     def enable_export_button(self) -> None:
+        """Create an export data button"""
         if self.shard is not None and self.telemetry:
             try:
                 self.export_button.download_button(
@@ -595,12 +633,14 @@ class ClientView(DualView):
             self.export_button.empty()
 
     def _get_files(self) -> t.Tuple[str, str]:
+        """Returns a tuple of the files used for telemetry"""
         if self.shard is not None:
             return self.shard.client_count_file, self.shard.client_file
 
         return ("", "")
 
     def _get_message(self) -> str:
+        """Returns the error message if files cannot be found"""
         if self.shard is not None:
             return f"Client information could not be found for {self.shard.name}"
 
@@ -617,19 +657,28 @@ class ClientView(DualView):
             graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
             if graph_df.shape[0] >= self.window_size:
                 graph_df = graph_df.sample(self.window_size)
+                self.chart = None
+                self._update_graph(graph_df)
+            else:
+                self._update_graph(self.graph_delta_df)
+
+    def get_columns(self) -> t.List[str]:
+        """Returns columns for the graph dataframe"""
+        return ["timestamp", "num_clients"]
+
+    def initial_load(self) -> None:
+        """Updates the table and graph with initial dataframes"""
+        if self.shard is not None:
+            try:
+                table_df = pd.read_csv(self.shard.client_file)
+                self._update_table(table_df)
+            except FileNotFoundError:
+                self.table_element.info(self.message)
+            graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
+            if graph_df.shape[0] >= self.window_size:
+                graph_df = graph_df.sample(self.window_size)
 
             self._update_graph(graph_df)
-
-    def update(self) -> None:
-        """Checks for new data and calls to update the table
-        and graph if there is new data"""
-        if self.shard is not None and self.telemetry:
-            df_delta = self._load_data_update(skiprows=self.telemetry_df.shape[0] + 1)
-            if not df_delta.empty:
-                self.telemetry_df = pd.concat(
-                    (self.telemetry_df, df_delta), axis=0, ignore_index=True
-                )
-                self._handle_data()
 
     def _update_table(self, dframe: pd.DataFrame) -> None:
         """Update client table for selected shard
@@ -664,22 +713,26 @@ class ClientView(DualView):
             dframe["timestamp"] = dframe["timestamp"] - self.timestamp_min
             return dframe
 
-        chart = (
-            alt.Chart(process_dataframe(dframe))
-            .mark_line()
-            .encode(
-                x=alt.X("timestamp:Q", axis=alt.Axis(title="Timestep in seconds")),
-                y=alt.Y("num_clients:Q", axis=alt.Axis(title="Client Count")),
-                tooltip=["timestamp:Q", "num_clients:Q"],
+        if self.chart is None:
+            self.chart = (
+                alt.Chart(process_dataframe(dframe))
+                .mark_line()
+                .encode(
+                    x=alt.X("timestamp:Q", axis=alt.Axis(title="Timestep in seconds")),
+                    y=alt.Y("num_clients:Q", axis=alt.Axis(title="Client Count")),
+                    tooltip=["timestamp:Q", "num_clients:Q"],
+                )
+                .interactive()
+                .properties(
+                    height=500,
+                    title=alt.TitleParams("Total Client Count", anchor="middle"),
+                )
             )
-            .interactive()
-            .properties(
-                height=500,
-                title=alt.TitleParams("Total Client Count", anchor="middle"),
-            )
-        )
 
-        self.graph_element.altair_chart(chart, use_container_width=True)
+            self.graph_element.altair_chart(self.chart, use_container_width=True)
+
+        else:
+            self.graph_element.add_rows(process_dataframe(dframe))
 
 
 class OrchestratorSummaryView(ViewBase):
