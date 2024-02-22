@@ -26,7 +26,6 @@
 
 import typing as t
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
 import altair as alt
 import pandas as pd
@@ -353,97 +352,59 @@ class OverviewView(ViewBase):
         self.orc_view.update()
 
 
-@dataclass
-class MemoryView(ViewBase):
-    """View class for memory section of the Database Telemetry page"""
+class DualView(ViewBase):
+    """Base class for Telemetry Views that have table and chart elements"""
 
     def __init__(
         self,
         shard: t.Optional[Shard],
-        memory_table_element: DeltaGenerator,
-        memory_graph_element: DeltaGenerator,
+        table_element: DeltaGenerator,
+        graph_element: DeltaGenerator,
         export_button: DeltaGenerator,
     ):
         self.shard = shard
-        self.memory_table_element = memory_table_element
-        self.memory_graph_element = memory_graph_element
+        self.table_element = table_element
+        self.graph_element = graph_element
         self.export_button = export_button
         self.telemetry = True
         self.window_size = 10000
+        self.files = self._get_files()
+        self.message = self._get_message()
 
         if self.shard is not None:
-            if self.shard.memory_file != "":
+            if self.files[0] != "" and self.files[1] != "":
                 try:
-                    self.memory_df = self._load_data()
+                    self.telemetry_df = self._load_data()
                 except Exception:
-                    self.memory_table_element.info(
-                        f"Memory information could not be found for {self.shard.name}"
-                    )
+                    self.table_element.info(self.message)
                     self.telemetry = False
             else:
-                self.memory_table_element.info(
-                    f"Memory information could not be found for {self.shard.name}"
-                )
+                self.table_element.info(self.message)
                 self.telemetry = False
 
         else:
             self.telemetry = False
 
         if self.shard is not None and self.telemetry:
-            try:
-                export_button.download_button(
-                    label="Export Data",
-                    data=self._get_data_file(),
-                    file_name=f"{self.shard.name} memory.csv",
-                    mime="text/csv",
-                    key="memory",
-                )
-            except Exception:
-                export_button.empty()
-        else:
-            export_button.empty()
-
-        if self.shard is not None and self.telemetry:
-            self.timestamp_min = self.memory_df["timestamp"].min()
+            self.timestamp_min = self.telemetry_df["timestamp"].min()
             self._handle_data()
 
-    def _handle_data(self) -> None:
-        """Updates the table and graph with appropriate dataframes"""
-        table_df = self.memory_df.copy(deep=True)
-        graph_df: pd.DataFrame = self.memory_df.copy(deep=True)
-        if self.memory_df.copy(deep=True).shape[0] >= self.window_size:
-            graph_df = graph_df.sample(self.window_size)
+        self.enable_export_button()
 
-        self._update_table(self.process_dataframe(table_df))
-        self._update_graph(self.process_dataframe(graph_df))
+    @abstractmethod
+    def enable_export_button(self) -> None: ...
 
-    def _get_data_file(self) -> str:
-        """On click event to return csv data for the export button
+    @abstractmethod
+    def _get_files(self) -> t.Tuple[str, str]: ...
 
-        :return: CSV data
-        :rtype: str
-        """
-        if self.shard is not None:
-            try:
-                return pd.read_csv(self.shard.memory_file).to_csv()
-            except FileNotFoundError:
-                self.memory_table_element.info(
-                    f"Memory information could not be found for {self.shard.name}"
-                )
-                self.telemetry = False
-        return ""
+    @abstractmethod
+    def _get_message(self) -> str: ...
 
-    def _load_data(self) -> pd.DataFrame:
-        """Load initial data
+    @abstractmethod
+    def _handle_data(self) -> None: ...
 
-        :return: Initial dataframe
-        :rtype: pandas.DataFrame
-        """
-        if self.shard is not None and self.telemetry:
-            memory_df = pd.read_csv(self.shard.memory_file)
-            return memory_df
-
-        return pd.DataFrame()
+    @abstractmethod
+    def update(self) -> None: ...
 
     def _load_data_update(self, skiprows: int) -> pd.DataFrame:
         """Load new data to append to existing dataframe
@@ -455,16 +416,79 @@ class MemoryView(ViewBase):
         """
         if self.shard is not None and self.telemetry:
             try:
-                delta_df = pd.read_csv(
-                    self.shard.memory_file, skiprows=range(1, skiprows)
-                )
+                delta_df = pd.read_csv(self.files[0], skiprows=range(1, skiprows))
                 return delta_df
             except FileNotFoundError:
-                self.memory_table_element.info(
-                    f"Memory information could not be found for {self.shard.name}"
-                )
+                self.table_element.info(self.message)
                 return pd.DataFrame()
         return pd.DataFrame()
+
+    def _get_data_file(self) -> str:
+        """On click event to return csv data for the export button
+
+        :return: CSV data
+        :rtype: str
+        """
+        if self.shard is not None:
+            try:
+                return pd.read_csv(self.files[0]).to_csv()
+            except FileNotFoundError:
+                self.table_element.info(self.message)
+                self.telemetry = False
+        return ""
+
+    def _load_data(self) -> pd.DataFrame:
+        """Load initial data
+
+        :return: Initial dataframe
+        :rtype: pandas.DataFrame
+        """
+        if self.shard is not None and self.telemetry:
+            telem_df = pd.read_csv(self.files[0])
+            return telem_df
+
+        return pd.DataFrame()
+
+
+class MemoryView(DualView):
+    """View class for memory section of the Database Telemetry page"""
+
+    def enable_export_button(self) -> None:
+        if self.shard is not None and self.telemetry:
+            try:
+                self.export_button.download_button(
+                    label="Export Data",
+                    data=self._get_data_file(),
+                    file_name=f"{self.shard.name} memory.csv",
+                    mime="text/csv",
+                    key="memory",
+                )
+            except Exception:
+                self.export_button.empty()
+        else:
+            self.export_button.empty()
+
+    def _get_files(self) -> t.Tuple[str, str]:
+        if self.shard is not None:
+            return self.shard.memory_file, self.shard.memory_file
+
+        return ("", "")
+
+    def _get_message(self) -> str:
+        if self.shard is not None:
+            return f"Memory information could not be found for {self.shard.name}"
+
+        return ""
+
+    def _handle_data(self) -> None:
+        """Updates the table and graph with appropriate dataframes"""
+        table_df = self.telemetry_df.copy(deep=True)
+        graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
+        if self.telemetry_df.copy(deep=True).shape[0] >= self.window_size:
+            graph_df = graph_df.sample(self.window_size)
+
+        self._update_table(self.process_dataframe(table_df))
+        self._update_graph(self.process_dataframe(graph_df))
 
     def process_dataframe(self, dframe: pd.DataFrame) -> pd.DataFrame:
         """Processes the dataframe by changing the headers, dividing
@@ -495,10 +519,10 @@ class MemoryView(ViewBase):
         """Checks for new data and calls to update the table
         and graph if there is new data"""
         if self.shard is not None and self.telemetry:
-            df_delta = self._load_data_update(skiprows=self.memory_df.shape[0] + 1)
+            df_delta = self._load_data_update(skiprows=self.telemetry_df.shape[0] + 1)
             if not df_delta.empty:
-                self.memory_df = pd.concat(
-                    (self.memory_df, df_delta), axis=0, ignore_index=True
+                self.telemetry_df = pd.concat(
+                    (self.telemetry_df, df_delta), axis=0, ignore_index=True
                 )
                 self._handle_data()
 
@@ -535,7 +559,7 @@ class MemoryView(ViewBase):
             .configure_legend(orient="bottom")
         )
 
-        self.memory_graph_element.altair_chart(
+        self.graph_element.altair_chart(
             chart, use_container_width=True, theme="streamlit"
         )
 
@@ -547,64 +571,40 @@ class MemoryView(ViewBase):
         """
 
         dframe = dframe.drop(columns=["timestamp"])
-        self.memory_table_element.dataframe(
+        self.table_element.dataframe(
             dframe.tail(1), use_container_width=True, hide_index=True
         )
 
 
-@dataclass
-class ClientView(ViewBase):
+class ClientView(DualView):
     """View class for client section of the Database Telemetry page"""
 
-    def __init__(
-        self,
-        shard: t.Optional[Shard],
-        client_table_element: DeltaGenerator,
-        client_graph_element: DeltaGenerator,
-        export_button: DeltaGenerator,
-    ):
-        self.shard = shard
-        self.client_table_element = client_table_element
-        self.client_graph_element = client_graph_element
-        self.export_button = export_button
-        self.telemetry = True
-        self.window_size = 10000
-
-        if self.shard is not None:
-            if self.shard.client_count_file != "" and self.shard.client_file != "":
-                try:
-                    self.client_counts_df = self._load_data()
-                except Exception:
-                    self.client_table_element.info(
-                        f"Client information could not be found for {self.shard.name}"
-                    )
-                    self.telemetry = False
-            else:
-                self.client_table_element.info(
-                    f"Client information could not be found for {self.shard.name}"
-                )
-                self.telemetry = False
-
-        else:
-            self.telemetry = False
-
+    def enable_export_button(self) -> None:
         if self.shard is not None and self.telemetry:
             try:
-                export_button.download_button(
+                self.export_button.download_button(
                     label="Export Data",
                     data=self._get_data_file(),
-                    file_name=f"{self.shard.name} client count.csv",
+                    file_name=f"{self.shard.name} clients.csv",
                     mime="text/csv",
-                    key="client",
+                    key="clients",
                 )
             except Exception:
-                export_button.empty()
+                self.export_button.empty()
         else:
-            export_button.empty()
+            self.export_button.empty()
 
-        if self.telemetry:
-            self.timestamp_min = self.client_counts_df["timestamp"].min()
-            self._handle_data()
+    def _get_files(self) -> t.Tuple[str, str]:
+        if self.shard is not None:
+            return self.shard.client_count_file, self.shard.client_file
+
+        return ("", "")
+
+    def _get_message(self) -> str:
+        if self.shard is not None:
+            return f"Client information could not be found for {self.shard.name}"
+
+        return ""
 
     def _handle_data(self) -> None:
         """Updates the table and graph with appropriate dataframes"""
@@ -613,74 +613,21 @@ class ClientView(ViewBase):
                 table_df = pd.read_csv(self.shard.client_file)
                 self._update_table(table_df)
             except FileNotFoundError:
-                self.client_table_element.info(
-                    f"Client information could not be found for {self.shard.name}"
-                )
-            graph_df: pd.DataFrame = self.client_counts_df.copy(deep=True)
+                self.table_element.info(self.message)
+            graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
             if graph_df.shape[0] >= self.window_size:
                 graph_df = graph_df.sample(self.window_size)
 
             self._update_graph(graph_df)
 
-    def _get_data_file(self) -> str:
-        """On click event to return csv data for the export button
-
-        :return: CSV data
-        :rtype: str
-        """
-        if self.shard is not None:
-            try:
-                return pd.read_csv(self.shard.client_count_file).to_csv()
-            except FileNotFoundError:
-                self.client_table_element.info(
-                    f"Client information could not be found for {self.shard.name}"
-                )
-                self.telemetry = False
-        return ""
-
-    def _load_data(self) -> pd.DataFrame:
-        """Load initial data
-
-        :return: Initial dataframe
-        :rtype: pandas.DataFrame
-        """
-        if self.shard is not None and self.telemetry:
-            counts_df = pd.read_csv(self.shard.client_count_file)
-            return counts_df
-
-        return pd.DataFrame()
-
-    def _load_data_update(self, skiprows: int) -> pd.DataFrame:
-        """Load new data to append to existing dataframe
-
-        :param skiprows: Number of rows to skip in the CSV
-        :type skiprows: int
-        :return: Data to be appended
-        :rtype: pandas.DataFrame
-        """
-        if self.shard is not None and self.telemetry:
-            try:
-                delta_df = pd.read_csv(
-                    self.shard.client_count_file, skiprows=range(1, skiprows)
-                )
-                return delta_df
-            except FileNotFoundError:
-                self.client_table_element.info(
-                    f"Client information could not be found for {self.shard.name}"
-                )
-                return pd.DataFrame()
-        return pd.DataFrame()
-
     def update(self) -> None:
         """Checks for new data and calls to update the table
         and graph if there is new data"""
         if self.shard is not None and self.telemetry:
-            df_delta = self._load_data_update(
-                skiprows=self.client_counts_df.shape[0] + 1
-            )
+            df_delta = self._load_data_update(skiprows=self.telemetry_df.shape[0] + 1)
             if not df_delta.empty:
-                self.client_counts_df = pd.concat(
-                    (self.client_counts_df, df_delta), axis=0, ignore_index=True
+                self.telemetry_df = pd.concat(
+                    (self.telemetry_df, df_delta), axis=0, ignore_index=True
                 )
                 self._handle_data()
 
@@ -702,7 +649,7 @@ class ClientView(ViewBase):
             )
             return dframe
 
-        self.client_table_element.dataframe(
+        self.table_element.dataframe(
             process_dataframe(dframe), use_container_width=True, hide_index=True
         )
 
@@ -732,7 +679,7 @@ class ClientView(ViewBase):
             )
         )
 
-        self.client_graph_element.altair_chart(chart, use_container_width=True)
+        self.graph_element.altair_chart(chart, use_container_width=True)
 
 
 class OrchestratorSummaryView(ViewBase):

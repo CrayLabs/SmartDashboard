@@ -48,12 +48,12 @@ from tests.utils.test_entities import *
 def test_client_view(
     shard, csv_length, telem_bool
 ):
-    view = ClientView(shard, client_table_element=st.empty(), client_graph_element=st.empty(), export_button=st.empty())
+    view = ClientView(shard, table_element=st.empty(), graph_element=st.empty(), export_button=st.empty())
     assert view.telemetry == telem_bool
     if telem_bool:
-        assert view.client_counts_df.shape[0] == csv_length
+        assert view.telemetry_df.shape[0] == csv_length
         
-        assert list(view.client_counts_df.columns)==[
+        assert list(view.telemetry_df.columns)==[
                 'timestamp',
                 "num_clients",
             ]
