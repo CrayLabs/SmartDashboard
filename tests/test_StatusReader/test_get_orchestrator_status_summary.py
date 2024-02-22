@@ -44,7 +44,7 @@ from ..utils.test_entities import *
             orchestrator_4,
             f"Status: {StatusEnum.INACTIVE.value} (all shards completed)",
         ),
-        pytest.param(no_shards_started, f"Status: {StatusEnum.PENDING.value}"),
+        pytest.param(no_shards_started, f"Status: {StatusEnum.UNKNOWN.value}"),
         pytest.param(None, "Status: "),
     ],
 )

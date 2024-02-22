@@ -36,7 +36,7 @@ from tests.utils.test_entities import *
         pytest.param(
             ensemble_1,
             ensemble_1.models[0],
-            "Status: 0 Running, 1 Completed, 0 Failed, 0 Pending, 0 Unknown",
+            "Status: 0 Running, 1 Completed, 0 Failed, 0 Unknown, 0 Malformed",
             "Status: :green[Completed]",
             model0_out_logs,
             model0_err_logs,
@@ -44,7 +44,7 @@ from tests.utils.test_entities import *
         pytest.param(
             ensemble_2,
             None,
-            "Status: 0 Running, 0 Completed, 0 Failed, 0 Pending, 0 Unknown",
+            "Status: 0 Running, 0 Completed, 0 Failed, 0 Unknown, 0 Malformed",
             "Status: ",
             "",
             "",
@@ -52,7 +52,7 @@ from tests.utils.test_entities import *
         pytest.param(
             ensemble_4,
             ensemble_4.models[0],
-            "Status: 0 Running, 0 Completed, 2 Failed, 0 Pending, 0 Unknown",
+            "Status: 0 Running, 0 Completed, 2 Failed, 0 Unknown, 0 Malformed",
             "Status: :red[Failed]",
             model0_out_logs,
             model0_err_logs,

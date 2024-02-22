@@ -1,6 +1,21 @@
 Changelog
 =========
 
+0.0.3
+-----
+
+Released on 15 February 2024
+
+Description
+
+- Added defined schemas for entity objects. (SmartDashboard-PR31_)
+- Added experiment level logs to the dashboard. (SmartDashboard-PR37_)
+
+.. _SmartDashboard-PR31: https://github.com/CrayLabs/SmartDashboard/pull/31
+.. _SmartDashboard-PR37: https://github.com/CrayLabs/SmartDashboard/pull/37
+
+
+
 0.0.2
 -----
 

@@ -50,7 +50,7 @@ from tests.utils.test_entities import *
         pytest.param(
             no_shards_started,
             no_shards_started.shards[0],
-            "Status: Pending",
+            "Status: Unknown",
             model0_out_logs,
             model0_err_logs,
         ),

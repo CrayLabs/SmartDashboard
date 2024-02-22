@@ -199,7 +199,7 @@ class ApplicationView(EntityView[Application]):
             try:
                 status = get_status(self.application.telemetry_metadata["status_dir"])
             except KeyError:
-                status = StatusData(StatusEnum.UNKNOWN, None)
+                status = StatusData(StatusEnum.MALFORMED, None)
             return format_status(status)
         return "Status: "
 
@@ -299,7 +299,7 @@ class EnsembleView(EntityView[Application]):
             try:
                 status = get_status(self.member.telemetry_metadata["status_dir"])
             except KeyError:
-                status = StatusData(StatusEnum.UNKNOWN, None)
+                status = StatusData(StatusEnum.MALFORMED, None)
             return format_status(status)
         return "Status: "
 

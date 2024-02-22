@@ -37,16 +37,24 @@ from ..utils.test_entities import *
     "ensemble, expected_status",
     [
         pytest.param(
-            ensemble_1, "Status: 0 Running, 1 Completed, 0 Failed, 0 Pending, 0 Unknown"
+            ensemble_1,
+            "Status: 0 Running, 1 Completed, 0 Failed, 0 Unknown, 0 Malformed",
         ),
         pytest.param(
-            ensemble_2, "Status: 0 Running, 0 Completed, 0 Failed, 0 Pending, 0 Unknown"
+            ensemble_2,
+            "Status: 0 Running, 0 Completed, 0 Failed, 0 Unknown, 0 Malformed",
         ),
         pytest.param(
-            ensemble_3, "Status: 1 Running, 0 Completed, 1 Failed, 0 Pending, 0 Unknown"
+            ensemble_3,
+            "Status: 1 Running, 0 Completed, 1 Failed, 0 Unknown, 0 Malformed",
         ),
         pytest.param(
-            ensemble_4, "Status: 0 Running, 0 Completed, 2 Failed, 0 Pending, 0 Unknown"
+            ensemble_4,
+            "Status: 0 Running, 0 Completed, 2 Failed, 0 Unknown, 0 Malformed",
+        ),
+        pytest.param(
+            ensemble_5,
+            "Status: 0 Running, 0 Completed, 0 Failed, 2 Unknown, 0 Malformed",
         ),
         pytest.param(None, "Status: "),
     ],

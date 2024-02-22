@@ -48,7 +48,8 @@ from ..utils.test_entities import *
         pytest.param(application_4, f"Status: {GREEN_COMPLETED}"),
         pytest.param(orchestrator_1.shards[0], f"Status: {GREEN_RUNNING}"),
         pytest.param(orchestrator_1.shards[1], f"Status: {RED_FAILED}"),
-        pytest.param(pending_shard, f"Status: {StatusEnum.PENDING.value}"),
+        pytest.param(pending_shard, f"Status: {StatusEnum.UNKNOWN.value}"),
+        pytest.param(no_return_code_shard, f"Status: {StatusEnum.MALFORMED.value}"),
     ],
 )
 def test_get_status(entity: t.Dict[str, t.Any], expected_status):

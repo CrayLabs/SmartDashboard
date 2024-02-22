@@ -44,6 +44,10 @@ from smartdashboard.utils.StatusReader import get_experiment_status_summary
             "tests/utils/manifest_files/no_running.json",
             f"Status: {StatusEnum.INACTIVE.value}",
         ),
+        pytest.param(
+            "tests/utils/manifest_files/exp_telem_disabled_manifest.json",
+            f"Status: {StatusEnum.UNKNOWN.value}. Experiment telemetry may have been disabled.",
+        ),
     ],
 )
 def test_get_experiment_status_summary(json_file, expected_status):
