@@ -423,9 +423,9 @@ class DualView(ViewBase):
         and graph if there is new data"""
         if self.shard is not None and self.telemetry:
             self.graph_delta_df = self._load_data_update(
-                skiprows=self.telemetry_df.shape[0] + 1
+                skiprows=self.telemetry_df.shape[0]
             )
-            if len(self.graph_delta_df) > 1:
+            if not self.graph_delta_df.empty:
                 self.telemetry_df = pd.concat(
                     (self.telemetry_df, self.graph_delta_df), axis=0, ignore_index=True
                 )
@@ -674,6 +674,7 @@ class ClientView(DualView):
             except FileNotFoundError:
                 self.table_element.info(self.message)
             graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
+            print(graph_df.shape[0])
             if graph_df.shape[0] >= self.window_size:
                 graph_df = graph_df.sample(self.window_size)
 
@@ -689,6 +690,7 @@ class ClientView(DualView):
         def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
             dframe = dframe.loc[dframe["timestamp"] == dframe["timestamp"].max()]
             dframe = dframe.drop(columns=["timestamp"])
+            dframe = dframe.sort_values(by="client_id")
             dframe = dframe.rename(
                 columns={
                     "client_id": "Client ID",

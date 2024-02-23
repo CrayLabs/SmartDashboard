@@ -115,8 +115,7 @@ def test_load_data_update_memory_view(
     shard, csv_length
 ):
     view = MemoryView(shard, table_element=st.empty(), graph_element=st.empty(), export_button=st.empty())
-    df = pd.read_csv(view.files[0], nrows=int(csv_length/2))
-    first_chunk = random.randint(1,df.shape[0])
+    first_chunk = random.randint(1,csv_length-1)
     initial_df = pd.read_csv(view.files[0], nrows=first_chunk)
     df_delta = view._load_data_update(skiprows=initial_df.shape[0]+1)
     assert pd.concat((initial_df, df_delta), axis=0).shape[0] == csv_length
