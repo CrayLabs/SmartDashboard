@@ -674,7 +674,6 @@ class ClientView(DualView):
             except FileNotFoundError:
                 self.table_element.info(self.message)
             graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
-            print(graph_df.shape[0])
             if graph_df.shape[0] >= self.window_size:
                 graph_df = graph_df.sample(self.window_size)
 
