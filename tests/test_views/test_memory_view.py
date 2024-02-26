@@ -34,88 +34,95 @@ from tests.utils.test_entities import *
 
 
 @pytest.mark.parametrize(
-    "shard, csv_length, telem_bool",
+    "shard, csv_length, telem_bool, files_tuple",
     [
         pytest.param(
-            orchestrator_2.shards[0], 300, True
+            orchestrator_2.shards[0],
+            300,
+            True,
+            ("tests/utils/memory/memory.csv", "tests/utils/memory/memory.csv"),
         ),
         pytest.param(
-            orchestrator_2.shards[1], 10001, True
+            orchestrator_2.shards[1],
+            10001,
+            True,
+            ("tests/utils/memory/memory_2.csv", "tests/utils/memory/memory_2.csv"),
         ),
-        pytest.param(
-            telemetry_off_shard, 0, False
-        ),
-        pytest.param(
-            telemetry_files_not_found, 0, False
-        ),
+        pytest.param(telemetry_off_shard, 0, False, ("", "")),
+        pytest.param(telemetry_files_not_found, 0, False, ("worse_file", "worse_file")),
     ],
 )
-def test_memory_view(
-    shard, csv_length, telem_bool
-):
-    view = MemoryView(shard, table_element=st.empty(), graph_element=st.empty(), export_button=st.empty())
+def test_memory_view(shard, csv_length, telem_bool, files_tuple):
+    view = MemoryView(
+        shard,
+        table_element=st.empty(),
+        graph_element=st.empty(),
+        export_button=st.empty(),
+    )
     assert view.telemetry == telem_bool
+    assert view.message == f"Memory information could not be found for {shard.name}"
+    assert view.columns == [
+        "timestamp",
+        "used_memory",
+        "used_memory_peak",
+        "total_system_memory",
+    ]
+    assert view.files == files_tuple
     if telem_bool:
         assert view.telemetry_df.shape[0] == csv_length
-        
-        assert list(view.telemetry_df.columns)==[
-                'timestamp',
-                "used_memory",
-                "used_memory_peak",
-                "total_system_memory",
-            ]
-        assert list(view.process_dataframe(view.telemetry_df).columns)==[
-                'timestamp',
-                "Used Memory (GB)",
-                "Used Memory Peak (GB)",
-                "Total System Memory (GB)",
-            ]
+
+        assert list(view.telemetry_df.columns) == [
+            "timestamp",
+            "used_memory",
+            "used_memory_peak",
+            "total_system_memory",
+        ]
+        assert list(view.process_dataframe(view.telemetry_df).columns) == [
+            "timestamp",
+            "Used Memory (GB)",
+            "Used Memory Peak (GB)",
+            "Total System Memory (GB)",
+        ]
         assert view._get_data_file() != ""
         assert view._load_data_update(skiprows=view.telemetry_df.shape[0] + 1).empty
     else:
         assert view._get_data_file() == ""
-        
+
 
 @pytest.mark.parametrize(
     "shard, csv_length",
     [
-        pytest.param(
-            orchestrator_2.shards[0], 300
-        ),
-        pytest.param(
-            orchestrator_2.shards[1], 10001
-        ),
-        pytest.param(
-            telemetry_off_shard, 0
-        ),
-        pytest.param(
-            telemetry_files_not_found, 0
-        ),
+        pytest.param(orchestrator_2.shards[0], 300),
+        pytest.param(orchestrator_2.shards[1], 10001),
+        pytest.param(telemetry_off_shard, 0),
+        pytest.param(telemetry_files_not_found, 0),
     ],
 )
-def test_load_data_memory_view(
-    shard, csv_length
-):
-    view = MemoryView(shard, table_element=st.empty(), graph_element=st.empty(), export_button=st.empty())
+def test_load_data_memory_view(shard, csv_length):
+    view = MemoryView(
+        shard,
+        table_element=st.empty(),
+        graph_element=st.empty(),
+        export_button=st.empty(),
+    )
     assert len(view._load_data()) == csv_length
 
 
 @pytest.mark.parametrize(
     "shard, csv_length",
     [
-        pytest.param(
-            orchestrator_2.shards[0], 300
-        ),
-        pytest.param(
-            orchestrator_2.shards[1], 10001
-        ),
+        pytest.param(orchestrator_2.shards[0], 300),
+        pytest.param(orchestrator_2.shards[1], 10001),
     ],
 )
-def test_load_data_update_memory_view(
-    shard, csv_length
-):
-    view = MemoryView(shard, table_element=st.empty(), graph_element=st.empty(), export_button=st.empty())
-    first_chunk = random.randint(1,csv_length-1)
+def test_load_data_update_memory_view(shard, csv_length):
+    view = MemoryView(
+        shard,
+        table_element=st.empty(),
+        graph_element=st.empty(),
+        export_button=st.empty(),
+    )
+    first_chunk = random.randint(1, csv_length - 1)
     initial_df = pd.read_csv(view.files[0], nrows=first_chunk)
-    df_delta = view._load_data_update(skiprows=initial_df.shape[0]+1)
+    df_delta = view._load_data_update(skiprows=initial_df.shape[0] + 1)
     assert pd.concat((initial_df, df_delta), axis=0).shape[0] == csv_length

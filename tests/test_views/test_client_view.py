@@ -34,31 +34,36 @@ from tests.utils.test_entities import *
 
 
 @pytest.mark.parametrize(
-    "shard, csv_length, telem_bool",
+    "shard, csv_length, telem_bool, files_tuple",
     [
         pytest.param(
-            orchestrator_2.shards[0], 300, True
+            orchestrator_2.shards[0],
+            300,
+            True,
+            ("tests/utils/clients/client_counts.csv", "tests/utils/clients/client.csv"),
         ),
-        pytest.param(
-            telemetry_off_shard, 0, False
-        ),
-        pytest.param(
-            telemetry_files_not_found, 0, False
-        ),
+        pytest.param(telemetry_off_shard, 0, False, ("", "")),
+        pytest.param(telemetry_files_not_found, 0, False, ("bad_file", "not_real")),
     ],
 )
-def test_client_view(
-    shard, csv_length, telem_bool
-):
-    view = ClientView(shard, table_element=st.empty(), graph_element=st.empty(), export_button=st.empty())
+def test_client_view(shard, csv_length, telem_bool, files_tuple):
+    view = ClientView(
+        shard,
+        table_element=st.empty(),
+        graph_element=st.empty(),
+        export_button=st.empty(),
+    )
     assert view.telemetry == telem_bool
+    assert view.message == f"Client information could not be found for {shard.name}"
+    assert view.columns == ["timestamp", "num_clients"]
+    assert view.files == files_tuple
     if telem_bool:
         assert view.telemetry_df.shape[0] == csv_length
-        
-        assert list(view.telemetry_df.columns)==[
-                'timestamp',
-                "num_clients",
-            ]
+
+        assert list(view.telemetry_df.columns) == [
+            "timestamp",
+            "num_clients",
+        ]
         assert view._get_data_file() != ""
     else:
         assert view._get_data_file() == ""
@@ -67,37 +72,35 @@ def test_client_view(
 @pytest.mark.parametrize(
     "shard, csv_length",
     [
-        pytest.param(
-            orchestrator_2.shards[0], 300
-        ),
-        pytest.param(
-            telemetry_off_shard, 0
-        ),
-        pytest.param(
-            telemetry_files_not_found, 0
-        ),
+        pytest.param(orchestrator_2.shards[0], 300),
+        pytest.param(telemetry_off_shard, 0),
+        pytest.param(telemetry_files_not_found, 0),
     ],
 )
-def test_load_data_client_view(
-    shard, csv_length
-):
-    view = ClientView(shard, table_element=st.empty(), graph_element=st.empty(), export_button=st.empty())
+def test_load_data_client_view(shard, csv_length):
+    view = ClientView(
+        shard,
+        table_element=st.empty(),
+        graph_element=st.empty(),
+        export_button=st.empty(),
+    )
     assert len(view._load_data()) == csv_length
 
 
 @pytest.mark.parametrize(
     "shard, csv_length",
     [
-        pytest.param(
-            orchestrator_2.shards[0], 300
-        ),
+        pytest.param(orchestrator_2.shards[0], 300),
     ],
 )
-def test_load_data_update_client_view(
-    shard, csv_length
-):
-    view = ClientView(shard, table_element=st.empty(), graph_element=st.empty(), export_button=st.empty())
-    first_chunk = random.randint(1,csv_length-1)
+def test_load_data_update_client_view(shard, csv_length):
+    view = ClientView(
+        shard,
+        table_element=st.empty(),
+        graph_element=st.empty(),
+        export_button=st.empty(),
+    )
+    first_chunk = random.randint(1, csv_length - 1)
     initial_df = pd.read_csv(view.files[0], nrows=first_chunk)
-    df_delta = view._load_data_update(skiprows=initial_df.shape[0]+1)
+    df_delta = view._load_data_update(skiprows=initial_df.shape[0] + 1)
     assert pd.concat((initial_df, df_delta), axis=0).shape[0] == csv_length

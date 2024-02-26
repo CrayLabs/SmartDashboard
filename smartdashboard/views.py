@@ -378,7 +378,7 @@ class DualView(ViewBase):
             if self.files[0] != "" and self.files[1] != "":
                 try:
                     self.telemetry_df = self._load_data()
-                except Exception:
+                except FileNotFoundError:
                     self.table_element.info(self.message)
                     self.telemetry = False
             else:
@@ -489,7 +489,7 @@ class MemoryView(DualView):
                     mime="text/csv",
                     key="memory",
                 )
-            except Exception:
+            except FileNotFoundError:
                 self.export_button.empty()
         else:
             self.export_button.empty()
@@ -626,7 +626,7 @@ class ClientView(DualView):
                     mime="text/csv",
                     key="clients",
                 )
-            except Exception:
+            except FileNotFoundError:
                 self.export_button.empty()
         else:
             self.export_button.empty()
