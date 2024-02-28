@@ -27,8 +27,8 @@
 import io
 import itertools
 import json
-import typing as t
 import os
+import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List
@@ -111,7 +111,7 @@ class ManifestFileReader(ManifestReader):
                 file=file_path,
                 exception=version_exception,
             )
-        
+
     @property
     def has_changed(self) -> bool:
         return self._last_modified != os.path.getmtime(self._file_path)

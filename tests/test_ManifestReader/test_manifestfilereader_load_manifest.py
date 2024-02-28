@@ -27,31 +27,53 @@
 import pytest
 
 from smartdashboard.utils.errors import ManifestError, VersionIncompatibilityError
-from smartdashboard.utils.ManifestReader import Manifest, load_manifest
+from smartdashboard.utils.ManifestReader import (
+    Manifest,
+    ManifestFileReader,
+    load_manifest,
+)
 
 
 @pytest.mark.parametrize(
-    "json_file, result_type",
+    "json_file, manifest_type, reader_type",
     [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", Manifest),
-        pytest.param("tests/utils/manifest_files/0.0.2_manifest.json", Manifest),
-        pytest.param("tests/utils/manifest_files/no_apps_manifest.json", Manifest),
-        pytest.param("file_doesn't_exist.json", ManifestError),
-        pytest.param("tests/utils/manifest_files/JSONDecodererror.json", ManifestError),
+        pytest.param(
+            "tests/utils/manifest_files/manifesttest.json", Manifest, ManifestFileReader
+        ),
+        pytest.param(
+            "tests/utils/manifest_files/0.0.2_manifest.json",
+            Manifest,
+            ManifestFileReader,
+        ),
+        pytest.param(
+            "tests/utils/manifest_files/no_apps_manifest.json",
+            Manifest,
+            ManifestFileReader,
+        ),
+        pytest.param("file_doesn't_exist.json", ManifestError, None),
+        pytest.param(
+            "tests/utils/manifest_files/JSONDecodererror.json", ManifestError, None
+        ),
         pytest.param(
             "tests/utils/manifest_files/invalid_version.json",
             VersionIncompatibilityError,
+            None,
         ),
     ],
 )
-def test_load_manifest(json_file, result_type):
+def test_load_manifest_and_has_changed(json_file, manifest_type, reader_type):
     try:
-        manifest = load_manifest(json_file)
+        manifest, manifest_reader = load_manifest(json_file)
     except ManifestError:
-        assert result_type == ManifestError
+        assert manifest_type == ManifestError
         return
     except VersionIncompatibilityError:
-        assert result_type == VersionIncompatibilityError
+        assert manifest_type == VersionIncompatibilityError
         return
 
-    assert type(manifest) == result_type
+    assert type(manifest) == manifest_type
+    assert type(manifest_reader) == reader_type
+    assert manifest_reader._last_modified > 0.0
+    assert manifest_reader.has_changed == False
+    manifest_reader._last_modified = 0.0
+    assert manifest_reader.has_changed == True
