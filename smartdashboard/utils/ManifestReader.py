@@ -28,6 +28,7 @@ import io
 import itertools
 import json
 import typing as t
+import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List
@@ -90,6 +91,7 @@ class ManifestFileReader(ManifestReader):
         :type file_path: str
         """
         self._file_path = file_path
+        self._last_modified = os.path.getmtime(self._file_path)
         self._data = self.from_file(self._file_path)
 
         try:
@@ -109,6 +111,10 @@ class ManifestFileReader(ManifestReader):
                 file=file_path,
                 exception=version_exception,
             )
+        
+    @property
+    def has_changed(self) -> bool:
+        return self._last_modified != os.path.getmtime(self._file_path)
 
     def get_manifest(self) -> Manifest:
         """Get the Manifest from self._data
@@ -151,7 +157,7 @@ class ManifestFileReader(ManifestReader):
         return data
 
 
-def load_manifest(path: str) -> Manifest:
+def load_manifest(path: str) -> t.Tuple[Manifest, ManifestFileReader]:
     """Instantiate and call get_manifest
 
     This is where we're checking for any errors
@@ -160,8 +166,8 @@ def load_manifest(path: str) -> Manifest:
 
     :param path: Path to the manifest file
     :type path: str
-    :return: Manifest
-    :rtype: Optional[Manifest]
+    :return: Manifest, ManifestFileReader
+    :rtype: Tuple[Manifest, ManifestFileReader]
     """
     try:
         manifest_file_reader = ManifestFileReader(path)
@@ -178,4 +184,4 @@ def load_manifest(path: str) -> Manifest:
         raise MalformedManifestError(
             title="Manifest file is malformed.", file=path, exception=val
         ) from val
-    return manifest
+    return manifest, manifest_file_reader
