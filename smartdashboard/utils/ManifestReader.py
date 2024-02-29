@@ -114,6 +114,11 @@ class ManifestFileReader(ManifestReader):
 
     @property
     def has_changed(self) -> bool:
+        """Check if the manifest file has been modified
+
+        :return: If the file has been modified
+        :rtype: bool
+        """
         return self._last_modified != os.path.getmtime(self._file_path)
 
     def get_manifest(self) -> Manifest:
