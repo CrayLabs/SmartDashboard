@@ -27,53 +27,35 @@
 import pytest
 
 from smartdashboard.utils.errors import ManifestError, VersionIncompatibilityError
-from smartdashboard.utils.ManifestReader import (
-    Manifest,
-    ManifestFileReader,
-    load_manifest,
-)
+from smartdashboard.utils.ManifestReader import ManifestFileReader, create_filereader
 
 
 @pytest.mark.parametrize(
-    "json_file, manifest_type, reader_type",
+    "json_file, return_type",
     [
         pytest.param(
-            "tests/utils/manifest_files/manifesttest.json", Manifest, ManifestFileReader
+            "tests/utils/manifest_files/manifesttest.json", ManifestFileReader
         ),
         pytest.param(
             "tests/utils/manifest_files/0.0.2_manifest.json",
-            Manifest,
             ManifestFileReader,
         ),
         pytest.param(
             "tests/utils/manifest_files/no_apps_manifest.json",
-            Manifest,
             ManifestFileReader,
         ),
-        pytest.param("file_doesn't_exist.json", ManifestError, None),
-        pytest.param(
-            "tests/utils/manifest_files/JSONDecodererror.json", ManifestError, None
-        ),
+        pytest.param("file_doesn't_exist.json", ManifestError),
+        pytest.param("tests/utils/manifest_files/JSONDecodererror.json", ManifestError),
         pytest.param(
             "tests/utils/manifest_files/invalid_version.json",
             VersionIncompatibilityError,
-            None,
         ),
     ],
 )
-def test_load_manifest_and_has_changed(json_file, manifest_type, reader_type):
-    try:
-        manifest, manifest_reader = load_manifest(json_file)
-    except ManifestError:
-        assert manifest_type == ManifestError
-        return
-    except VersionIncompatibilityError:
-        assert manifest_type == VersionIncompatibilityError
-        return
-
-    assert type(manifest) == manifest_type
-    assert type(manifest_reader) == reader_type
-    assert manifest_reader._last_modified > 0.0
-    assert manifest_reader.has_changed == False
-    manifest_reader._last_modified = 0.0
-    assert manifest_reader.has_changed == True
+def test_create_filereader(json_file, return_type):
+    if return_type == ManifestError or return_type == VersionIncompatibilityError:
+        with pytest.raises(return_type):
+            create_filereader(json_file)
+    else:
+        manifest_reader = create_filereader(json_file)
+        assert isinstance(manifest_reader, return_type)

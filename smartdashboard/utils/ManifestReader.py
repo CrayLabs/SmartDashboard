@@ -127,15 +127,20 @@ class ManifestFileReader(ManifestReader):
         :return: Manifest
         :rtype: Manifest
         """
-        experiment = Experiment(**self._data.get("experiment", {}))
-        runs_data = self._data.get("runs", [])
+        try:
+            experiment = Experiment(**self._data.get("experiment", {}))
+            runs_data = self._data.get("runs", [])
 
-        runs = [Run(**run_data) for run_data in runs_data]
+            runs = [Run(**run_data) for run_data in runs_data]
 
-        return Manifest(
-            experiment=experiment,
-            runs=runs,
-        )
+            return Manifest(
+                experiment=experiment,
+                runs=runs,
+            )
+        except ValidationError as val:
+            raise MalformedManifestError(
+                title="Manifest file is malformed.", file=self._file_path, exception=val
+            ) from val
 
     @classmethod
     def from_file(cls, file_path: str) -> Dict[str, Any]:
@@ -162,8 +167,8 @@ class ManifestFileReader(ManifestReader):
         return data
 
 
-def load_manifest(path: str) -> t.Tuple[Manifest, ManifestFileReader]:
-    """Instantiate and call get_manifest
+def create_filereader(path: str) -> ManifestFileReader:
+    """Instantiate ManifestFileReader
 
     This is where we're checking for any errors
     that could occur when creating a manifest
@@ -171,12 +176,11 @@ def load_manifest(path: str) -> t.Tuple[Manifest, ManifestFileReader]:
 
     :param path: Path to the manifest file
     :type path: str
-    :return: Manifest, ManifestFileReader
-    :rtype: Tuple[Manifest, ManifestFileReader]
+    :return: ManifestFileReader
+    :rtype: ManifestFileReader
     """
     try:
         manifest_file_reader = ManifestFileReader(path)
-        manifest = manifest_file_reader.get_manifest()
     except FileNotFoundError as fnf:
         raise ManifestError(
             title="Manifest file does not exist.", file=path, exception=fnf
@@ -185,8 +189,4 @@ def load_manifest(path: str) -> t.Tuple[Manifest, ManifestFileReader]:
         raise ManifestError(
             title="Manifest file could not be decoded.", file=path, exception=jde
         ) from jde
-    except ValidationError as val:
-        raise MalformedManifestError(
-            title="Manifest file is malformed.", file=path, exception=val
-        ) from val
-    return manifest, manifest_file_reader
+    return manifest_file_reader

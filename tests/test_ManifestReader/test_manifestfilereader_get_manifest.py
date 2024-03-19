@@ -28,7 +28,7 @@ import pytest
 from pydantic import ValidationError
 
 from smartdashboard.utils.errors import MalformedManifestError
-from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
+from smartdashboard.utils.ManifestReader import Manifest, create_filereader
 
 
 @pytest.mark.parametrize(
@@ -39,6 +39,14 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
         ),
         pytest.param(
             "tests/utils/manifest_files/no_experiment_manifest.json",
+            0,
+            0,
+            0,
+            0,
+            MalformedManifestError,
+        ),
+        pytest.param(
+            "tests/utils/manifest_files/malformed_apps.json",
             0,
             0,
             0,
@@ -83,9 +91,9 @@ def test_get_manifest(
     json_file, runs_length, app_length, orc_length, ens_length, return_type
 ):
     try:
-        manifest_file_reader = ManifestFileReader(json_file)
+        manifest_file_reader = create_filereader(json_file)
         manifest = manifest_file_reader.get_manifest()
-    except ValidationError as v:
+    except MalformedManifestError as v:
         assert return_type == MalformedManifestError
         return
     assert len(list(manifest.runs)) == runs_length
