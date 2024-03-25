@@ -90,14 +90,16 @@ from smartdashboard.utils.ManifestReader import Manifest, create_filereader
 def test_get_manifest(
     json_file, runs_length, app_length, orc_length, ens_length, return_type
 ):
-    try:
+    if return_type == MalformedManifestError:
+        with pytest.raises(return_type):
+            manifest_file_reader = create_filereader(json_file)
+            manifest_file_reader.get_manifest()
+    
+    else:
         manifest_file_reader = create_filereader(json_file)
         manifest = manifest_file_reader.get_manifest()
-    except MalformedManifestError as v:
-        assert return_type == MalformedManifestError
-        return
-    assert len(list(manifest.runs)) == runs_length
-    assert len(list(manifest.apps_with_run_ctx)) == app_length
-    assert len(list(manifest.orcs_with_run_ctx)) == orc_length
-    assert len(list(manifest.ensemble_with_run_ctx)) == ens_length
-    assert type(manifest) == return_type
+        assert len(list(manifest.runs)) == runs_length
+        assert len(list(manifest.apps_with_run_ctx)) == app_length
+        assert len(list(manifest.orcs_with_run_ctx)) == orc_length
+        assert len(list(manifest.ensemble_with_run_ctx)) == ens_length
+        assert type(manifest) == return_type

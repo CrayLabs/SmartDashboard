@@ -61,7 +61,7 @@ def test_has_changed(json_file, touch):
     assert manifest_reader.has_changed == False
 
     if touch:
-        pathlib.Path.touch(json_file)
+        json_file.touch()
         assert manifest_reader.has_changed == True
     else:
         assert manifest_reader.has_changed == False
