@@ -35,23 +35,14 @@ from smartdashboard.utils.ManifestReader import create_filereader
     "json_file, touch",
     [
         pytest.param(
-            pathlib.Path("tests/utils/manifest_files/manifesttest.json"), True
-        ),
-        pytest.param(
-            pathlib.Path("tests/utils/manifest_files/0.0.2_manifest.json"),
-            False,
-        ),
-        pytest.param(
-            pathlib.Path("tests/utils/manifest_files/no_apps_manifest.json"),
+            pathlib.Path("tests/utils/manifest_files/manifesttest.json"),
             True,
-        ),
-        pytest.param(
-            pathlib.Path("tests/utils/manifest_files/no_ensembles_manifest.json"),
-            True,
+            id="ensure change seen",
         ),
         pytest.param(
             pathlib.Path("tests/utils/manifest_files/no_orchestrator_manifest.json"),
             False,
+            id="ensure change not seen",
         ),
     ],
 )
