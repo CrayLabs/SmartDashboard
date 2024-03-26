@@ -28,6 +28,7 @@ import io
 import itertools
 import json
 import pathlib
+import os
 import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -91,6 +92,7 @@ class ManifestFileReader(ManifestReader):
         :type file_path: str
         """
         self._file_path = file_path
+        self._last_modified = os.path.getmtime(self._file_path)
         self._data = self.from_file(self._file_path)
 
         try:
@@ -111,21 +113,35 @@ class ManifestFileReader(ManifestReader):
                 exception=version_exception,
             )
 
+    @property
+    def has_changed(self) -> bool:
+        """Check if the manifest file has been modified
+
+        :return: If the file has been modified
+        :rtype: bool
+        """
+        return self._last_modified != os.path.getmtime(self._file_path)
+
     def get_manifest(self) -> Manifest:
         """Get the Manifest from self._data
 
         :return: Manifest
         :rtype: Manifest
         """
-        experiment = Experiment(**self._data.get("experiment", {}))
-        runs_data = self._data.get("runs", [])
+        try:
+            experiment = Experiment(**self._data.get("experiment", {}))
+            runs_data = self._data.get("runs", [])
 
-        runs = [Run(**run_data) for run_data in runs_data]
+            runs = [Run(**run_data) for run_data in runs_data]
 
-        return Manifest(
-            experiment=experiment,
-            runs=runs,
-        )
+            return Manifest(
+                experiment=experiment,
+                runs=runs,
+            )
+        except ValidationError as val:
+            raise MalformedManifestError(
+                title="Manifest file is malformed.", file=self._file_path, exception=val
+            ) from val
 
     @classmethod
     def from_file(cls, file_path: str) -> Dict[str, Any]:
@@ -152,8 +168,8 @@ class ManifestFileReader(ManifestReader):
         return data
 
 
-def load_manifest(path: str) -> Manifest:
-    """Instantiate and call get_manifest
+def create_filereader(path: str) -> ManifestFileReader:
+    """Instantiate ManifestFileReader
 
     This is where we're checking for any errors
     that could occur when creating a manifest
@@ -161,12 +177,11 @@ def load_manifest(path: str) -> Manifest:
 
     :param path: Path to the manifest file
     :type path: str
-    :return: Manifest
-    :rtype: Optional[Manifest]
+    :return: ManifestFileReader
+    :rtype: ManifestFileReader
     """
     try:
         manifest_file_reader = ManifestFileReader(path)
-        manifest = manifest_file_reader.get_manifest()
     except FileNotFoundError as fnf:
         raise ManifestError(
             title="Manifest file does not exist.", file=path, exception=fnf
@@ -175,11 +190,7 @@ def load_manifest(path: str) -> Manifest:
         raise ManifestError(
             title="Manifest file could not be decoded.", file=path, exception=jde
         ) from jde
-    except ValidationError as val:
-        raise MalformedManifestError(
-            title="Manifest file is malformed.", file=path, exception=val
-        ) from val
-    return manifest
+    return manifest_file_reader
 
 
 def get_manifest_path(

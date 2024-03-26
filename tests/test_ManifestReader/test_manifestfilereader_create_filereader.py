@@ -27,15 +27,23 @@
 import pytest
 
 from smartdashboard.utils.errors import ManifestError, VersionIncompatibilityError
-from smartdashboard.utils.ManifestReader import Manifest, load_manifest
+from smartdashboard.utils.ManifestReader import ManifestFileReader, create_filereader
 
 
 @pytest.mark.parametrize(
-    "json_file, result_type",
+    "json_file, return_type",
     [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", Manifest),
-        pytest.param("tests/utils/manifest_files/0.0.2_manifest.json", Manifest),
-        pytest.param("tests/utils/manifest_files/no_apps_manifest.json", Manifest),
+        pytest.param(
+            "tests/utils/manifest_files/manifesttest.json", ManifestFileReader
+        ),
+        pytest.param(
+            "tests/utils/manifest_files/0.0.2_manifest.json",
+            ManifestFileReader,
+        ),
+        pytest.param(
+            "tests/utils/manifest_files/no_apps_manifest.json",
+            ManifestFileReader,
+        ),
         pytest.param("file_doesn't_exist.json", ManifestError),
         pytest.param("tests/utils/manifest_files/JSONDecodererror.json", ManifestError),
         pytest.param(
@@ -44,14 +52,10 @@ from smartdashboard.utils.ManifestReader import Manifest, load_manifest
         ),
     ],
 )
-def test_load_manifest(json_file, result_type):
-    try:
-        manifest = load_manifest(json_file)
-    except ManifestError:
-        assert result_type == ManifestError
-        return
-    except VersionIncompatibilityError:
-        assert result_type == VersionIncompatibilityError
-        return
-
-    assert type(manifest) == result_type
+def test_create_filereader(json_file, return_type):
+    if return_type == ManifestError or return_type == VersionIncompatibilityError:
+        with pytest.raises(return_type):
+            create_filereader(json_file)
+    else:
+        manifest_reader = create_filereader(json_file)
+        assert isinstance(manifest_reader, return_type)
