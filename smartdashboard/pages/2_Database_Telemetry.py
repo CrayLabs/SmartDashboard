@@ -37,7 +37,7 @@ from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.ManifestReader import (
     Manifest,
     get_manifest_path,
-    load_manifest,
+    create_filereader,
 )
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import db_telem_builder, error_builder
@@ -61,7 +61,8 @@ def build_telemetry_page() -> None:
             / "tests/utils/manifest_files/manifesttest.json",
         )
         try:
-            manifest = load_manifest(manifest_path)
+            manifest_reader = create_filereader(manifest_path)
+            manifest = manifest_reader.get_manifest()
             st.session_state["manifest"] = manifest
         except SSDashboardError as ex:
             error_builder(ex)
