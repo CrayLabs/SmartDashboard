@@ -32,8 +32,10 @@ import time
 import typing as t
 from subprocess import run
 
+import streamlit as st
+
 from smartdashboard.utils.errors import SSDashboardError
-from smartdashboard.utils.ManifestReader import load_manifest
+from smartdashboard.utils.ManifestReader import create_filereader
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import error_builder, overview_builder
 from smartdashboard.views import EntityView
@@ -51,7 +53,8 @@ def build_app(manifest_path: str) -> None:
     local_css(str(curr_path / "static/style.css"))
 
     try:
-        manifest = load_manifest(manifest_path)
+        manifest_reader = create_filereader(manifest_path)
+        manifest = manifest_reader.get_manifest()
     except SSDashboardError as ex:
         error_builder(ex)
     else:
@@ -64,9 +67,10 @@ def build_app(manifest_path: str) -> None:
         )
 
         while True:
+            if manifest_reader.has_changed:
+                st.rerun()
             for v in to_update:
                 v.update()
-
             time.sleep(1)
 
 
