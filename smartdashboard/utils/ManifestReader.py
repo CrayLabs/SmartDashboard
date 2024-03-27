@@ -28,6 +28,7 @@ import io
 import itertools
 import json
 import os
+import pathlib
 import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -190,3 +191,24 @@ def create_filereader(path: str) -> ManifestFileReader:
             title="Manifest file could not be decoded.", file=path, exception=jde
         ) from jde
     return manifest_file_reader
+
+
+def get_manifest_path(
+    directory: t.Optional[pathlib.Path], default: pathlib.Path
+) -> str:
+    """Get the manifest path using the directory
+    path passed in from the command line arguments.
+
+    :param directory: An experiment directory
+    :type directory: t.Optional[pathlib.Path]
+    :param default: Default path for testing
+    :type default: pathlib.Path
+    :return: Manifest path
+    :rtype: str
+    """
+
+    if directory is not None:
+        manifest_path = directory / ".smartsim/telemetry/manifest.json"
+    else:
+        manifest_path = default
+    return str(manifest_path)

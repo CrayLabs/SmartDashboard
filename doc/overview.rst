@@ -135,4 +135,9 @@ configuration and status information, as well as logs per shard for a selected o
 Finally, in the ``Ensembles`` section, select an ensemble to see its status and configuration. 
 Then select any of its members to see its status, configuration, and logs.  
   
+``Database Telemetry:`` This tab provides additional details about ``Orchestrators``.
+The ``Orchestrator Summary`` section shows configuration and status information. The ``Memory``
+section provides memory usage data per shard within the ``Orchestrator``. The ``Clients``
+section displays client data per shard within the ``Orchestrator``.
+
 ``Help:`` This tab links to SmartSim documentation and provides a SmartSim contact for support.

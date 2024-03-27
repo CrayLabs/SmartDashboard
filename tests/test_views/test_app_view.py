@@ -26,24 +26,35 @@
 
 import pytest
 
-from smartdashboard.utils.errors import (
-    MalformedManifestError,
-    ManifestError,
-    SSDashboardError,
+from smartdashboard.views import ApplicationView
+from tests.utils.test_entities import (
+    application_1,
+    application_2,
+    application_3,
+    application_4,
+    model0_err_logs,
+    model0_out_logs,
+    model1_err_logs,
+    model1_out_logs,
 )
-from smartdashboard.view_builders import error_builder
-from smartdashboard.views import ErrorView
 
 
 @pytest.mark.parametrize(
-    "error, return_type",
+    "application, status_string, out_logs, err_logs",
     [
         pytest.param(
-            MalformedManifestError("Error message", "file", Exception()), ErrorView
+            application_1, "Status: :green[Completed]", model0_out_logs, model0_err_logs
         ),
-        pytest.param(ManifestError("Error message", "file", Exception()), ErrorView),
-        pytest.param(SSDashboardError("Error message", "file", Exception()), ErrorView),
+        pytest.param(
+            application_2, "Status: :red[Failed]", model1_out_logs, model1_err_logs
+        ),
+        pytest.param(
+            application_3, "Status: :green[Running]", model0_out_logs, model0_err_logs
+        ),
     ],
 )
-def test_error_builder(error, return_type):
-    assert type(error_builder(error)) == return_type
+def test_app_view(application, status_string, out_logs, err_logs):
+    view = ApplicationView(application)
+    assert view.status == status_string
+    assert view.out_logs == out_logs
+    assert view.err_logs == err_logs
