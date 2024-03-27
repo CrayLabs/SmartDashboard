@@ -27,8 +27,8 @@
 import io
 import itertools
 import json
-import pathlib
 import os
+import pathlib
 import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -199,8 +199,8 @@ def get_manifest_path(
     """Get the manifest path using the directory
     path passed in from the command line arguments.
 
-    :param directory: Args.directory
-    :type directory: t.Optional[pathlib.Path]]
+    :param directory: An experiment directory
+    :type directory: t.Optional[pathlib.Path]
     :param default: Default path for testing
     :type default: pathlib.Path
     :return: Manifest path

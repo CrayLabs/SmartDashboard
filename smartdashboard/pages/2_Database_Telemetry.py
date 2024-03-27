@@ -36,8 +36,8 @@ from smartdashboard.utils.argparser import get_parser
 from smartdashboard.utils.errors import SSDashboardError
 from smartdashboard.utils.ManifestReader import (
     Manifest,
-    get_manifest_path,
     create_filereader,
+    get_manifest_path,
 )
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import db_telem_builder, error_builder

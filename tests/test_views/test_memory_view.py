@@ -24,12 +24,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
-import streamlit as st
-import pandas as pd
 import random
 
-from smartdashboard.views import MemoryView
+import pandas as pd
+import pytest
+import streamlit as st
+
+from smartdashboard.views import Files, MemoryView
 from tests.utils.test_entities import *
 
 
@@ -40,16 +41,18 @@ from tests.utils.test_entities import *
             orchestrator_2.shards[0],
             300,
             True,
-            ("tests/utils/memory/memory.csv", "tests/utils/memory/memory.csv"),
+            Files("tests/utils/memory/memory.csv", "tests/utils/memory/memory.csv"),
         ),
         pytest.param(
             orchestrator_2.shards[1],
             10001,
             True,
-            ("tests/utils/memory/memory_2.csv", "tests/utils/memory/memory_2.csv"),
+            Files("tests/utils/memory/memory_2.csv", "tests/utils/memory/memory_2.csv"),
         ),
-        pytest.param(telemetry_off_shard, 0, False, ("", "")),
-        pytest.param(telemetry_files_not_found, 0, False, ("worse_file", "worse_file")),
+        pytest.param(telemetry_off_shard, 0, False, Files("", "")),
+        pytest.param(
+            telemetry_files_not_found, 0, False, Files("worse_file", "worse_file")
+        ),
     ],
 )
 def test_memory_view(shard, csv_length, telem_bool, files_tuple):
@@ -105,7 +108,7 @@ def test_load_data_memory_view(shard, csv_length):
         graph_element=st.empty(),
         export_button=st.empty(),
     )
-    assert len(view._load_data()) == csv_length
+    assert len(view._load_data_update(0)) == csv_length
 
 
 @pytest.mark.parametrize(
@@ -123,6 +126,6 @@ def test_load_data_update_memory_view(shard, csv_length):
         export_button=st.empty(),
     )
     first_chunk = random.randint(1, csv_length - 1)
-    initial_df = pd.read_csv(view.files[0], nrows=first_chunk)
+    initial_df = pd.read_csv(view.files.graph_file, nrows=first_chunk)
     df_delta = view._load_data_update(skiprows=initial_df.shape[0] + 1)
     assert pd.concat((initial_df, df_delta), axis=0).shape[0] == csv_length

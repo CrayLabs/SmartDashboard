@@ -522,7 +522,7 @@ def memory_view_builder(shards: t.List[Shard]) -> MemoryView:
             st.write("")
             st.write("")
             memory_graph_element = st.empty()
-            cola, colb = st.columns([0.85, 0.15])  # pylint: disable=unused-variable
+            _, colb = st.columns([0.85, 0.15])
             with colb:
                 export_button = st.empty()
 
@@ -553,7 +553,7 @@ def client_view_builder(shards: t.List[Shard]) -> ClientView:
             st.write("")
             st.write("")
             client_graph_element = st.empty()
-            cola, colb = st.columns([0.85, 0.15])  # pylint: disable=unused-variable
+            _, colb = st.columns([0.85, 0.15])
             with colb:
                 export_button = st.empty()
 

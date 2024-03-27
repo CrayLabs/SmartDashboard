@@ -24,8 +24,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import typing as t
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 import altair as alt
 import pandas as pd
@@ -352,6 +354,25 @@ class OverviewView(ViewBase):
         self.orc_view.update()
 
 
+@dataclass(frozen=True)
+class Files:
+    graph_file: str
+    table_file: str
+
+    def is_valid(self) -> bool:
+        """Check that paths are not empty strings and exist"""
+        if any(file_path == "" for file_path in (self.graph_file, self.table_file)):
+            return False
+
+        if not all(
+            os.path.exists(file_path)
+            for file_path in (self.graph_file, self.table_file)
+        ):
+            return False
+
+        return True
+
+
 class DualView(ViewBase):
     """Base class for Telemetry Views that have table and chart elements"""
 
@@ -366,70 +387,71 @@ class DualView(ViewBase):
         self.table_element = table_element
         self.graph_element = graph_element
         self.export_button = export_button
-        self.telemetry = True
         self.window_size = 10000
-        self.files = self._get_files()
-        self.message = self._get_message()
+        self.telemetry_df = pd.DataFrame(columns=self.columns)
+        self.sampling = False
         self.chart: t.Optional[alt.Chart] = None
-        self.columns = self.get_columns()
-        self.graph_delta_df = pd.DataFrame(columns=self.columns)
 
-        if self.shard is not None:
-            if self.files[0] != "" and self.files[1] != "":
-                try:
-                    self.telemetry_df = self._load_data()
-                except FileNotFoundError:
-                    self.table_element.info(self.message)
-                    self.telemetry = False
-            else:
-                self.table_element.info(self.message)
-                self.telemetry = False
-
-        else:
-            self.telemetry = False
-
-        if self.shard is not None and self.telemetry:
+        if self.telemetry:
+            self.telemetry_df = self.set_telemetry_df()
             self.timestamp_min = self.telemetry_df["timestamp"].min()
             self.initial_load()
+            self.enable_export_button()
 
-        self.enable_export_button()
+        # info message should pop up
+        elif self.shard is not None:
+            self.table_element.info(self.message)
+
+    @property
+    def telemetry(self) -> bool:
+        """Returns True if telemetry is being collected"""
+        return self.shard is not None and self.files.is_valid()
+
+    @property
+    @abstractmethod
+    def files(self) -> Files:
+        """Returns a tuple of the files used for telemetry"""
+
+    @property
+    @abstractmethod
+    def message(self) -> str:
+        """Returns the error message if files cannot be found"""
+
+    @property
+    @abstractmethod
+    def columns(self) -> t.List[str]:
+        """Returns columns for the graph dataframe"""
 
     @abstractmethod
     def enable_export_button(self) -> None:
         """Create an export data button"""
 
     @abstractmethod
-    def _get_files(self) -> t.Tuple[str, str]:
-        """Returns a tuple of the files used for telemetry"""
-
-    @abstractmethod
-    def _get_message(self) -> str:
-        """Returns the error message if files cannot be found"""
-
-    @abstractmethod
-    def _handle_data(self) -> None:
+    def _handle_data(self, graph_delta_df: pd.DataFrame) -> None:
         """Updates the table and graph with appropriate dataframes"""
 
     @abstractmethod
     def initial_load(self) -> None:
         """Updates the table and graph with initial dataframes"""
 
-    @abstractmethod
-    def get_columns(self) -> t.List[str]:
-        """Returns columns for the graph dataframe"""
+    def set_telemetry_df(self) -> pd.DataFrame:
+        """ "Load data into telemetry_df is telemetry is enabled"""
+        try:
+            return self._load_data_update(skiprows=0)
+        except FileNotFoundError:
+            self.table_element.info(self.message)
+            return pd.DataFrame(columns=self.columns)
 
     def update(self) -> None:
         """Checks for new data and calls to update the table
         and graph if there is new data"""
-        if self.shard is not None and self.telemetry:
-            self.graph_delta_df = self._load_data_update(
-                skiprows=self.telemetry_df.shape[0]
-            )
-            if not self.graph_delta_df.empty:
+        if self.telemetry:
+            graph_delta_df = self._load_data_update(skiprows=self.telemetry_df.shape[0])
+            if not graph_delta_df.empty:
                 self.telemetry_df = pd.concat(
-                    (self.telemetry_df, self.graph_delta_df), axis=0, ignore_index=True
+                    (self.telemetry_df, graph_delta_df), axis=0, ignore_index=True
                 )
-                self._handle_data()
+                self._handle_data(graph_delta_df)
 
     def _load_data_update(self, skiprows: int) -> pd.DataFrame:
         """Load new data to append to existing dataframe
@@ -439,9 +461,11 @@ class DualView(ViewBase):
         :return: Data to be appended
         :rtype: pandas.DataFrame
         """
-        if self.shard is not None and self.telemetry:
+        if self.telemetry:
             try:
-                delta_df = pd.read_csv(self.files[0], skiprows=range(1, skiprows))
+                delta_df = pd.read_csv(
+                    self.files.graph_file, skiprows=range(1, skiprows)
+                )
                 return delta_df
             except FileNotFoundError:
                 self.table_element.info(self.message)
@@ -454,29 +478,37 @@ class DualView(ViewBase):
         :return: CSV data
         :rtype: str
         """
-        if self.shard is not None:
+        if self.telemetry:
             try:
-                return pd.read_csv(self.files[0]).to_csv()
+                return pd.read_csv(self.files.graph_file).to_csv()
             except FileNotFoundError:
                 self.table_element.info(self.message)
-                self.telemetry = False
         return ""
-
-    def _load_data(self) -> pd.DataFrame:
-        """Load initial data
-
-        :return: Initial dataframe
-        :rtype: pandas.DataFrame
-        """
-        if self.shard is not None and self.telemetry:
-            telem_df = pd.read_csv(self.files[0])
-            return telem_df
-
-        return pd.DataFrame(columns=self.columns)
 
 
 class MemoryView(DualView):
     """View class for memory section of the Database Telemetry page"""
+
+    @property
+    def files(self) -> Files:
+        """Returns a tuple of the files used for telemetry"""
+        if self.shard is not None:
+            return Files(self.shard.memory_file, self.shard.memory_file)
+
+        return Files("", "")
+
+    @property
+    def message(self) -> str:
+        """Returns the error message if files cannot be found"""
+        if self.shard is not None:
+            return f"Memory information could not be found for {self.shard.name}"
+
+        return ""
+
+    @property
+    def columns(self) -> t.List[str]:
+        """Returns columns for the graph dataframe"""
+        return ["timestamp", "used_memory", "used_memory_peak", "total_system_memory"]
 
     def enable_export_button(self) -> None:
         """Create an export data button"""
@@ -485,7 +517,7 @@ class MemoryView(DualView):
                 self.export_button.download_button(
                     label="Export Data",
                     data=self._get_data_file(),
-                    file_name=f"{self.shard.name} memory.csv",
+                    file_name=f"{self.shard.name}-memory.csv",
                     mime="text/csv",
                     key="memory",
                 )
@@ -494,44 +526,27 @@ class MemoryView(DualView):
         else:
             self.export_button.empty()
 
-    def _get_files(self) -> t.Tuple[str, str]:
-        """Returns a tuple of the files used for telemetry"""
-        if self.shard is not None:
-            return self.shard.memory_file, self.shard.memory_file
-
-        return ("", "")
-
-    def _get_message(self) -> str:
-        """Returns the error message if files cannot be found"""
-        if self.shard is not None:
-            return f"Memory information could not be found for {self.shard.name}"
-
-        return ""
-
-    def get_columns(self) -> t.List[str]:
-        """Returns columns for the graph dataframe"""
-        return ["timestamp", "used_memory", "used_memory_peak", "total_system_memory"]
-
     def initial_load(self) -> None:
         """Updates the table and graph with initial dataframes"""
         table_df = self.telemetry_df.copy(deep=True)
-        graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
-        if self.telemetry_df.copy(deep=True).shape[0] >= self.window_size:
+        table_df = self.process_dataframe(table_df)
+        graph_df: pd.DataFrame = table_df.copy(deep=True)
+        if self.telemetry_df.shape[0] >= self.window_size:
             graph_df = graph_df.sample(self.window_size)
+            self.sampling = True
+        self._update_graph(graph_df)
+        self._update_table(table_df)
 
-        self._update_graph(self.process_dataframe(graph_df))
-        self._update_table(self.process_dataframe(table_df))
-
-    def _handle_data(self) -> None:
+    def _handle_data(self, graph_delta_df: pd.DataFrame) -> None:
         """Updates the table and graph with appropriate dataframes"""
         table_df = self.telemetry_df.copy(deep=True)
         graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
         if graph_df.shape[0] >= self.window_size:
             graph_df = graph_df.sample(self.window_size)
-            self.chart = None
+            self.sampling = True
             self._update_graph(self.process_dataframe(graph_df))
         else:
-            self._update_graph(self.process_dataframe(self.graph_delta_df))
+            self._update_graph(self.process_dataframe(graph_delta_df))
         self._update_table(self.process_dataframe(table_df))
 
     def process_dataframe(self, dframe: pd.DataFrame) -> pd.DataFrame:
@@ -566,13 +581,13 @@ class MemoryView(DualView):
         :type dframe: pandas.DataFrame
         """
 
-        dframe = dframe.drop(columns=["Total System Memory (GB)"])
-        dframe_long = dframe.melt(
+        dframe = dframe.drop(columns=["Total System Memory (GB)"]).melt(
             "timestamp", var_name="Metric", value_name="Memory (GB)"
         )
-        if self.chart is None:
-            self.chart = (
-                alt.Chart(dframe_long)
+
+        if self.chart is None or self.sampling:
+            chart = (
+                alt.Chart(dframe)
                 .mark_line()
                 .encode(
                     x=alt.X(
@@ -593,11 +608,12 @@ class MemoryView(DualView):
             )
 
             self.graph_element.altair_chart(
-                self.chart, use_container_width=True, theme="streamlit"
+                chart, use_container_width=True, theme="streamlit"
             )
+            self.chart = chart
 
         else:
-            self.graph_element.add_rows(dframe_long)
+            self.graph_element.add_rows(dframe)
 
     def _update_table(self, dframe: pd.DataFrame) -> None:
         """Update memory table for selected shard
@@ -615,6 +631,27 @@ class MemoryView(DualView):
 class ClientView(DualView):
     """View class for client section of the Database Telemetry page"""
 
+    @property
+    def files(self) -> Files:
+        """Returns a tuple of the files used for telemetry"""
+        if self.shard is not None:
+            return Files(self.shard.client_count_file, self.shard.client_file)
+
+        return Files("", "")
+
+    @property
+    def message(self) -> str:
+        """Returns the error message if files cannot be found"""
+        if self.shard is not None:
+            return f"Client information could not be found for {self.shard.name}"
+
+        return ""
+
+    @property
+    def columns(self) -> t.List[str]:
+        """Returns columns for the graph dataframe"""
+        return ["timestamp", "num_clients"]
+
     def enable_export_button(self) -> None:
         """Create an export data button"""
         if self.shard is not None and self.telemetry:
@@ -622,7 +659,7 @@ class ClientView(DualView):
                 self.export_button.download_button(
                     label="Export Data",
                     data=self._get_data_file(),
-                    file_name=f"{self.shard.name} clients.csv",
+                    file_name=f"{self.shard.name}-clients.csv",
                     mime="text/csv",
                     key="clients",
                 )
@@ -631,21 +668,22 @@ class ClientView(DualView):
         else:
             self.export_button.empty()
 
-    def _get_files(self) -> t.Tuple[str, str]:
-        """Returns a tuple of the files used for telemetry"""
-        if self.shard is not None:
-            return self.shard.client_count_file, self.shard.client_file
+    def initial_load(self) -> None:
+        """Updates the table and graph with initial dataframes"""
+        if self.telemetry:
+            try:
+                table_df = pd.read_csv(self.files.table_file)
+                self._update_table(table_df)
+            except FileNotFoundError:
+                self.table_element.info(self.message)
+            graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
+            if graph_df.shape[0] >= self.window_size:
+                graph_df = graph_df.sample(self.window_size)
+                self.sampling = True
 
-        return ("", "")
+            self._update_graph(graph_df)
 
-    def _get_message(self) -> str:
-        """Returns the error message if files cannot be found"""
-        if self.shard is not None:
-            return f"Client information could not be found for {self.shard.name}"
-
-        return ""
-
-    def _handle_data(self) -> None:
+    def _handle_data(self, graph_delta_df: pd.DataFrame) -> None:
         """Updates the table and graph with appropriate dataframes"""
         if self.shard is not None:
             try:
@@ -656,28 +694,10 @@ class ClientView(DualView):
             graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
             if graph_df.shape[0] >= self.window_size:
                 graph_df = graph_df.sample(self.window_size)
-                self.chart = None
+                self.sampling = True
                 self._update_graph(graph_df)
             else:
-                self._update_graph(self.graph_delta_df)
-
-    def get_columns(self) -> t.List[str]:
-        """Returns columns for the graph dataframe"""
-        return ["timestamp", "num_clients"]
-
-    def initial_load(self) -> None:
-        """Updates the table and graph with initial dataframes"""
-        if self.shard is not None:
-            try:
-                table_df = pd.read_csv(self.shard.client_file)
-                self._update_table(table_df)
-            except FileNotFoundError:
-                self.table_element.info(self.message)
-            graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
-            if graph_df.shape[0] >= self.window_size:
-                graph_df = graph_df.sample(self.window_size)
-
-            self._update_graph(graph_df)
+                self._update_graph(graph_delta_df)
 
     def _update_table(self, dframe: pd.DataFrame) -> None:
         """Update client table for selected shard
@@ -713,8 +733,8 @@ class ClientView(DualView):
             dframe["timestamp"] = dframe["timestamp"] - self.timestamp_min
             return dframe
 
-        if self.chart is None:
-            self.chart = (
+        if self.chart is None or self.sampling:
+            chart = (
                 alt.Chart(process_dataframe(dframe))
                 .mark_line()
                 .encode(
@@ -729,7 +749,8 @@ class ClientView(DualView):
                 )
             )
 
-            self.graph_element.altair_chart(self.chart, use_container_width=True)
+            self.graph_element.altair_chart(chart, use_container_width=True)
+            self.chart = chart
 
         else:
             self.graph_element.add_rows(process_dataframe(dframe))
