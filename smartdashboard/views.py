@@ -571,7 +571,7 @@ class MemoryView(DualView):
                 "total_system_memory": "Total System Memory (GB)",
             }
         )
-        dframe["timestamp"] = dframe["timestamp"] - self.timestamp_min
+        dframe["timestamp"] = (dframe["timestamp"] - self.timestamp_min) / 1000
         return dframe
 
     def _update_graph(self, dframe: pd.DataFrame) -> None:
@@ -730,7 +730,7 @@ class ClientView(DualView):
         """
 
         def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
-            dframe["timestamp"] = dframe["timestamp"] - self.timestamp_min
+            dframe["timestamp"] = (dframe["timestamp"] - self.timestamp_min) / 1000
             return dframe
 
         if self.chart is None or self.sampling:
