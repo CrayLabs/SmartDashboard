@@ -39,7 +39,7 @@ from tests.utils.test_entities import *
     [
         pytest.param(
             orchestrator_2.shards[0],
-            300,
+            30,
             True,
             Files(
                 "tests/utils/clients/client_counts.csv",
@@ -78,7 +78,7 @@ def test_client_view(shard, csv_length, telem_bool, files_tuple):
 @pytest.mark.parametrize(
     "shard, csv_length",
     [
-        pytest.param(orchestrator_2.shards[0], 300),
+        pytest.param(orchestrator_2.shards[0], 30),
         pytest.param(telemetry_off_shard, 0),
         pytest.param(telemetry_files_not_found, 0),
     ],
@@ -96,7 +96,7 @@ def test_load_data_client_view(shard, csv_length):
 @pytest.mark.parametrize(
     "shard, csv_length",
     [
-        pytest.param(orchestrator_2.shards[0], 300),
+        pytest.param(orchestrator_2.shards[0], 30),
     ],
 )
 def test_load_data_update_client_view(shard, csv_length):

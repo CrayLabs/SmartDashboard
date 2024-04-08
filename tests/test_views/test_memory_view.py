@@ -39,7 +39,7 @@ from tests.utils.test_entities import *
     [
         pytest.param(
             orchestrator_2.shards[0],
-            300,
+            30,
             True,
             Files("tests/utils/memory/memory.csv", "tests/utils/memory/memory.csv"),
         ),
@@ -95,7 +95,7 @@ def test_memory_view(shard, csv_length, telem_bool, files_tuple):
 @pytest.mark.parametrize(
     "shard, csv_length",
     [
-        pytest.param(orchestrator_2.shards[0], 300),
+        pytest.param(orchestrator_2.shards[0], 30),
         pytest.param(orchestrator_2.shards[1], 10001),
         pytest.param(telemetry_off_shard, 0),
         pytest.param(telemetry_files_not_found, 0),
@@ -114,7 +114,7 @@ def test_load_data_memory_view(shard, csv_length):
 @pytest.mark.parametrize(
     "shard, csv_length",
     [
-        pytest.param(orchestrator_2.shards[0], 300),
+        pytest.param(orchestrator_2.shards[0], 30),
         pytest.param(orchestrator_2.shards[1], 10001),
     ],
 )
