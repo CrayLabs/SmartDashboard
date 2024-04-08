@@ -1,6 +1,17 @@
 Changelog
 =========
 
+Development branch
+------------------
+
+Description
+
+- Add Github Actions workflow that checks if changelog is edited
+  on pull requests into develop. (SmartSim-PR480_)
+
+.. _SmartDashboard-PR31: https://github.com/CrayLabs/SmartRedis/pull/480
+
+
 0.0.3
 -----
 
