@@ -55,11 +55,7 @@ def build_telemetry_page() -> None:
     if "manifest" not in st.session_state:
         args = get_parser().parse_args(sys.argv[1:])
         directory = pathlib.Path(args.directory) if args.directory is not None else None
-        manifest_path = get_manifest_path(
-            directory,
-            pathlib.Path(__file__).parent.parent.parent
-            / "tests/utils/manifest_files/manifesttest.json",
-        )
+        manifest_path = get_manifest_path(directory)
         try:
             manifest_reader = create_filereader(manifest_path)
             manifest = manifest_reader.get_manifest()

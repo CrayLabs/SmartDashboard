@@ -364,16 +364,13 @@ class Files:
         if any(file_path == "" for file_path in (self.graph_file, self.table_file)):
             return False
 
-        if not all(
+        return all(
             os.path.exists(file_path)
             for file_path in (self.graph_file, self.table_file)
-        ):
-            return False
-
-        return True
+        )
 
 
-class DualView(ViewBase):
+class DatabaseDataView(ViewBase):
     """Base class for Telemetry Views that have table and chart elements"""
 
     def __init__(
@@ -389,13 +386,14 @@ class DualView(ViewBase):
         self.export_button = export_button
         self.window_size = 10000
         self.telemetry_df = pd.DataFrame(columns=self.columns)
+        self.timestamp_min = 0
         self.sampling = False
         self.chart: t.Optional[alt.Chart] = None
 
         if self.telemetry:
-            self.telemetry_df = self.set_telemetry_df()
+            self.telemetry_df = self._load_data_update(skiprows=0)
             self.timestamp_min = self.telemetry_df["timestamp"].min()
-            self.initial_load()
+            self._handle_data(graph_delta_df=self.telemetry_df)
             self.enable_export_button()
 
         # info message should pop up
@@ -429,18 +427,6 @@ class DualView(ViewBase):
     @abstractmethod
     def _handle_data(self, graph_delta_df: pd.DataFrame) -> None:
         """Updates the table and graph with appropriate dataframes"""
-
-    @abstractmethod
-    def initial_load(self) -> None:
-        """Updates the table and graph with initial dataframes"""
-
-    def set_telemetry_df(self) -> pd.DataFrame:
-        """ "Load data into telemetry_df is telemetry is enabled"""
-        try:
-            return self._load_data_update(skiprows=0)
-        except FileNotFoundError:
-            self.table_element.info(self.message)
-            return pd.DataFrame(columns=self.columns)
 
     def update(self) -> None:
         """Checks for new data and calls to update the table
@@ -483,10 +469,11 @@ class DualView(ViewBase):
                 return pd.read_csv(self.files.graph_file).to_csv()
             except FileNotFoundError:
                 self.table_element.info(self.message)
+                self.export_button.empty()
         return ""
 
 
-class MemoryView(DualView):
+class MemoryView(DatabaseDataView):
     """View class for memory section of the Database Telemetry page"""
 
     @property
@@ -513,29 +500,15 @@ class MemoryView(DualView):
     def enable_export_button(self) -> None:
         """Create an export data button"""
         if self.shard is not None and self.telemetry:
-            try:
-                self.export_button.download_button(
-                    label="Export Data",
-                    data=self._get_data_file(),
-                    file_name=f"{self.shard.name}-memory.csv",
-                    mime="text/csv",
-                    key="memory",
-                )
-            except FileNotFoundError:
-                self.export_button.empty()
+            self.export_button.download_button(
+                label="Export Data",
+                data=self._get_data_file(),
+                file_name=f"{self.shard.name}-memory.csv",
+                mime="text/csv",
+                key="memory",
+            )
         else:
             self.export_button.empty()
-
-    def initial_load(self) -> None:
-        """Updates the table and graph with initial dataframes"""
-        table_df = self.telemetry_df.copy(deep=True)
-        table_df = self.process_dataframe(table_df)
-        graph_df: pd.DataFrame = table_df.copy(deep=True)
-        if self.telemetry_df.shape[0] >= self.window_size:
-            graph_df = graph_df.sample(self.window_size)
-            self.sampling = True
-        self._update_graph(graph_df)
-        self._update_table(table_df)
 
     def _handle_data(self, graph_delta_df: pd.DataFrame) -> None:
         """Updates the table and graph with appropriate dataframes"""
@@ -628,7 +601,7 @@ class MemoryView(DualView):
         )
 
 
-class ClientView(DualView):
+class ClientView(DatabaseDataView):
     """View class for client section of the Database Telemetry page"""
 
     @property
@@ -655,49 +628,30 @@ class ClientView(DualView):
     def enable_export_button(self) -> None:
         """Create an export data button"""
         if self.shard is not None and self.telemetry:
-            try:
-                self.export_button.download_button(
-                    label="Export Data",
-                    data=self._get_data_file(),
-                    file_name=f"{self.shard.name}-clients.csv",
-                    mime="text/csv",
-                    key="clients",
-                )
-            except FileNotFoundError:
-                self.export_button.empty()
+            self.export_button.download_button(
+                label="Export Data",
+                data=self._get_data_file(),
+                file_name=f"{self.shard.name}-clients.csv",
+                mime="text/csv",
+                key="clients",
+            )
         else:
             self.export_button.empty()
 
-    def initial_load(self) -> None:
-        """Updates the table and graph with initial dataframes"""
-        if self.telemetry:
-            try:
-                table_df = pd.read_csv(self.files.table_file)
-                self._update_table(table_df)
-            except FileNotFoundError:
-                self.table_element.info(self.message)
-            graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
-            if graph_df.shape[0] >= self.window_size:
-                graph_df = graph_df.sample(self.window_size)
-                self.sampling = True
-
-            self._update_graph(graph_df)
-
     def _handle_data(self, graph_delta_df: pd.DataFrame) -> None:
         """Updates the table and graph with appropriate dataframes"""
-        if self.shard is not None:
-            try:
-                table_df = pd.read_csv(self.shard.client_file)
-                self._update_table(table_df)
-            except FileNotFoundError:
-                self.table_element.info(self.message)
-            graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
-            if graph_df.shape[0] >= self.window_size:
-                graph_df = graph_df.sample(self.window_size)
-                self.sampling = True
-                self._update_graph(graph_df)
-            else:
-                self._update_graph(graph_delta_df)
+        try:
+            table_df = pd.read_csv(self.files.table_file)
+            self._update_table(table_df)
+        except FileNotFoundError:
+            self.table_element.info(self.message)
+        graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
+        if graph_df.shape[0] >= self.window_size:
+            graph_df = graph_df.sample(self.window_size)
+            self.sampling = True
+            self._update_graph(graph_df)
+        else:
+            self._update_graph(graph_delta_df)
 
     def _update_table(self, dframe: pd.DataFrame) -> None:
         """Update client table for selected shard
@@ -705,22 +659,17 @@ class ClientView(DualView):
         :param dframe: DataFrame with client data
         :type dframe: pandas.DataFrame
         """
-
-        def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
-            dframe = dframe.loc[dframe["timestamp"] == dframe["timestamp"].max()]
-            dframe = dframe.drop(columns=["timestamp"])
-            dframe = dframe.sort_values(by="client_id")
-            dframe = dframe.rename(
-                columns={
-                    "client_id": "Client ID",
-                    "address": "Address",
-                }
-            )
-            return dframe
-
-        self.table_element.dataframe(
-            process_dataframe(dframe), use_container_width=True, hide_index=True
+        dframe = dframe.loc[dframe["timestamp"] == dframe["timestamp"].max()]
+        dframe = dframe.drop(columns=["timestamp"])
+        dframe = dframe.sort_values(by="client_id")
+        dframe = dframe.rename(
+            columns={
+                "client_id": "Client ID",
+                "address": "Address",
+            }
         )
+
+        self.table_element.dataframe(dframe, use_container_width=True, hide_index=True)
 
     def _update_graph(self, dframe: pd.DataFrame) -> None:
         """Update client graph for selected shard
@@ -729,13 +678,11 @@ class ClientView(DualView):
         :type dframe: pandas.DataFrame
         """
 
-        def process_dataframe(dframe: pd.DataFrame) -> pd.DataFrame:
-            dframe["timestamp"] = (dframe["timestamp"] - self.timestamp_min) / 1000
-            return dframe
+        dframe["timestamp"] = (dframe["timestamp"] - self.timestamp_min) / 1000
 
         if self.chart is None or self.sampling:
             chart = (
-                alt.Chart(process_dataframe(dframe))
+                alt.Chart(dframe)
                 .mark_line()
                 .encode(
                     x=alt.X("timestamp:Q", axis=alt.Axis(title="Timestep in seconds")),
@@ -753,7 +700,7 @@ class ClientView(DualView):
             self.chart = chart
 
         else:
-            self.graph_element.add_rows(process_dataframe(dframe))
+            self.graph_element.add_rows(dframe)
 
 
 class OrchestratorSummaryView(ViewBase):
@@ -782,7 +729,7 @@ class OrchestratorSummaryView(ViewBase):
         self.status_element.write(self.status)
 
 
-class TelemetryView(ViewBase):
+class DatabaseTelemetryView(ViewBase):
     """View class for the collection of Database Telemetry views"""
 
     def __init__(

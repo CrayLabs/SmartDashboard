@@ -47,6 +47,7 @@ from smartdashboard.utils.ManifestReader import Manifest
 from smartdashboard.views import (
     ApplicationView,
     ClientView,
+    DatabaseTelemetryView,
     EnsembleView,
     ErrorView,
     ExperimentView,
@@ -54,7 +55,6 @@ from smartdashboard.views import (
     OrchestratorSummaryView,
     OrchestratorView,
     OverviewView,
-    TelemetryView,
 )
 
 
@@ -68,10 +68,12 @@ def error_builder(error: SSDashboardError) -> ErrorView:
     """
     view = ErrorView()
     st.header(str(error))
+    # fmt: off
     st.error(
         f"""Error found in file: {error.file}  
              Error Message: {error.exception}"""
     )
+    # fmt: on
 
     with st.expander(label="Traceback"):
         st.code(traceback.format_exc(), language="log")
@@ -118,14 +120,14 @@ def app_builder(manifest: Manifest) -> ApplicationView:
     st.subheader("Application Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_application_tuple = st.selectbox(
+        selected_application_context = st.selectbox(
             "Select an application:",
             manifest.apps_with_run_ctx,
-            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
+            format_func=lambda context: f"{context.entity.name}: Run {context.run_id}",
         )
 
-    if selected_application_tuple is not None:
-        _, selected_application = selected_application_tuple
+    if selected_application_context is not None:
+        selected_application = selected_application_context.entity
     else:
         selected_application = None
 
@@ -226,14 +228,14 @@ def orc_builder(manifest: Manifest) -> OrchestratorView:
     st.subheader("Orchestrator Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_orchestrator_tuple = st.selectbox(
+        selected_orchestrator_context = st.selectbox(
             "Select an orchestrator:",
             manifest.orcs_with_run_ctx,
-            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
+            format_func=lambda context: f"{context.entity.name}: Run {context.run_id}",
         )
 
-    if selected_orchestrator_tuple is not None:
-        _, selected_orchestrator = selected_orchestrator_tuple
+    if selected_orchestrator_context is not None:
+        selected_orchestrator = selected_orchestrator_context.entity
     else:
         selected_orchestrator = None
 
@@ -287,14 +289,14 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     st.subheader("Ensemble Configuration")
     col1, col2 = st.columns([4, 4])
     with col1:
-        selected_ensemble_tuple = st.selectbox(
+        selected_ensemble_context = st.selectbox(
             "Select an ensemble:",
             manifest.ensemble_with_run_ctx,
-            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
+            format_func=lambda context: f"{context.entity.name}: Run {context.run_id}",
         )
 
-    if selected_ensemble_tuple is not None:
-        _, selected_ensemble = selected_ensemble_tuple
+    if selected_ensemble_context is not None:
+        selected_ensemble = selected_ensemble_context.entity
     else:
         selected_ensemble = None
 
@@ -447,7 +449,7 @@ def overview_builder(manifest: Manifest) -> OverviewView:
     return OverviewView(exp_view, app_view, orc_view, ens_view)
 
 
-def db_telem_builder(manifest: Manifest) -> TelemetryView:
+def db_telem_builder(manifest: Manifest) -> DatabaseTelemetryView:
     """Database Telemetry page to be rendered
 
     This function organizes the views within
@@ -464,16 +466,17 @@ def db_telem_builder(manifest: Manifest) -> TelemetryView:
 
     col1, _ = st.columns([6, 6])
     with col1:
-        selected_orchestrator_tuple = st.selectbox(
+        selected_orchestrator_context = st.selectbox(
             "Select an orchestrator:",
             manifest.orcs_with_run_ctx,
-            format_func=lambda tup: f"{tup[1].name}: Run {tup[0]}",
+            format_func=lambda context: f"{context.entity.name}: Run {context.run_id}",
         )
 
     st.write("")
 
-    if selected_orchestrator_tuple is not None:
-        run_id, selected_orchestrator = selected_orchestrator_tuple
+    if selected_orchestrator_context is not None:
+        run_id = selected_orchestrator_context.run_id
+        selected_orchestrator = selected_orchestrator_context.entity
         shards = selected_orchestrator.shards
         st.subheader(f"{selected_orchestrator.name}: Run {run_id} Telemetry")
     else:
@@ -495,7 +498,7 @@ def db_telem_builder(manifest: Manifest) -> TelemetryView:
     client_view = client_view_builder(shards)
     st.write("")
 
-    return TelemetryView(orc_summary_view, memory_view, client_view)
+    return DatabaseTelemetryView(orc_summary_view, memory_view, client_view)
 
 
 def memory_view_builder(shards: t.List[Shard]) -> MemoryView:

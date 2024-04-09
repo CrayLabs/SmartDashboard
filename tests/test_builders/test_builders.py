@@ -47,12 +47,12 @@ from tests.utils.test_entities import *
         pytest.param(
             db_telem_builder,
             "tests/utils/manifest_files/manifesttest.json",
-            TelemetryView,
+            DatabaseTelemetryView,
         ),
         pytest.param(
             db_telem_builder,
             "tests/utils/manifest_files/no_orchestrator_manifest.json",
-            TelemetryView,
+            DatabaseTelemetryView,
         ),
         pytest.param(
             ens_builder, "tests/utils/manifest_files/manifesttest.json", EnsembleView
@@ -117,8 +117,8 @@ def test_db_content_builder(function, json_file, return_type):
     manifest_file_reader = ManifestFileReader(json_file)
     manifest = manifest_file_reader.get_manifest()
     orcs = manifest.orcs_with_run_ctx
-    for run_id, orc in orcs:
-        assert type(function(orc.shards)) == return_type
+    for orc in orcs:
+        assert type(function(orc.entity.shards)) == return_type
 
 
 @pytest.mark.parametrize(

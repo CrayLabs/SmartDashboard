@@ -39,11 +39,11 @@ from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import error_builder, overview_builder
 
 
-def build_app(manifest_path: str) -> None:
+def build_app(manifest_path: pathlib.Path) -> None:
     """Build the application components with streamlit
 
     :param manifest_path: Path to build Manifest with
-    :type manifest_path: str
+    :type manifest_path: pathlib.Path
     """
     set_streamlit_page_config()
 
@@ -117,9 +117,5 @@ if __name__ == "__main__":
     directory = (
         pathlib.Path(cli_args.directory) if cli_args.directory is not None else None
     )
-    PATH = get_manifest_path(
-        directory,
-        pathlib.Path(__file__).parent.parent
-        / "tests/utils/manifest_files/manifesttest.json",
-    )
+    PATH = get_manifest_path(directory)
     build_app(PATH)
