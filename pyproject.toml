@@ -33,7 +33,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "smartdashboard"
 version = "0.0.3"
-requires-python = ">=3.8,<3.11"
+requires-python = ">=3.9,<3.11"
 authors = [
   {name = "CrayLabs: a Hewlett Packard Enterprise OSS Organization", email = "craylabs@hpe.com"},
 ]
@@ -41,7 +41,6 @@ description = "Visualize SmartSim Experiments"
 license = { text = "BSD 2-Clause License" }
 keywords = ["scientific", "ai", "workflow", "hpc", "analysis"]
 classifiers = [
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "License :: OSI Approved :: BSD License",
@@ -104,7 +103,7 @@ tests = ["tests"]
 
 [tool.black]
 line-length = 88
-target-version = ['py38', 'py39', 'py310']
+target-version = ['py39', 'py310']
 exclude = '''
 (
   | \.egg
