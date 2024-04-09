@@ -9,7 +9,7 @@ Description
 - Add Github Actions workflow that checks if changelog is edited
   on pull requests into develop. (SmartDashboard-PR47_)
 
-.. _SmartDashboard-PR47: https://github.com/CrayLabs/SmartRedis/pull/480
+.. _SmartDashboard-PR47: https://github.com/CrayLabs/SmartDashboard/pull/47
 
 
 0.0.3
