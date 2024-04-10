@@ -24,28 +24,26 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import argparse
 import os
 import pathlib
 import sys
 import time
-import typing as t
 from subprocess import run
 
 import streamlit as st
 
+from smartdashboard.utils.argparser import get_parser
 from smartdashboard.utils.errors import SSDashboardError
-from smartdashboard.utils.ManifestReader import create_filereader
+from smartdashboard.utils.ManifestReader import create_filereader, get_manifest_path
 from smartdashboard.utils.pageSetup import local_css, set_streamlit_page_config
 from smartdashboard.view_builders import error_builder, overview_builder
-from smartdashboard.views import EntityView
 
 
-def build_app(manifest_path: str) -> None:
+def build_app(manifest_path: pathlib.Path) -> None:
     """Build the application components with streamlit
 
     :param manifest_path: Path to build Manifest with
-    :type manifest_path: str
+    :type manifest_path: pathlib.Path
     """
     set_streamlit_page_config()
 
@@ -55,47 +53,17 @@ def build_app(manifest_path: str) -> None:
     try:
         manifest_reader = create_filereader(manifest_path)
         manifest = manifest_reader.get_manifest()
+        st.session_state["manifest"] = manifest
     except SSDashboardError as ex:
         error_builder(ex)
     else:
         views = overview_builder(manifest)
-        to_update: t.Iterable[EntityView[t.Any]] = (
-            views.exp_view,
-            views.app_view,
-            views.orc_view,
-            views.ens_view,
-        )
 
         while True:
             if manifest_reader.has_changed:
                 st.rerun()
-            for v in to_update:
-                v.update()
+            views.update()
             time.sleep(1)
-
-
-def get_parser() -> argparse.ArgumentParser:
-    """Build an argument parser to handle the expected CLI arguments
-
-    :return: Argument parser that handles CLI arguments
-    :rtype: argparse.ArgumentParser
-    """
-    parser = argparse.ArgumentParser("smart-dash", prefix_chars="-")
-    parser.add_argument(
-        "-d",
-        "--directory",
-        help="The path to an experiment to load. Default to current directory",
-        type=str,
-        default=None,
-    )
-    parser.add_argument(
-        "-p",
-        "--port",
-        help="The port to expose the dashboard on",
-        type=int,
-        default=8501,
-    )
-    return parser
 
 
 def run_dash_app(exp_path: str, app_port: int) -> None:
@@ -141,27 +109,13 @@ def cli() -> None:
     run_dash_app(str(exp_path), app_port)
 
 
-def execute(args: t.List[str]) -> None:
-    """Build the dashboard application
-
-    :param args: Passed in arguments
-    :type args: List[str]
-    """
-    arg_parser = get_parser()
-    parsed_args: argparse.Namespace = arg_parser.parse_args(args)
-
-    # default behavior will load a demo manifest from the test samples
-    exp_path = pathlib.Path(__file__).parent.parent
-    manifest_path = exp_path / "tests/utils/manifest_files/manifesttest.json"
-    if parsed_args.directory is not None:
-        exp_path = pathlib.Path(parsed_args.directory)
-        manifest_path = exp_path / ".smartsim/telemetry/manifest.json"
-
-    build_app(str(manifest_path))
-
-
 if __name__ == "__main__":
     # sample direct execution:
     # streamlit run ./smartdashboard/Experiment_Overview.py --
     #       -d <repo_path>/tests/utils/manifest_files/fauxexp
-    execute(sys.argv[1:])
+    cli_args = get_parser().parse_args(sys.argv[1:])
+    directory = (
+        pathlib.Path(cli_args.directory) if cli_args.directory is not None else None
+    )
+    PATH = get_manifest_path(directory)
+    build_app(PATH)
