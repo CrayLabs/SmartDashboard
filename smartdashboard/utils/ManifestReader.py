@@ -208,5 +208,5 @@ def get_manifest_path(directory: t.Optional[pathlib.Path]) -> pathlib.Path:
     if directory is not None:
         manifest_path = directory / ".smartsim/telemetry/manifest.json"
     else:
-        manifest_path = pathlib.Path()
-    return manifest_path
+        manifest_path = pathlib.Path() / ".smartsim/telemetry/manifest.json"
+    return manifest_path.resolve()
