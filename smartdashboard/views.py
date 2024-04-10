@@ -24,9 +24,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import typing as t
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
+import altair as alt
+import pandas as pd
 from streamlit.delta_generator import DeltaGenerator
 
 from smartdashboard.schemas.application import Application
@@ -316,8 +320,8 @@ class ErrorView(ViewBase):
     def update(self) -> None: ...
 
 
-class OverviewView:
-    """View class for the collection of views"""
+class OverviewView(ViewBase):
+    """View class for the collection of Experiment Overview views"""
 
     def __init__(
         self,
@@ -341,3 +345,414 @@ class OverviewView:
         self.app_view = app_view
         self.ens_view = ens_view
         self.orc_view = orc_view
+
+    def update(self) -> None:
+        """Update all views within the OverviewView"""
+        self.exp_view.update()
+        self.app_view.update()
+        self.ens_view.update()
+        self.orc_view.update()
+
+
+@dataclass(frozen=True)
+class Files:
+    graph_file: str
+    table_file: str
+
+    def is_valid(self) -> bool:
+        """Check that paths are not empty strings and exist"""
+        if any(file_path == "" for file_path in (self.graph_file, self.table_file)):
+            return False
+
+        return all(
+            os.path.exists(file_path)
+            for file_path in (self.graph_file, self.table_file)
+        )
+
+
+class DatabaseDataView(ViewBase):
+    """Base class for Telemetry Views that have table and chart elements"""
+
+    def __init__(
+        self,
+        shard: t.Optional[Shard],
+        table_element: DeltaGenerator,
+        graph_element: DeltaGenerator,
+        export_button: DeltaGenerator,
+    ):
+        self.shard = shard
+        self.table_element = table_element
+        self.graph_element = graph_element
+        self.export_button = export_button
+        self.window_size = 10000
+        self.telemetry_df = pd.DataFrame(columns=self.columns)
+        self.timestamp_min = 0
+        self.sampling = False
+        self.chart: t.Optional[alt.Chart] = None
+
+        if self.telemetry:
+            self.telemetry_df = self._load_data_update(skiprows=0)
+            self.timestamp_min = self.telemetry_df["timestamp"].min()
+            self._handle_data(graph_delta_df=self.telemetry_df)
+            self.enable_export_button()
+
+        # info message should pop up
+        elif self.shard is not None:
+            self.table_element.info(self.message)
+
+    @property
+    def telemetry(self) -> bool:
+        """Returns True if telemetry is being collected"""
+        return self.shard is not None and self.files.is_valid()
+
+    @property
+    @abstractmethod
+    def files(self) -> Files:
+        """Returns a tuple of the files used for telemetry"""
+
+    @property
+    @abstractmethod
+    def message(self) -> str:
+        """Returns the error message if files cannot be found"""
+
+    @property
+    @abstractmethod
+    def columns(self) -> t.List[str]:
+        """Returns columns for the graph dataframe"""
+
+    @abstractmethod
+    def enable_export_button(self) -> None:
+        """Create an export data button"""
+
+    @abstractmethod
+    def _handle_data(self, graph_delta_df: pd.DataFrame) -> None:
+        """Updates the table and graph with appropriate dataframes"""
+
+    def update(self) -> None:
+        """Checks for new data and calls to update the table
+        and graph if there is new data"""
+        if self.telemetry:
+            graph_delta_df = self._load_data_update(skiprows=self.telemetry_df.shape[0])
+            if not graph_delta_df.empty:
+                self.telemetry_df = pd.concat(
+                    (self.telemetry_df, graph_delta_df), axis=0, ignore_index=True
+                )
+                self._handle_data(graph_delta_df)
+
+    def _load_data_update(self, skiprows: int) -> pd.DataFrame:
+        """Load new data to append to existing dataframe
+
+        :param skiprows: Number of rows to skip in the CSV
+        :type skiprows: int
+        :return: Data to be appended
+        :rtype: pandas.DataFrame
+        """
+        if self.telemetry:
+            try:
+                delta_df = pd.read_csv(
+                    self.files.graph_file, skiprows=range(1, skiprows)
+                )
+                return delta_df
+            except FileNotFoundError:
+                self.table_element.info(self.message)
+                return pd.DataFrame()
+        return pd.DataFrame(columns=self.columns)
+
+    def _get_data_file(self) -> str:
+        """On click event to return csv data for the export button
+
+        :return: CSV data
+        :rtype: str
+        """
+        if self.telemetry:
+            try:
+                return pd.read_csv(self.files.graph_file).to_csv()
+            except FileNotFoundError:
+                self.table_element.info(self.message)
+                self.export_button.empty()
+        return ""
+
+
+class MemoryView(DatabaseDataView):
+    """View class for memory section of the Database Telemetry page"""
+
+    @property
+    def files(self) -> Files:
+        """Returns a tuple of the files used for telemetry"""
+        if self.shard is not None:
+            return Files(self.shard.memory_file, self.shard.memory_file)
+
+        return Files("", "")
+
+    @property
+    def message(self) -> str:
+        """Returns the error message if files cannot be found"""
+        if self.shard is not None:
+            return f"Memory information could not be found for {self.shard.name}"
+
+        return ""
+
+    @property
+    def columns(self) -> t.List[str]:
+        """Returns columns for the graph dataframe"""
+        return ["timestamp", "used_memory", "used_memory_peak", "total_system_memory"]
+
+    def enable_export_button(self) -> None:
+        """Create an export data button"""
+        if self.shard is not None and self.telemetry:
+            self.export_button.download_button(
+                label="Export Data",
+                data=self._get_data_file(),
+                file_name=f"{self.shard.name}-memory.csv",
+                mime="text/csv",
+                key="memory",
+            )
+        else:
+            self.export_button.empty()
+
+    def _handle_data(self, graph_delta_df: pd.DataFrame) -> None:
+        """Updates the table and graph with appropriate dataframes"""
+        table_df = self.telemetry_df.copy(deep=True)
+        graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
+        if graph_df.shape[0] >= self.window_size:
+            graph_df = graph_df.sample(self.window_size)
+            self.sampling = True
+            self._update_graph(self.process_dataframe(graph_df))
+        else:
+            self._update_graph(self.process_dataframe(graph_delta_df))
+        self._update_table(self.process_dataframe(table_df))
+
+    def process_dataframe(self, dframe: pd.DataFrame) -> pd.DataFrame:
+        """Processes the dataframe by changing the headers,
+        converting to GB, and adjusting the timestamp
+
+        :param dframe: Dataframe to be processed
+        :type dframe: pandas.DataFrame
+        :return: Processed dataframe
+        :rtype: pandas.DataFrame
+        """
+        gb_columns = [
+            "used_memory",
+            "used_memory_peak",
+            "total_system_memory",
+        ]
+        dframe[gb_columns] /= 1024**3
+        dframe = dframe.rename(
+            columns={
+                "used_memory": "Used Memory (GB)",
+                "used_memory_peak": "Used Memory Peak (GB)",
+                "total_system_memory": "Total System Memory (GB)",
+            }
+        )
+        dframe["timestamp"] = (dframe["timestamp"] - self.timestamp_min) / 1000
+        return dframe
+
+    def _update_graph(self, dframe: pd.DataFrame) -> None:
+        """Update memory graph for selected shard
+
+        :param dframe: DataFrame with memory data
+        :type dframe: pandas.DataFrame
+        """
+
+        dframe = dframe.drop(columns=["Total System Memory (GB)"]).melt(
+            "timestamp", var_name="Metric", value_name="Memory (GB)"
+        )
+
+        if self.chart is None or self.sampling:
+            chart = (
+                alt.Chart(dframe)
+                .mark_line()
+                .encode(
+                    x=alt.X(
+                        "timestamp:Q",
+                        axis=alt.Axis(title="Timestep in seconds", labelAngle=0),
+                    ),
+                    y=alt.Y("Memory (GB):Q", axis=alt.Axis(title="Memory in GB")),
+                    color=alt.Color(  # type: ignore[no-untyped-call]
+                        "Metric:N", scale=alt.Scale(scheme="category10"), title="Legend"
+                    ),
+                    tooltip=["timestamp:Q", "Metric:N", "Memory (GB):Q"],
+                )
+                .interactive()
+                .properties(
+                    height=500, title=alt.TitleParams("Memory Usage", anchor="middle")
+                )
+                .configure_legend(orient="bottom")
+            )
+
+            self.graph_element.altair_chart(
+                chart, use_container_width=True, theme="streamlit"
+            )
+            self.chart = chart
+
+        else:
+            self.graph_element.add_rows(dframe)
+
+    def _update_table(self, dframe: pd.DataFrame) -> None:
+        """Update memory table for selected shard
+
+        :param dframe: DataFrame with memory data
+        :type dframe: pandas.DataFrame
+        """
+
+        dframe = dframe.drop(columns=["timestamp"])
+        self.table_element.dataframe(
+            dframe.tail(1), use_container_width=True, hide_index=True
+        )
+
+
+class ClientView(DatabaseDataView):
+    """View class for client section of the Database Telemetry page"""
+
+    @property
+    def files(self) -> Files:
+        """Returns a tuple of the files used for telemetry"""
+        if self.shard is not None:
+            return Files(self.shard.client_count_file, self.shard.client_file)
+
+        return Files("", "")
+
+    @property
+    def message(self) -> str:
+        """Returns the error message if files cannot be found"""
+        if self.shard is not None:
+            return f"Client information could not be found for {self.shard.name}"
+
+        return ""
+
+    @property
+    def columns(self) -> t.List[str]:
+        """Returns columns for the graph dataframe"""
+        return ["timestamp", "num_clients"]
+
+    def enable_export_button(self) -> None:
+        """Create an export data button"""
+        if self.shard is not None and self.telemetry:
+            self.export_button.download_button(
+                label="Export Data",
+                data=self._get_data_file(),
+                file_name=f"{self.shard.name}-clients.csv",
+                mime="text/csv",
+                key="clients",
+            )
+        else:
+            self.export_button.empty()
+
+    def _handle_data(self, graph_delta_df: pd.DataFrame) -> None:
+        """Updates the table and graph with appropriate dataframes"""
+        try:
+            table_df = pd.read_csv(self.files.table_file)
+            self._update_table(table_df)
+        except FileNotFoundError:
+            self.table_element.info(self.message)
+        graph_df: pd.DataFrame = self.telemetry_df.copy(deep=True)
+        if graph_df.shape[0] >= self.window_size:
+            graph_df = graph_df.sample(self.window_size)
+            self.sampling = True
+            self._update_graph(graph_df)
+        else:
+            self._update_graph(graph_delta_df)
+
+    def _update_table(self, dframe: pd.DataFrame) -> None:
+        """Update client table for selected shard
+
+        :param dframe: DataFrame with client data
+        :type dframe: pandas.DataFrame
+        """
+        dframe = dframe.loc[dframe["timestamp"] == dframe["timestamp"].max()]
+        dframe = dframe.drop(columns=["timestamp"])
+        dframe = dframe.sort_values(by="client_id")
+        dframe = dframe.rename(
+            columns={
+                "client_id": "Client ID",
+                "address": "Address",
+            }
+        )
+
+        self.table_element.dataframe(dframe, use_container_width=True, hide_index=True)
+
+    def _update_graph(self, dframe: pd.DataFrame) -> None:
+        """Update client graph for selected shard
+
+        :param dframe: DataFrame with client data
+        :type dframe: pandas.DataFrame
+        """
+
+        dframe["timestamp"] = (dframe["timestamp"] - self.timestamp_min) / 1000
+
+        if self.chart is None or self.sampling:
+            chart = (
+                alt.Chart(dframe)
+                .mark_line()
+                .encode(
+                    x=alt.X("timestamp:Q", axis=alt.Axis(title="Timestep in seconds")),
+                    y=alt.Y("num_clients:Q", axis=alt.Axis(title="Client Count")),
+                    tooltip=["timestamp:Q", "num_clients:Q"],
+                )
+                .interactive()
+                .properties(
+                    height=500,
+                    title=alt.TitleParams("Total Client Count", anchor="middle"),
+                )
+            )
+
+            self.graph_element.altair_chart(chart, use_container_width=True)
+            self.chart = chart
+
+        else:
+            self.graph_element.add_rows(dframe)
+
+
+class OrchestratorSummaryView(ViewBase):
+    """View class for orchestrator summary section of the Database Telemetry page"""
+
+    def __init__(self, orchestrator: t.Optional[Orchestrator]) -> None:
+        """Initialize an OrchestratorSummaryView
+
+        :param orchestrator: Selected orchestrator
+        :type orchestrator: t.Optional[Orchestrator]
+        """
+        self.orchestrator = orchestrator
+        self.status_element = DeltaGenerator()
+
+    @property
+    def status(self) -> str:
+        """Get orchestrator status summary
+
+        :return: Status summary
+        :rtype: str
+        """
+        return get_orchestrator_status_summary(self.orchestrator)
+
+    def update(self) -> None:
+        """Update status element in OrchestratorView"""
+        self.status_element.write(self.status)
+
+
+class DatabaseTelemetryView(ViewBase):
+    """View class for the collection of Database Telemetry views"""
+
+    def __init__(
+        self,
+        orc_summary_view: OrchestratorSummaryView,
+        memory_view: MemoryView,
+        client_view: ClientView,
+    ) -> None:
+        """Initialize a TelemetryView
+
+        :param orc_summary_view: OrchestratorSummaryView rendered in the dashboard
+        :type orc_summary_view: OrchestratorSummaryView
+        :param memory_view: MemoryView rendered in the dashboard
+        :type memory_view: MemoryView
+        :param client_view: ClientView view rendered in the dashboard
+        :type client_view: ClientView
+        """
+        self.orc_summary_view = orc_summary_view
+        self.memory_view = memory_view
+        self.client_view = client_view
+
+    def update(self) -> None:
+        """Update all views within the TelemetryView"""
+        self.orc_summary_view.update()
+        self.memory_view.update()
+        self.client_view.update()

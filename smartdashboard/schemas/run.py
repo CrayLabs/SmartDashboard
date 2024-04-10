@@ -25,12 +25,21 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import typing as t
+from dataclasses import dataclass
 
 from pydantic import BaseModel
 
 from smartdashboard.schemas.application import Application
 from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.orchestrator import Orchestrator
+
+T = t.TypeVar("T")
+
+
+@dataclass(frozen=True)
+class RunContext(t.Generic[T]):
+    run_id: str
+    entity: T
 
 
 class Run(BaseModel):
@@ -40,13 +49,13 @@ class Run(BaseModel):
     ensemble: t.List[Ensemble] = []
 
     @property
-    def apps_with_ctx(self) -> t.Tuple[t.Tuple[str, Application], ...]:
-        return tuple((self.run_id, app) for app in self.model)
+    def apps_with_ctx(self) -> t.Tuple[RunContext[Application], ...]:
+        return tuple(RunContext(self.run_id, app) for app in self.model)
 
     @property
-    def orcs_with_ctx(self) -> t.Tuple[t.Tuple[str, Orchestrator], ...]:
-        return tuple((self.run_id, orc) for orc in self.orchestrator)
+    def orcs_with_ctx(self) -> t.Tuple[RunContext[Orchestrator], ...]:
+        return tuple(RunContext(self.run_id, orc) for orc in self.orchestrator)
 
     @property
-    def ensemble_with_ctx(self) -> t.Tuple[t.Tuple[str, Ensemble], ...]:
-        return tuple((self.run_id, ens) for ens in self.ensemble)
+    def ensemble_with_ctx(self) -> t.Tuple[RunContext[Ensemble], ...]:
+        return tuple(RunContext(self.run_id, ens) for ens in self.ensemble)

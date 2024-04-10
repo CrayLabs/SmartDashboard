@@ -26,18 +26,39 @@
 
 import pytest
 
-from smartdashboard.utils.ManifestReader import ManifestFileReader
-from smartdashboard.view_builders import ens_builder
-from smartdashboard.views import EnsembleView
+from smartdashboard.views import OrchestratorView
+from tests.utils.test_entities import *
 
 
 @pytest.mark.parametrize(
-    "json_file, return_type",
+    "orc, shard, status_string, out_logs, err_logs",
     [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", EnsembleView),
+        pytest.param(
+            orchestrator_1,
+            orchestrator_1.shards[0],
+            "Status: :red[Unstable] (1 shard(s) failed)",
+            model1_out_logs,
+            model1_err_logs,
+        ),
+        pytest.param(
+            orchestrator_2,
+            orchestrator_2.shards[1],
+            "Status: :red[Unstable] (1 shard(s) failed)",
+            model1_out_logs,
+            model1_err_logs,
+        ),
+        pytest.param(
+            no_shards_started,
+            no_shards_started.shards[0],
+            "Status: Unknown",
+            model0_out_logs,
+            model0_err_logs,
+        ),
     ],
 )
-def test_ens_builder(json_file, return_type):
-    manifest_file_reader = ManifestFileReader(json_file)
-    manifest = manifest_file_reader.get_manifest()
-    assert type(ens_builder(manifest)) == return_type
+def test_orc_view(orc, shard, status_string, out_logs, err_logs):
+    view = OrchestratorView(orc, shard)
+    assert view.view_model == shard
+    assert view.status == status_string
+    assert view.out_logs == out_logs
+    assert view.err_logs == err_logs
