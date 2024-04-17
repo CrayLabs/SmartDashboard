@@ -6,7 +6,7 @@ Development branch
 
 Description
 
-- Drop Python 3.8 support. (SmartDashboard-PR49_)
+- Drop Python 3.8 support, add 3.11 support. (SmartDashboard-PR49_)
 - Add Database Telemetry page. (SmartDashboard-PR38_)
 - Add Github Actions workflow that checks if changelog is edited
   on pull requests into develop. (SmartDashboard-PR47_)
