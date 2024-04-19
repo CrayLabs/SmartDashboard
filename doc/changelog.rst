@@ -6,11 +6,13 @@ Development branch
 
 Description
 
+- Drop Python 3.8 support, add 3.11 support. (SmartDashboard-PR49_)
 - Add Database Telemetry page. (SmartDashboard-PR38_)
 - Add Github Actions workflow that checks if changelog is edited
   on pull requests into develop. (SmartDashboard-PR47_)
 - Add manifest file tracking. (SmartDashboard-PR46_)
 
+.. _SmartDashboard-PR49: https://github.com/CrayLabs/SmartDashboard/pull/49
 .. _SmartDashboard-PR38: https://github.com/CrayLabs/SmartDashboard/pull/38
 .. _SmartDashboard-PR47: https://github.com/CrayLabs/SmartDashboard/pull/47
 .. _SmartDashboard-PR46: https://github.com/CrayLabs/SmartDashboard/pull/46
