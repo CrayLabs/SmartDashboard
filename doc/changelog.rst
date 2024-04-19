@@ -16,7 +16,7 @@ Description
 .. _SmartDashboard-PR46: https://github.com/CrayLabs/SmartDashboard/pull/46
 
 
-0.0.3
+0.0.4
 -----
 
 Released on 15 February 2024

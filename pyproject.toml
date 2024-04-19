@@ -32,7 +32,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smartdashboard"
-version = "0.0.3"
+version = "4"
 requires-python = ">=3.8,<3.11"
 authors = [
   {name = "CrayLabs: a Hewlett Packard Enterprise OSS Organization", email = "craylabs@hpe.com"},
@@ -53,7 +53,7 @@ dependencies = [
     "altair>=5.2.0",
     "pandas>=2.0.0",
     "pydantic>=2.5.2",
-    "streamlit>=1.28.0, <1.31.0",
+    "streamlit>=1.28.0, !=1.31.0, !=1.31.1",
     "watchdog>=3.0.0",
 ]
 
