@@ -41,6 +41,10 @@ from smartdashboard.utils.ManifestReader import ManifestFileReader, create_filer
             ManifestFileReader,
         ),
         pytest.param(
+            "tests/utils/manifest_files/0.0.3_manifest.json",
+            ManifestFileReader,
+        ),
+        pytest.param(
             "tests/utils/manifest_files/no_apps_manifest.json",
             ManifestFileReader,
         ),
