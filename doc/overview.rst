@@ -5,17 +5,37 @@ SmartDashboard
 
 ``SmartDashboard`` is an add-on to SmartSim that provides a dashboard to help users understand
 and monitor their SmartSim experiments in a visual way. Configuration, status, and logs
-are available for all launched entities within an experiment for easy inspection.
+are available for all launched entities within an experiment for easy inspection,
+along with memory and client data per shard for launched orchestrators.
 
 A ``Telemetry Monitor`` is a background process that is launched along with the experiment
-that produces the data displayed by SmartDashboard. The ``Telemetry Monitor`` can be disabled by
-adding ``export SMARTSIM_TELEMETRY_ENABLE=0`` as an environment variable. When disabled, SmartDashboard
-will not display any data. To re-enable, set the ``SMARTSIM_TELEMETRY_ENABLE`` environment variable to ``1``
-with ``export SMARTSIM_TELEMETRY_ENABLE=1``.
+that produces the data displayed by SmartDashboard. The ``Telemetry Monitor`` can be disabled globally by
+adding ``export SMARTSIM_FLAG_TELEMETRY=0`` as an environment variable. When disabled, SmartDashboard
+will not display entity status data. To re-enable, set the ``SMARTSIM_FLAG_TELEMETRY`` environment variable to ``1``
+with ``export SMARTSIM_FLAG_TELEMETRY=1``. For more fine-grained contol of experiment telemetry collection,
+adding ``Experiment.telemetry.enable()`` or ``Experiment.telemetry.disable()`` to a driver script also sets experiment level telemetry.
 
-Experiment metadata is also stored in the ``.smartsim`` directory, a hidden folder for internal api use and used by the dashboard.
+``Orchestrator`` memory and client data can be collected by enabling database telemetry. To do so, add ``Orchestrator.telemetry.enable()``
+after creating an ``Orchestrator`` within the driver script. Database telemetry is enabled per ``Orchestrator``, so if there are multiple 
+``Orchestrators`` launched, they will each need to be enabled separately in the driver script.
+
+.. code-block:: python
+  # enabling telemetry example
+
+  from smartsim import Experiment
+
+  exp = Experiment("local-db", launcher="local")
+  exp.telemetry.enable()
+
+  db = exp.create_database(port=6780, interface="lo")
+  db.telemetry.enable()
+
+  exp.start(db, block=True)
+  exp.stop(db)
+
+
+Experiment metadata is stored in the ``.smartsim`` directory, a hidden folder for internal api use and used by the dashboard.
 Deletion of the experiment folder will remove all experiment metadata.
-
 
 
 Installation
