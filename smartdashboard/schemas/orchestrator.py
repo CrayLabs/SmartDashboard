@@ -26,7 +26,7 @@
 
 import typing as t
 
-from pydantic import field_validator
+from pydantic import validator
 
 from smartdashboard.schemas.base import HasName
 from smartdashboard.schemas.shard import Shard
@@ -37,7 +37,7 @@ class Orchestrator(HasName):
     interface: t.List[str] = []
     shards: t.List[Shard] = []
 
-    @field_validator("interface", mode="before")
+    @validator("interface", pre=True)
     @classmethod
     def convert_interface(cls, value: t.Union[str, t.List[str]]) -> t.List[str]:
         if isinstance(value, str):

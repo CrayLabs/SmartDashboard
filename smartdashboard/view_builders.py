@@ -151,14 +151,14 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             column=col1,
             title="Batch Settings",
             dict_name="batch_settings",
-            entity=selected_application.model_dump() if selected_application else {},
+            entity=selected_application.dict() if selected_application else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Run Settings",
             dict_name="run_settings",
-            entity=selected_application.model_dump() if selected_application else {},
+            entity=selected_application.dict() if selected_application else {},
             df_columns=["Name", "Value"],
         )
 
@@ -169,14 +169,14 @@ def app_builder(manifest: Manifest) -> ApplicationView:
             column=col1,
             title="Parameters",
             dict_name="params",
-            entity=selected_application.model_dump() if selected_application else {},
+            entity=selected_application.dict() if selected_application else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Files",
             dict_name="files",
-            entity=selected_application.model_dump() if selected_application else {},
+            entity=selected_application.dict() if selected_application else {},
             df_columns=["Type", "File"],
         )
 
@@ -311,7 +311,7 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
     with st.expander(label="Batch Settings"):
         batch = flatten_nested_keyvalue_containers(
             "batch_settings",
-            selected_ensemble.model_dump() if selected_ensemble else {},
+            selected_ensemble.dict() if selected_ensemble else {},
         )
         render_dataframe(pd.DataFrame(batch, columns=["Name", "Value"]))
 
@@ -349,14 +349,14 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             column=col1,
             title="Batch Settings",
             dict_name="batch_settings",
-            entity=member.model_dump() if member else {},
+            entity=member.dict() if member else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Run Settings",
             dict_name="run_settings",
-            entity=member.model_dump() if member else {},
+            entity=member.dict() if member else {},
             df_columns=["Name", "Value"],
         )
 
@@ -367,14 +367,14 @@ def ens_builder(manifest: Manifest) -> EnsembleView:
             column=col1,
             title="Parameters",
             dict_name="params",
-            entity=member.model_dump() if member else {},
+            entity=member.dict() if member else {},
             df_columns=["Name", "Value"],
         )
         build_dataframe_generic(
             column=col2,
             title="Files",
             dict_name="files",
-            entity=member.model_dump() if member else {},
+            entity=member.dict() if member else {},
             df_columns=["Type", "File"],
         )
 
