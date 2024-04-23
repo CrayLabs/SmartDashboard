@@ -20,8 +20,8 @@ after creating an ``Orchestrator`` within the driver script. Database telemetry 
 ``Orchestrators`` launched, they will each need to be enabled separately in the driver script.
 
 .. code-block:: python
+  
   # enabling telemetry example
-
   from smartsim import Experiment
 
   exp = Experiment("local-db", launcher="local")
