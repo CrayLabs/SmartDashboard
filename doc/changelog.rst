@@ -6,6 +6,7 @@ Development branch
 
 Description
 
+- Add database telemetry documentation. (SmartDashboard-PR52_)
 - Bump version to 0.0.4, exclude streamlit version 1.31.X (SmartDashboard-PR50_)
 - Drop Python 3.8 support, add 3.11 support. (SmartDashboard-PR49_)
 - Add Database Telemetry page. (SmartDashboard-PR38_)
@@ -13,6 +14,7 @@ Description
   on pull requests into develop. (SmartDashboard-PR47_)
 - Add manifest file tracking. (SmartDashboard-PR46_)
 
+.. _SmartDashboard-PR52: https://github.com/CrayLabs/SmartDashboard/pull/52
 .. _SmartDashboard-PR50: https://github.com/CrayLabs/SmartDashboard/pull/50
 .. _SmartDashboard-PR49: https://github.com/CrayLabs/SmartDashboard/pull/49
 .. _SmartDashboard-PR38: https://github.com/CrayLabs/SmartDashboard/pull/38
