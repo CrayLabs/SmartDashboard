@@ -36,12 +36,12 @@ from ..utils.test_entities import *
     [
         pytest.param(
             "batch_settings",
-            application_1.model_dump(),
+            application_1.dict(),
             [("batch_cmd", "command"), ("arg1", "string1"), ("arg2", "None")],
         ),
         pytest.param(
             "run_settings",
-            application_1.model_dump(),
+            application_1.dict(),
             [
                 ("exe", "echo"),
                 ("run_command", "srun"),
@@ -49,10 +49,10 @@ from ..utils.test_entities import *
                 ("arg2", "None"),
             ],
         ),
-        pytest.param("params", ensemble_1.models[0].model_dump(), [("string", "Any")]),
+        pytest.param("params", ensemble_1.models[0].dict(), [("string", "Any")]),
         pytest.param(
             "files",
-            application_2.model_dump(),
+            application_2.dict(),
             [
                 ("Symlink", "file1"),
                 ("Symlink", "file2"),
@@ -73,7 +73,7 @@ from ..utils.test_entities import *
                 ("debug", "False"),
             ],
         ),
-        pytest.param("doesnt_exist", ensemble_1.models[0].model_dump(), []),
+        pytest.param("doesnt_exist", ensemble_1.models[0].dict(), []),
         pytest.param("batch_settings", None, []),
     ],
 )
