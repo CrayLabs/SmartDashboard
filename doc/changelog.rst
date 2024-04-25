@@ -6,6 +6,8 @@ Development branch
 
 Description
 
+
+- Auto-post release PR to develop from master
 - Decrease the pinned version of Pydantic (SmartDashboard-PR51_) 
 - Bump version to 0.0.4, exclude streamlit version 1.31.X (SmartDashboard-PR50_)
 - Drop Python 3.8 support, add 3.11 support. (SmartDashboard-PR49_)
