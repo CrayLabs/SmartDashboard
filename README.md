@@ -6,8 +6,8 @@ A ``Telemetry Monitor`` is a background process that is launched alongside the e
 It is responsible for generating the data displayed by SmartDashboard. The ``Telemetry Monitor`` can be disabled globally by
 adding ``export SMARTSIM_FLAG_TELEMETRY=0`` as an environment variable. When disabled, SmartDashboard
 will not display entity status data. To re-enable, set the ``SMARTSIM_FLAG_TELEMETRY`` environment variable to ``1``
-with ``export SMARTSIM_FLAG_TELEMETRY=1``. For more fine-grained control of experiment telemetry collection,
-adding ``Experiment.telemetry.enable`` or ``Experiment.telemetry.disable`` to a driver script also sets experiment level telemetry.
+with ``export SMARTSIM_FLAG_TELEMETRY=1``. For workflows involving multiple experiments, SmartSim provides the attributes
+``Experiment.telemetry.enable`` and ``Experiment.telemetry.disable`` to manage the enabling or disabling of telemetry on a per-experiment basis.
 
 `Orchestrator` memory and client data can be collected by enabling database telemetry. To do so, add ``Orchestrator.telemetry.enable``
 after creating an `Orchestrator` within the driver script. Database telemetry is enabled per `Orchestrator`, so if there are multiple
