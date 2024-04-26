@@ -6,6 +6,8 @@ Description
 
 -   Automate the creation of release notes
     ([SmartDashboard-PR54](https://github.com/CrayLabs/SmartDashboard/pull/54))
+-   Auto-post release PR to develop from master
+    ([SmartDashboard-PR53](https://github.com/CrayLabs/SmartDashboard/pull/53))
 -   Decrease the pinned version of Pydantic
     ([SmartDashboard-PR51](https://github.com/CrayLabs/SmartDashboard/pull/51))
 -   Bump version to 0.0.4, exclude streamlit version 1.31.X
