@@ -6,7 +6,7 @@ Development branch
 
 Description
 
-
+- Add database telemetry documentation. (SmartDashboard-PR52_)
 - Auto-post release PR to develop from master (SmartDashboard-PR53_)
 - Decrease the pinned version of Pydantic (SmartDashboard-PR51_)
 - Bump version to 0.0.4, exclude streamlit version 1.31.X (SmartDashboard-PR50_)
@@ -16,6 +16,7 @@ Description
   on pull requests into develop. (SmartDashboard-PR47_)
 - Add manifest file tracking. (SmartDashboard-PR46_)
 
+.. _SmartDashboard-PR52: https://github.com/CrayLabs/SmartDashboard/pull/52
 .. _SmartDashboard-PR53: https://github.com/CrayLabs/SmartDashboard/pull/53
 .. _SmartDashboard-PR51: https://github.com/CrayLabs/SmartDashboard/pull/51
 .. _SmartDashboard-PR50: https://github.com/CrayLabs/SmartDashboard/pull/50
