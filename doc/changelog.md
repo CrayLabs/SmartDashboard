@@ -1,6 +1,6 @@
 # Changelog
 
-## Development branch
+### Development branch
 
 Description
 
@@ -24,7 +24,7 @@ Description
 -   Add manifest file tracking.
     ([SmartDashboard-PR46](https://github.com/CrayLabs/SmartDashboard/pull/46))
 
-## 0.0.3
+### 0.0.3
 
 Released on 15 February 2024
 
@@ -35,7 +35,7 @@ Description
 -   Added experiment level logs to the dashboard.
     ([SmartDashboard-PR37](https://github.com/CrayLabs/SmartDashboard/pull/37))
 
-## 0.0.2
+### 0.0.2
 
 Released on 14 December 2023
 
