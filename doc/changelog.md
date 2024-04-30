@@ -4,6 +4,8 @@
 
 Description
 
+-   Fix header styling issue
+    ([SmartDashboard-PR55](https://github.com/CrayLabs/SmartDashboard/pull/55))
 -   Automate the creation of release notes
     ([SmartDashboard-PR54](https://github.com/CrayLabs/SmartDashboard/pull/54))
 -   Add database telemetry documentation.
