@@ -1,6 +1,8 @@
 # Changelog
 
-### Development branch
+### 0.0.4
+
+Released on 14 May 2024
 
 Description
 
