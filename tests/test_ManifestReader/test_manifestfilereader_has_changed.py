@@ -24,20 +24,35 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import pathlib
+
 import pytest
 
-from smartdashboard.utils.ManifestReader import ManifestFileReader
-from smartdashboard.view_builders import ens_builder
-from smartdashboard.views import EnsembleView
+from smartdashboard.utils.ManifestReader import create_filereader
 
 
 @pytest.mark.parametrize(
-    "json_file, return_type",
+    "json_file, touch",
     [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", EnsembleView),
+        pytest.param(
+            pathlib.Path("tests/utils/manifest_files/manifesttest.json"),
+            True,
+            id="ensure change seen",
+        ),
+        pytest.param(
+            pathlib.Path("tests/utils/manifest_files/no_orchestrator_manifest.json"),
+            False,
+            id="ensure change not seen",
+        ),
     ],
 )
-def test_ens_builder(json_file, return_type):
-    manifest_file_reader = ManifestFileReader(json_file)
-    manifest = manifest_file_reader.get_manifest()
-    assert type(ens_builder(manifest)) == return_type
+def test_has_changed(json_file, touch):
+    manifest_reader = create_filereader(json_file)
+
+    assert manifest_reader.has_changed == False
+
+    if touch:
+        json_file.touch()
+        assert manifest_reader.has_changed == True
+    else:
+        assert manifest_reader.has_changed == False

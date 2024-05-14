@@ -27,17 +27,31 @@
 import pytest
 
 from smartdashboard.utils.ManifestReader import ManifestFileReader
-from smartdashboard.view_builders import orc_builder
-from smartdashboard.views import OrchestratorView
+from smartdashboard.views import ExperimentView
+from tests.utils.test_entities import model0_err_logs, model0_out_logs
 
 
 @pytest.mark.parametrize(
-    "json_file, return_type",
+    "json_file, status_string, out_logs, err_logs",
     [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", OrchestratorView),
+        pytest.param(
+            "tests/utils/manifest_files/manifesttest.json",
+            "Status: :green[Running]",
+            model0_out_logs,
+            model0_err_logs,
+        ),
+        pytest.param(
+            "tests/utils/manifest_files/no_running.json",
+            "Status: Inactive",
+            model0_out_logs,
+            model0_err_logs,
+        ),
     ],
 )
-def test_orc_builder(json_file, return_type):
+def test_exp_view(json_file, status_string, out_logs, err_logs):
     manifest_file_reader = ManifestFileReader(json_file)
     manifest = manifest_file_reader.get_manifest()
-    assert type(orc_builder(manifest)) == return_type
+    view = ExperimentView(experiment=manifest.experiment, runs=manifest.runs)
+    assert view.status == status_string
+    assert view.out_logs == out_logs
+    assert view.err_logs == err_logs

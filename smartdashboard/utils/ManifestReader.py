@@ -27,6 +27,8 @@
 import io
 import itertools
 import json
+import os
+import pathlib
 import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -38,7 +40,7 @@ from smartdashboard.schemas.application import Application
 from smartdashboard.schemas.ensemble import Ensemble
 from smartdashboard.schemas.experiment import Experiment
 from smartdashboard.schemas.orchestrator import Orchestrator
-from smartdashboard.schemas.run import Run
+from smartdashboard.schemas.run import Run, RunContext
 from smartdashboard.utils.errors import (
     MalformedManifestError,
     ManifestError,
@@ -60,15 +62,15 @@ class Manifest:
     runs: List[Run]
 
     @property
-    def apps_with_run_ctx(self) -> t.Iterable[t.Tuple[str, Application]]:
+    def apps_with_run_ctx(self) -> t.Iterable[RunContext[Application]]:
         return itertools.chain.from_iterable(run.apps_with_ctx for run in self.runs)
 
     @property
-    def orcs_with_run_ctx(self) -> t.Iterable[t.Tuple[str, Orchestrator]]:
+    def orcs_with_run_ctx(self) -> t.Iterable[RunContext[Orchestrator]]:
         return itertools.chain.from_iterable(run.orcs_with_ctx for run in self.runs)
 
     @property
-    def ensemble_with_run_ctx(self) -> t.Iterable[t.Tuple[str, Ensemble]]:
+    def ensemble_with_run_ctx(self) -> t.Iterable[RunContext[Ensemble]]:
         return itertools.chain.from_iterable(run.ensemble_with_ctx for run in self.runs)
 
 
@@ -83,32 +85,42 @@ class ManifestReader(ABC):
 class ManifestFileReader(ManifestReader):
     """ManifestReader class for file-based manifests"""
 
-    def __init__(self, file_path: str) -> None:
+    def __init__(self, file_path: pathlib.Path) -> None:
         """Initialize a ManifestFileReader
 
         :param file_path: Path to the manifest file
-        :type file_path: str
+        :type file_path: pathlib.Path
         """
         self._file_path = file_path
+        self._last_modified = os.path.getmtime(self._file_path)
         self._data = self.from_file(self._file_path)
 
         try:
             version = self._data["schema info"]["version"]
         except KeyError as key:
             raise MalformedManifestError(
-                "Version data is malformed.", file=self._file_path, exception=key
+                "Version data is malformed.", file=str(self._file_path), exception=key
             ) from key
 
-        if version not in ("0.0.2", "0.0.3"):
+        if version not in ("0.0.2", "0.0.3", "0.0.4"):
             version_exception = Exception(
-                "SmartDashboard version 0.0.3 is unable to parse manifest "
+                "SmartDashboard version 0.0.4 is unable to parse manifest "
                 f"file at version {version}."
             )
             raise VersionIncompatibilityError(
                 title="Invalid Version Number",
-                file=file_path,
+                file=str(file_path),
                 exception=version_exception,
             )
+
+    @property
+    def has_changed(self) -> bool:
+        """Check if the manifest file has been modified
+
+        :return: If the file has been modified
+        :rtype: bool
+        """
+        return self._last_modified != os.path.getmtime(self._file_path)
 
     def get_manifest(self) -> Manifest:
         """Get the Manifest from self._data
@@ -116,22 +128,29 @@ class ManifestFileReader(ManifestReader):
         :return: Manifest
         :rtype: Manifest
         """
-        experiment = Experiment(**self._data.get("experiment", {}))
-        runs_data = self._data.get("runs", [])
+        try:
+            experiment = Experiment(**self._data.get("experiment", {}))
+            runs_data = self._data.get("runs", [])
 
-        runs = [Run(**run_data) for run_data in runs_data]
+            runs = [Run(**run_data) for run_data in runs_data]
 
-        return Manifest(
-            experiment=experiment,
-            runs=runs,
-        )
+            return Manifest(
+                experiment=experiment,
+                runs=runs,
+            )
+        except ValidationError as val:
+            raise MalformedManifestError(
+                title="Manifest file is malformed.",
+                file=str(self._file_path),
+                exception=val,
+            ) from val
 
     @classmethod
-    def from_file(cls, file_path: str) -> Dict[str, Any]:
+    def from_file(cls, file_path: pathlib.Path) -> Dict[str, Any]:
         """Initialize self._data
 
         :param file_path: File path of the manifest
-        :type file_path: str
+        :type file_path: pathlib.Path
         :return: self._data
         :rtype: Dict[str, Any]
         """
@@ -151,8 +170,8 @@ class ManifestFileReader(ManifestReader):
         return data
 
 
-def load_manifest(path: str) -> Manifest:
-    """Instantiate and call get_manifest
+def create_filereader(path: pathlib.Path) -> ManifestFileReader:
+    """Instantiate ManifestFileReader
 
     This is where we're checking for any errors
     that could occur when creating a manifest
@@ -160,22 +179,34 @@ def load_manifest(path: str) -> Manifest:
 
     :param path: Path to the manifest file
     :type path: str
-    :return: Manifest
-    :rtype: Optional[Manifest]
+    :return: ManifestFileReader
+    :rtype: ManifestFileReader
     """
     try:
         manifest_file_reader = ManifestFileReader(path)
-        manifest = manifest_file_reader.get_manifest()
     except FileNotFoundError as fnf:
         raise ManifestError(
-            title="Manifest file does not exist.", file=path, exception=fnf
+            title="Manifest file does not exist.", file=str(path), exception=fnf
         ) from fnf
     except json.decoder.JSONDecodeError as jde:
         raise ManifestError(
-            title="Manifest file could not be decoded.", file=path, exception=jde
+            title="Manifest file could not be decoded.", file=str(path), exception=jde
         ) from jde
-    except ValidationError as val:
-        raise MalformedManifestError(
-            title="Manifest file is malformed.", file=path, exception=val
-        ) from val
-    return manifest
+    return manifest_file_reader
+
+
+def get_manifest_path(directory: t.Optional[pathlib.Path]) -> pathlib.Path:
+    """Get the manifest path using the directory
+    path passed in from the command line arguments.
+
+    :param directory: An experiment directory
+    :type directory: t.Optional[pathlib.Path]
+    :return: Manifest path
+    :rtype: pathlib.Path
+    """
+
+    if directory is not None:
+        manifest_path = directory / ".smartsim/telemetry/manifest.json"
+    else:
+        manifest_path = pathlib.Path() / ".smartsim/telemetry/manifest.json"
+    return manifest_path.resolve()

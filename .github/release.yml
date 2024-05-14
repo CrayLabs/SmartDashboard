@@ -1,3 +1,4 @@
+#
 # BSD 2-Clause License
 #
 # Copyright (c) 2021-2024, Hewlett Packard Enterprise
@@ -23,21 +24,33 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
-import pytest
-
-from smartdashboard.utils.ManifestReader import ManifestFileReader
-from smartdashboard.view_builders import app_builder
-from smartdashboard.views import ApplicationView
-
-
-@pytest.mark.parametrize(
-    "json_file, return_type",
-    [
-        pytest.param("tests/utils/manifest_files/manifesttest.json", ApplicationView),
-    ],
-)
-def test_app_builder(json_file, return_type):
-    manifest_file_reader = ManifestFileReader(json_file)
-    manifest = manifest_file_reader.get_manifest()
-    assert type(app_builder(manifest)) == return_type
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: Features
+      labels:
+        - 'type: feature'
+      exclude:
+        labels:
+          - non-user-facing
+    - title: Bug Fixes
+      labels:
+        - 'bug: critical'
+        - 'bug: major'
+        - 'bug: minor'
+      exclude:
+        labels:
+          - non-user-facing
+    - title: API Breaks
+      labels:
+        - 'API break'
+      exclude:
+        labels:
+          - non-user-facing
+    - title: Miscellaneous Improvements
+      labels:
+        - "*"

@@ -62,7 +62,7 @@ jobs:
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.8'
+          python-version: '3.9'
 
       - name: Install build
         run: |
@@ -90,7 +90,7 @@ jobs:
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.8'
+          python-version: '3.9'
 
       - name: Install build
         run: |
@@ -120,3 +120,16 @@ jobs:
           # user: __token__
           password: ${{ secrets.PYPI }}
           #repository_url: https://test.pypi.org/legacy/
+
+
+  createPullRequest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create pull request
+        run: |
+          gh pr create -B develop -H master --title 'Merge master into develop' --body 'This PR brings develop up to date with master for release.'
+        env:
+            GH_TOKEN: ${{ github.token }}

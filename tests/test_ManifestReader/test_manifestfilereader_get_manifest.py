@@ -28,7 +28,7 @@ import pytest
 from pydantic import ValidationError
 
 from smartdashboard.utils.errors import MalformedManifestError
-from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
+from smartdashboard.utils.ManifestReader import Manifest, create_filereader
 
 
 @pytest.mark.parametrize(
@@ -36,14 +36,6 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
     [
         pytest.param(
             "tests/utils/manifest_files/manifesttest.json", 2, 4, 3, 3, Manifest
-        ),
-        pytest.param(
-            "tests/utils/manifest_files/no_experiment_manifest.json",
-            0,
-            0,
-            0,
-            0,
-            MalformedManifestError,
         ),
         pytest.param(
             "tests/utils/manifest_files/no_apps_manifest.json",
@@ -77,19 +69,42 @@ from smartdashboard.utils.ManifestReader import Manifest, ManifestFileReader
             3,
             Manifest,
         ),
+        pytest.param(
+            "tests/utils/manifest_files/0.0.3_manifest.json",
+            1,
+            2,
+            1,
+            1,
+            Manifest,
+        ),
     ],
 )
 def test_get_manifest(
     json_file, runs_length, app_length, orc_length, ens_length, return_type
 ):
-    try:
-        manifest_file_reader = ManifestFileReader(json_file)
-        manifest = manifest_file_reader.get_manifest()
-    except ValidationError as v:
-        assert return_type == MalformedManifestError
-        return
+    manifest_file_reader = create_filereader(json_file)
+    manifest = manifest_file_reader.get_manifest()
     assert len(list(manifest.runs)) == runs_length
     assert len(list(manifest.apps_with_run_ctx)) == app_length
     assert len(list(manifest.orcs_with_run_ctx)) == orc_length
     assert len(list(manifest.ensemble_with_run_ctx)) == ens_length
     assert type(manifest) == return_type
+
+
+@pytest.mark.parametrize(
+    "json_file, return_type",
+    [
+        pytest.param(
+            "tests/utils/manifest_files/no_experiment_manifest.json",
+            MalformedManifestError,
+        ),
+        pytest.param(
+            "tests/utils/manifest_files/malformed_apps.json",
+            MalformedManifestError,
+        ),
+    ],
+)
+def test_get_manifest_malformed(json_file, return_type):
+    manifest_file_reader = create_filereader(json_file)
+    with pytest.raises(return_type):
+        manifest_file_reader.get_manifest()

@@ -1,7 +1,7 @@
 {
     "schema info": {
         "schema_name": "entity manifest",
-        "version": "0.0.3"
+        "version": "0.0.4"
     },
     "experiment": {
         "name": "my-experiment",
@@ -34,7 +34,10 @@
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": "111"
-                            }
+                            },
+                            "client_file": "tests/utils/clients/client.csv",
+                            "client_count_file":"tests/utils/clients/client_counts.csv",
+                            "memory_file": "tests/utils/memory/memory.csv"
                         },
                         {
                             "name": "shard 2",
@@ -47,7 +50,10 @@
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": "111"
-                            }
+                            },
+                            "client_file": "tests/utils/clients/client.csv",
+                            "client_count_file":"tests/utils/clients/client_counts.csv",
+                            "memory_file": "tests/utils/memory/memory.csv"
                         }
                     ]
                 }
@@ -175,7 +181,10 @@
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": "111"
-                            }
+                            },
+                            "client_file": "tests/utils/clients/client.csv",
+                            "client_count_file":"tests/utils/clients/client_counts.csv",
+                            "memory_file": "tests/utils/memory/memory.csv"
                         },
                         {
                             "name": "orc 2 shard 2",
@@ -188,7 +197,10 @@
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": "111"
-                            }
+                            },
+                            "client_file": "tests/utils/clients/client.csv",
+                            "client_count_file":"tests/utils/clients/client_counts.csv",
+                            "memory_file": "tests/utils/memory/memory.csv"
                         }
                     ]
                 },
@@ -208,7 +220,10 @@
                                 "status_dir": "tests/utils/status_files/model_3",
                                 "job_id": "111",
                                 "step_id": "111"
-                            }
+                            },
+                            "client_file": "tests/utils/clients/client.csv",
+                            "client_count_file":"tests/utils/clients/client_counts.csv",
+                            "memory_file": "tests/utils/memory/memory.csv"
                         }
                     ]
                 }

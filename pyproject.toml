@@ -32,8 +32,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smartdashboard"
-version = "0.0.3"
-requires-python = ">=3.8,<3.11"
+version = "0.0.4"
+requires-python = ">=3.9,<3.12"
 authors = [
   {name = "CrayLabs: a Hewlett Packard Enterprise OSS Organization", email = "craylabs@hpe.com"},
 ]
@@ -41,18 +41,19 @@ description = "Visualize SmartSim Experiments"
 license = { text = "BSD 2-Clause License" }
 keywords = ["scientific", "ai", "workflow", "hpc", "analysis"]
 classifiers = [
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: BSD License",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering",
 ]
 readme = "README.md"
 dependencies = [
+    "altair>=5.2.0",
     "pandas>=2.0.0",
-    "pydantic>=2.5.2",
-    "streamlit>=1.28.0",
+    "pydantic>=1.10.14, <2", # this is pinned to keep consistency with SmartSim
+    "streamlit>=1.28.0, !=1.31.0, !=1.31.1",
     "watchdog>=3.0.0",
 ]
 
@@ -104,7 +105,7 @@ tests = ["tests"]
 
 [tool.black]
 line-length = 88
-target-version = ['py38', 'py39', 'py310']
+target-version = ['py39', 'py310', 'py311']
 exclude = '''
 (
   | \.egg
@@ -169,10 +170,3 @@ warn_unused_ignores = true
 warn_redundant_casts = true
 warn_unused_configs = true
 show_error_codes = true
-
-
-[[tool.mypy.overrides]]
-# Ignore packages that are not used or not typed
-module = []
-ignore_missing_imports = true
-ignore_errors = true

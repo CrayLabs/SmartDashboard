@@ -24,31 +24,47 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import typing as t
+import pytest
 
-from pydantic import validator
-
-from smartdashboard.schemas.base import HasName
-from smartdashboard.schemas.shard import Shard
+from smartdashboard.views import EnsembleView
+from tests.utils.test_entities import *
 
 
-class Orchestrator(HasName):
-    type: str
-    interface: t.List[str] = []
-    shards: t.List[Shard] = []
-
-    @validator("interface", pre=True)
-    @classmethod
-    def convert_interface(cls, value: t.Union[str, t.List[str]]) -> t.List[str]:
-        if isinstance(value, str):
-            return [value]
-
-        return value
-
-    @property
-    def ports(self) -> t.Sequence[int]:
-        return tuple({shard.port for shard in self.shards})
-
-    @property
-    def db_hosts(self) -> t.Sequence[str]:
-        return tuple(sorted({shard.hostname for shard in self.shards}))
+@pytest.mark.parametrize(
+    "ensemble, member, status_string, member_status_string, out_logs, err_logs",
+    [
+        pytest.param(
+            ensemble_1,
+            ensemble_1.models[0],
+            "Status: 0 Running, 1 Completed, 0 Failed, 0 Unknown, 0 Malformed",
+            "Status: :green[Completed]",
+            model0_out_logs,
+            model0_err_logs,
+        ),
+        pytest.param(
+            ensemble_2,
+            None,
+            "Status: 0 Running, 0 Completed, 0 Failed, 0 Unknown, 0 Malformed",
+            "Status: ",
+            "",
+            "",
+        ),
+        pytest.param(
+            ensemble_4,
+            ensemble_4.models[0],
+            "Status: 0 Running, 0 Completed, 2 Failed, 0 Unknown, 0 Malformed",
+            "Status: :red[Failed]",
+            model0_out_logs,
+            model0_err_logs,
+        ),
+    ],
+)
+def test_ensemble_view(
+    ensemble, member, status_string, member_status_string, out_logs, err_logs
+):
+    view = EnsembleView(ensemble, member)
+    assert view.view_model == member
+    assert view.member_status == member_status_string
+    assert view.status == status_string
+    assert view.out_logs == out_logs
+    assert view.err_logs == err_logs

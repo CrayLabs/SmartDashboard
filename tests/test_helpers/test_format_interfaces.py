@@ -24,31 +24,20 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import typing as t
+import pytest
 
-from pydantic import validator
-
-from smartdashboard.schemas.base import HasName
-from smartdashboard.schemas.shard import Shard
+from smartdashboard.utils.helpers import format_interfaces
+from tests.utils.test_entities import *
 
 
-class Orchestrator(HasName):
-    type: str
-    interface: t.List[str] = []
-    shards: t.List[Shard] = []
-
-    @validator("interface", pre=True)
-    @classmethod
-    def convert_interface(cls, value: t.Union[str, t.List[str]]) -> t.List[str]:
-        if isinstance(value, str):
-            return [value]
-
-        return value
-
-    @property
-    def ports(self) -> t.Sequence[int]:
-        return tuple({shard.port for shard in self.shards})
-
-    @property
-    def db_hosts(self) -> t.Sequence[str]:
-        return tuple(sorted({shard.hostname for shard in self.shards}))
+@pytest.mark.parametrize(
+    "entity, expected_value",
+    [
+        pytest.param(orchestrator_1, "lo, lo2"),
+        pytest.param(orchestrator_2, "lo"),
+        pytest.param(orchestrator_3, "lo"),
+    ],
+)
+def test_format_interfaces(entity: Orchestrator, expected_value):
+    val = format_interfaces(entity)
+    assert val == expected_value

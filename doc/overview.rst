@@ -5,17 +5,38 @@ SmartDashboard
 
 ``SmartDashboard`` is an add-on to SmartSim that provides a dashboard to help users understand
 and monitor their SmartSim experiments in a visual way. Configuration, status, and logs
-are available for all launched entities within an experiment for easy inspection.
+are available for all launched entities within an experiment for easy inspection,
+along with memory and client data per shard for launched orchestrators.
 
-A ``Telemetry Monitor`` is a background process that is launched along with the experiment
-that produces the data displayed by SmartDashboard. The ``Telemetry Monitor`` can be disabled by
-adding ``export SMARTSIM_TELEMETRY_ENABLE=0`` as an environment variable. When disabled, SmartDashboard
-will not display any data. To re-enable, set the ``SMARTSIM_TELEMETRY_ENABLE`` environment variable to ``1``
-with ``export SMARTSIM_TELEMETRY_ENABLE=1``.
+A ``Telemetry Monitor`` is a background process that is launched alongside the experiment.
+It is responsible for generating the data displayed by SmartDashboard. The ``Telemetry Monitor`` can be disabled globally by
+adding ``export SMARTSIM_FLAG_TELEMETRY=0`` as an environment variable. When disabled, SmartDashboard
+will not display entity status data. To re-enable, set the ``SMARTSIM_FLAG_TELEMETRY`` environment variable to ``1``
+with ``export SMARTSIM_FLAG_TELEMETRY=1``. For workflows involving multiple experiments, SmartSim provides the attributes
+``Experiment.telemetry.enable`` and ``Experiment.telemetry.disable`` to manage the enabling or disabling of telemetry on a per-experiment basis.
 
-Experiment metadata is also stored in the ``.smartsim`` directory, a hidden folder for internal api use and used by the dashboard.
-Deletion of the experiment folder will remove all experiment metadata.
+``Orchestrator`` memory and client data can be collected by enabling database telemetry. To do so, add ``Orchestrator.telemetry.enable``
+after creating an ``Orchestrator`` within the driver script. Database telemetry is enabled per ``Orchestrator``, so if there are multiple 
+``Orchestrators`` launched, they will each need to be enabled separately in the driver script.
 
+.. code-block:: python
+  
+  # enabling telemetry example
+  from smartsim import Experiment
+
+  exp = Experiment("experiment", launcher="auto")
+  exp.telemetry.enable()
+
+  db = exp.create_database(db_nodes=3)
+  db.telemetry.enable()
+
+  exp.start(db, block=True)
+  exp.stop(db)
+
+
+Experiment metadata is stored in the ``.smartsim`` directory, a hidden folder used by the internal api and accessed by the dashboard.
+This folder can be found within the created experiment directory.
+Deletion of the experiment folder will remove all associated metadata.
 
 
 Installation
@@ -135,4 +156,9 @@ configuration and status information, as well as logs per shard for a selected o
 Finally, in the ``Ensembles`` section, select an ensemble to see its status and configuration. 
 Then select any of its members to see its status, configuration, and logs.  
   
+``Database Telemetry:`` This tab provides additional details about ``Orchestrators``.
+The ``Orchestrator Summary`` section shows configuration and status information. The ``Memory``
+section provides memory usage data per shard within the ``Orchestrator``. The ``Clients``
+section displays client data per shard within the ``Orchestrator``.
+
 ``Help:`` This tab links to SmartSim documentation and provides a SmartSim contact for support.
