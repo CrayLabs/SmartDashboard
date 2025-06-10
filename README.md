@@ -1,3 +1,6 @@
+> [!CAUTION]
+> The SmartDashboard project has been discontinued and this repository is no longer maintained by the SmartSim team.
+
 # SmartDashboard
 
 SmartDashboard is an add-on to SmartSim that provides a dashboard to help users understand and monitor their SmartSim experiments in a visual way. Configuration, status, and logs are available for all launched entities within an experiment for easy inspection, along with memory and client data per shard for launched orchestrators.
